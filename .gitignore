@@ -3,3 +3,4 @@
 runserver.sh
 build/
 dist/
+*.db
