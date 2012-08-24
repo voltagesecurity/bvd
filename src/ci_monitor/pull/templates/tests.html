@@ -1,0 +1,16 @@
+{%extends "base.html"%}
+{%block header_tag%}
+<script src="{{STATIC_URL}}js/qunit.js"></script>
+<script src="{{STATIC_URL}}js/tests/test_pull.js"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}/css/qunit.css">
+<style>
+body {
+	background: #FFFFFF;
+}
+</style>
+{%endblock%}
+{%block content%}
+	<div id="qunit"></div>
+	<div id="qunit-fixture">
+
+{%endblock%}

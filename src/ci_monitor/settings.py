@@ -11,8 +11,8 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': './db/ci_monitor.db',                      # Or path to database file if using sqlite3.
+        'ENGINE': '', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '',                      # Or path to database file if using sqlite3.
         'USER': '',                      # Not used with sqlite3.
         'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
@@ -115,10 +115,9 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    # Uncomment the next line to enable the admin:
-    # 'django.contrib.admin',
-    # Uncomment the next line to enable admin documentation:
-    # 'django.contrib.admindocs',
+	'fixture_generator',
+	'ci_monitor.pull',
+	
 )
 
 # A sample logging configuration. The only tangible logging
@@ -143,3 +142,20 @@ LOGGING = {
         },
     }
 }
+
+import os
+PROJECT_ROOT = os.getcwd()
+
+
+AD_DNS_NAME='your-ldap-server.com'
+# If using SSL use these:
+AD_LDAP_PORT=636
+AD_LDAP_URL='ldaps://%s:%s' % (AD_DNS_NAME,AD_LDAP_PORT)
+AD_SEARCH_DN='dc=mygroup,dc=net,dc=com'
+AD_NT4_DOMAIN='YOURDOMAIN'
+AD_SEARCH_FIELDS= ['mail','givenName','sn','sAMAccountName','memberOf']
+AD_MEMBERSHIP_REQ=['Group_Required','Alternative_Group']
+AD_CERT_FILE='/path/to/your/cert.txt'
+AUTHENTICATION_BACKENDS = ('ci_monitor.accounts.backends.ActiveDirectoryGroupMembershipSSLBackend','django.contrib.auth.backends.ModelBackend')
+AD_DEBUG=True
+AD_DEBUG_FILE='/path/to/writable/log/file/ldap.debug'
