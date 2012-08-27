@@ -16,9 +16,13 @@ def install_requirements(*args,**kwargs):
 	if kwargs.get('remote'):
 		api.run('%(install)s' % dict(install=install))
 	else:
-		#create virtual env
-		mkvirtualenv = '%s %s' % (wrapper,'mkvirtualenv %s' % app_name)
-		workon = '%s %s' % (wrapper,'workon %s' % app_name)
+		#check if user
+		
+		
+		#TODO: provide arguments: whether a user wants to use a virtualenv
+		#mkvirtualenv = '%s %s' % (wrapper,'mkvirtualenv %s' % app_name)
+		#workon = '%s %s' % (wrapper,'workon %s' % app_name)
+		
 		install = '%s -e %s' % (install, os.getcwd())
 		
 		cmd = '%s ; %s ; %s' % (mkvirtualenv, workon, install)
