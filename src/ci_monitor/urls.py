@@ -8,9 +8,9 @@ from django.views.generic.simple import direct_to_template
 urlpatterns = patterns('',
     
     url(r'^$', include('ci_monitor.pull.urls')),
-	url(r'^listener/$', include('ci_monitor.listener.urls')),
+	#url(r'^listener/$', include('ci_monitor.listener.urls')),
 	url(r'^js_tests$', direct_to_template, {'template': 'tests.html'}),
-	url(r'^poll/$','pull.views.poll_jenkins_servers',name='view_poll'),
+	url(r'^pull/', include('ci_monitor.pull.urls')),
 	
     # url(r'^ci_monitor/', include('ci_monitor.foo.urls')),
 

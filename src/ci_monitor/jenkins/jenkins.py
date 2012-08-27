@@ -161,11 +161,11 @@ class PollCI(object):
 				
 			entries = self.filter_entries(entries,ns)
 			for entry in entries:
-				if not entry: continue
+				if entry is None: continue
 				
 				job_link = self.get_job_link(entry,ns)
 				
-				if not job_link: continue
+				if job_link is None: continue
 				
 				json = self.get_job_last_build_status(job_link)
 				if json is None: continue

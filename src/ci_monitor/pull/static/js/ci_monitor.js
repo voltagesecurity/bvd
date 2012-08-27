@@ -24,7 +24,7 @@ var Poll = function(url) {
 }
 
 $(function(){
-	var poll = new Poll('/poll');
+	var poll = new Poll('/pull/get_jenkins_views/');
 	poll.ajax();
 	
 });

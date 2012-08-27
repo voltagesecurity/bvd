@@ -68,10 +68,10 @@ function create_or_update_widgets(json_results) {
 		$widget = widget_map[job_name] || create_widget(job_name);
 		
 		switch (json_results[i].status) {
-			case 'success':
+			case 'SUCCESS':
 				$widget.make_success();
 				break;
-			case 'failed':
+			case 'FAILURE':
 				$widget.make_failure();
 				break;
 		}
