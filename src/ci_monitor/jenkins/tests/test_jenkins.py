@@ -29,6 +29,7 @@ class JenkinsMouleTests(unittest.TestCase):
 		self.assertEqual(poll.hosts,settings.CI_INSTALLATIONS)
 		
 	def test_sort_list_of_entries(self):
+		#test the positive case: function sorts elements as expected
 		doc = et.fromstring("""
 			<feed xmlns="http://www.w3.org/2005/Atom">
 			<entry>
@@ -68,6 +69,24 @@ class JenkinsMouleTests(unittest.TestCase):
 		actual = poll.sort_entry_list(entries,ns)
 		self.assertEquals(actual,expected)
 		
+		#test case when function receives a null list to sort and a null namespace
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.sort_entry_list(None,None)
+		self.assertEqual(actual,None)
+					
+		#test case when function is given a list with 1 entry
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.sort_entry_list([entries[0]],ns) 
+		expected = [entries[0]]
+		self.assertEqual(actual,expected)
+		
+		#test case when function is not given a list, but given an xml element
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.sort_entry_list(entries[0],ns) 
+		expected = [entries[0]]
+		self.assertEqual(actual,expected)
+		
+
 	def test_filter_entry_list(self):
 		doc = et.fromstring("""
 			<feed xmlns="http://www.w3.org/2005/Atom">
@@ -116,8 +135,25 @@ class JenkinsMouleTests(unittest.TestCase):
 				actual_2 = parser.parse(elem[3].text)
 				
 		self.assertEqual(actual_1,test_1)
-		self.assertEqual(actual_2,test_2)				
+		self.assertEqual(actual_2,test_2)	
 		
+		#test case when function is given a null parameter
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.filter_entries(None,None)
+		self.assertEqual(actual,[])
+		
+		#test case when function is given an empty list
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.filter_entries(None,None)
+		self.assertEqual(actual,[])
+		
+		#test case when function is given a single xml Element as a param
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.filter_entries(entries[0],ns)
+		self.assertEqual(len(actual),1)
+		import types
+		self.assertEqual(type(actual),types.ListType)
+		self.assertEqual(actual,[entries[0]])
 		
 	def test_poll(self):
 		doc = et.fromstring("""
@@ -161,14 +197,32 @@ class JenkinsMouleTests(unittest.TestCase):
 				status = "SUCCESS"
 				),
 			dict(
-				job_name = "test1 #1",
-				status = "SUCCESS"
-				),
-			dict(
-				job_name = "test1 #1",
-				status = "SUCCESS"
-				),
+				job_name = "test1 #2",
+				status = "FAILURE"
+				)
 		]
+		
+		
+		#test case when function is given a null param
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		poll.hosts = None
+		actual = poll.poll()
+		self.assertEquals(actual,[])
+		
+		#test when function gets expected result
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.poll()
+		self.assertEqual(len(actual),len(expected))
+		
+		expected = ["FAILURE","SUCCESS","SUCCESS"]
+		actual_result = []
+		
+		for item in actual:
+			for k,v in item.iteritems():
+				if k == 'status':
+					actual_result.append(v)
+				
+		self.assertEqual(actual_result,expected)
 		
 	def test_get_job_link(self):
 		doc = et.fromstring("""
@@ -189,6 +243,13 @@ class JenkinsMouleTests(unittest.TestCase):
 		actual = poll.get_job_link(entry,ns)
 		
 		self.assertEquals(actual,expected)
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.get_job_link(entry,ns)
+		
+		#test case when function is given a null param
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.get_job_link(None,ns)
+		self.assertEqual(actual,None)
 		
 	def test_get_job_last_build_status(self):
 		expected = dict(
@@ -198,11 +259,20 @@ class JenkinsMouleTests(unittest.TestCase):
 		
 		poll = PollCI(settings.CI_INSTALLATIONS)
 		actual = poll.get_job_last_build_status('http://localhost:8080/job/test3')
-		
 		self.assertEquals(actual,expected)
 		
+		#test case when function is given a null parameter
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.get_job_last_build_status(None)
+		self.assertEquals(actual,None)
+		
+		#test case when function is given an invalid URI
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual = poll.get_job_last_build_status('localhost:8080/job/test3')
+		self.assertEquals(actual,None)	
 
 	def test_get_entries(self):
+		#test positive case: function returns 4 entry elements
 		doc = et.fromstring("""
 			<feed xmlns="http://www.w3.org/2005/Atom">
 			<entry>
@@ -238,6 +308,17 @@ class JenkinsMouleTests(unittest.TestCase):
 		expected = doc.findall('%sentry' %ns)
 		poll = PollCI(settings.CI_INSTALLATIONS)
 		for host in poll.hosts:
-			actual,ns1 = poll.get_entries(host,ns)
+			actual,ns1 = poll.get_entries(host)
 			self.assertEqual(len(actual),len(expected))
 			self.assertEqual(ns1,ns)
+			
+		#test function when given a null hostname
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual,ns1 = poll.get_entries(None)
+		self.assertEqual(len(actual),0)
+					
+		#test function when given an invalid uri for a view
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		actual,ns1 = poll.get_entries('localhost:8000/invalid/')
+		self.assertEqual(len(actual),0)	
+		
