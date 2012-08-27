@@ -6,4 +6,5 @@ urlpatterns = patterns('ci_monitor.pull.views',
     url(r'^$', 'home',name='home'),
 	
 	
+	
 )
