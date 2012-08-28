@@ -25,7 +25,8 @@ def install_requirements(*args,**kwargs):
 		
 		install = '%s -e %s' % (install, os.getcwd())
 		
-		cmd = '%s ; %s ; %s' % (mkvirtualenv, workon, install)
+		#cmd = '%s ; %s ; %s' % (mkvirtualenv, workon, install)
+		cmd = install
 		
 		out, err = subprocess.Popen(cmd,shell=True).communicate()
 		
