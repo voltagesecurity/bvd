@@ -30,28 +30,27 @@ def install_requirements(*args,**kwargs):
 		cmd = install
 		
 		out, err = subprocess.Popen(cmd,shell=True).communicate()
-	
-def kill_django_dev_server(*args,**kwargs):
-	cmd1 = 'ps aux | grep \"manage.py runserver\"'
-	cmd2 = 'awk {\'print $2\'}'
-	
-	proc1 = subprocess.Popen(cmd1,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)	
-	proc2 = subprocess.Popen(['-c', cmd2],stdin=proc1.stdout,stdout=subprocess.PIPE,stderr=subprocess.PIPE,shell=True)
-	
-	pids = [id for id in proc2.communicate()[0].split('\n')  if id.isdigit()]
-	
-	for pid in pids:
-		subprocess.call(shlex.split('kill -9 %s' % pid))
 		
 def start_django_dev_server(*args,**kwargs):
-	cmd = shlex.split('./src/ci_monitor/manage.py runserver 0.0.0.0:8000')
+	cmd = shlex.split('python /src/ci_monitor/manage.py runserver 0.0.0.0:8000')
 	
 	subprocess.Popen(cmd)
 	
 	print 'CI Monitor is running under http://localhost:8000'
 	
 def local(*args,**kwargs):
+	"""
+		Main function to be run for local development.  Function installs requirements, then starts the django dev server.
+		
+		Before running this function, check to make sure the CI_INSTALLATIONS tuple in settings.py is properly set to your CI servers
+	"""
 	install_requirements()
-	#kill_django_dev_server()
 	start_django_dev_server()
+	
+def ci_build(*args,**kwargs):
+	"""
+		Function to be run by a CI build system.  Function installs requirements, and application to $USER's home directory.
+	"""
+	install_requirements()
+	#TODO: Add Apache config and restart
 	
