@@ -37,7 +37,7 @@ function create_widget(job_name) {
 		size = size.substring(2,5);
 		
 		this.css('height',size+'px');
-		this.css('line-height',size+'px');
+		//this.css('line-height',size+'px');
 		this.css('width',size+'px');
 	}
 	
