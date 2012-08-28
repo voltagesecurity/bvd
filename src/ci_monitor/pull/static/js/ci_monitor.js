@@ -10,7 +10,7 @@ var Poll = function(url) {
 	
 	var error = function(data) { 
 		//catch-all 
-		alert('Please check jenkins URIs in settings.py');
+		alert('Please check CI System URIs in settings.py');
 	};
 	
 	this.ajax = function() {
