@@ -107,6 +107,17 @@ class PollCI(object):
 		conn.close()
 		return entries,ns
 		
+	def get_job_name_from_job_link(self,job_link):
+		
+		if job_link is None:
+			return None
+			
+		if job_link.find('/job') > -1:
+			job_link = job_link.rstrip('/')[0:job_link.rstrip('/').rfind('/')]
+			return job_link[job_link.find('/job')+5:len(job_link)]
+			
+		return None
+		
 	def get_job_link(self,entry,ns):
 		"""
 			Function to extract the href attribute of the link element in the given entry element.  The href attribute is the URI for a
@@ -134,7 +145,7 @@ class PollCI(object):
 			return None
 		
 		if 'result' in json and 'fullDisplayName' in json:
-			job_name = job_link
+			job_name = self.get_job_name_from_job_link(job_link) or json.get('fullDisplayName')
 			status   = json.get('result')
 		else:
 			return None

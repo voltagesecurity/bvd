@@ -28,6 +28,32 @@ class JenkinsMouleTests(unittest.TestCase):
 		poll = PollCI(settings.CI_INSTALLATIONS,'one','two')
 		self.assertEqual(poll.hosts,settings.CI_INSTALLATIONS)
 		
+	
+	def test_get_job_name(self):
+		
+		#test normal case, function returned expected job name
+		link = 'http://localhost:8080/job/test1/1/'
+		expected = 'test1'
+		poll = PollCI(settings.CI_INSTALLATIONS)
+		
+		actual = poll.get_job_name_from_job_link(link)
+		self.assertEqual(actual,expected)
+		
+		#test case when function gets a null parameter
+		actual = poll.get_job_name_from_job_link(None)
+		self.assertEqual(actual,None)
+		
+		#test case when function gets an empty string
+		actual = poll.get_job_name_from_job_link('')
+		self.assertEqual(actual,None)
+		
+		#test case when function gets a link without the /job part of the string
+		actual = poll.get_job_name_from_job_link('http://localhost:8080/test1/1')
+		self.assertEqual(actual,None)
+		
+		
+		
+		
 	def test_sort_list_of_entries(self):
 		#test the positive case: function sorts elements as expected
 		doc = et.fromstring("""
