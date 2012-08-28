@@ -9,7 +9,8 @@ var Poll = function(url) {
 	};
 	
 	var error = function(data) { 
-		//need to do something here
+		//catch-all 
+		alert('Please check jenkins URIs in settings.py');
 	};
 	
 	this.ajax = function() {
