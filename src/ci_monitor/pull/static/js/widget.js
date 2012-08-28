@@ -17,8 +17,7 @@ function create_widget(job_name) {
 		$widget = $('<div></div>');
 		$widget.html(job_name);
 		$widget.attr('class','widget');
-		$widget.append();
-		
+		$('#widgets').append($widget);
 	}
 	
 	base();
@@ -40,10 +39,6 @@ function create_widget(job_name) {
 		this.css('height',size+'px');
 		this.css('line-height',size+'px');
 		this.css('width',size+'px');
-	}
-	
-	$widget.append = function() {
-		$('#widgets').append(this);
 	}
 	
 	$widget.job_name = job_name;
