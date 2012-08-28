@@ -28,4 +28,10 @@ $(function(){
 	var poll = new Poll('/pull/get_jenkins_views/');
 	poll.ajax();
 	
+	var jenkins = function() {
+		poll.ajax();
+	}
+	
+	setTimeout(jenkins,'60000');
+	
 });
