@@ -44,7 +44,7 @@ def kill_django_dev_server(*args,**kwargs):
 		subprocess.call(shlex.split('kill -9 %s' % pid))
 		
 def start_django_dev_server(*args,**kwargs):
-	cmd = shlex.split('nohup python ./src/ci_monitor/manage.py runserver 0.0.0.0:8000')
+	cmd = shlex.split('python ./src/ci_monitor/manage.py runserver 0.0.0.0:8000')
 	
 	subprocess.Popen(cmd)
 	
@@ -52,6 +52,6 @@ def start_django_dev_server(*args,**kwargs):
 	
 def local(*args,**kwargs):
 	install_requirements()
-	kill_django_dev_server()
+	#kill_django_dev_server()
 	start_django_dev_server()
 	
