@@ -32,7 +32,7 @@ class JenkinsMouleTests(unittest.TestCase):
 	def test_get_job_name(self):
 		
 		#test normal case, function returned expected job name
-		link = 'http://localhost:8080/job/test1/1/'
+		link = 'http://localhost:8080/job/test1'
 		expected = 'test1'
 		poll = PollCI(settings.CI_INSTALLATIONS)
 		
@@ -215,15 +215,15 @@ class JenkinsMouleTests(unittest.TestCase):
 		""")
 		expected = [
 			dict(
-				job_name = "test3 #1",
+				job_name = "test3",
 				status = "SUCCESS"
 				),
 			dict(
-				job_name = "test2 #1",
+				job_name = "test2",
 				status = "SUCCESS"
 				),
 			dict(
-				job_name = "test1 #2",
+				job_name = "test1",
 				status = "FAILURE"
 				)
 		]
@@ -279,7 +279,7 @@ class JenkinsMouleTests(unittest.TestCase):
 		
 	def test_get_job_last_build_status(self):
 		expected = dict(
-			job_name = "test3 #1",
+			job_name = "test3",
 			status = "SUCCESS"
 		)
 		

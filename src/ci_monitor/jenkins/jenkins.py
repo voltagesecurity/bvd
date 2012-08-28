@@ -113,7 +113,6 @@ class PollCI(object):
 			return None
 			
 		if job_link.find('/job') > -1:
-			job_link = job_link.rstrip('/')[0:job_link.rstrip('/').rfind('/')]
 			return job_link[job_link.find('/job')+5:len(job_link)]
 			
 		return None
