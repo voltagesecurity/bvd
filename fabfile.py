@@ -32,7 +32,7 @@ def install_requirements(*args,**kwargs):
 		out, err = subprocess.Popen(cmd,shell=True).communicate()
 		
 def start_django_dev_server(*args,**kwargs):
-	cmd = shlex.split('python /src/ci_monitor/manage.py runserver 0.0.0.0:8000')
+	cmd = shlex.split('python ./src/ci_monitor/manage.py runserver 0.0.0.0:8000')
 	
 	subprocess.Popen(cmd)
 	
