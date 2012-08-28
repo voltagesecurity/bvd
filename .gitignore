@@ -4,3 +4,4 @@ runserver.sh
 build/
 dist/
 *.db
+nohup.out
