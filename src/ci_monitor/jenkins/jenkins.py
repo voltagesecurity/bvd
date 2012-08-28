@@ -134,7 +134,7 @@ class PollCI(object):
 			return None
 		
 		if 'result' in json and 'fullDisplayName' in json:
-			job_name = json.get('fullDisplayName')
+			job_name = job_link
 			status   = json.get('result')
 		else:
 			return None
