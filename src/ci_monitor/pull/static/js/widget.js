@@ -17,7 +17,7 @@ function create_widget(job_name) {
 		$widget = $('<div></div>');
 		$widget.html(job_name);
 		$widget.attr('class','widget');
-		
+		$widget.append();
 		
 	}
 	
@@ -76,8 +76,7 @@ function create_or_update_widgets(json_results) {
 				break;
 		}
 		$widget.set_size(json_results.length);
-		$widget.append();
-		
+
 		widget_map[job_name] = $widget;
 	}
 }
