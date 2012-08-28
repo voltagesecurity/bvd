@@ -44,7 +44,7 @@ def kill_django_dev_server(*args,**kwargs):
 		subprocess.call(shlex.split('kill -9 %s' % pid))
 		
 def start_django_dev_server(*args,**kwargs):
-	cmd = shlex.split('./src/ci_monitor/manage.py runserver 0.0.0.0:8000 &')
+	cmd = shlex.split('./src/ci_monitor/manage.py runserver 0.0.0.0:8000')
 	
 	subprocess.Popen(cmd)
 	
