@@ -32,6 +32,6 @@ $(function(){
 		poll.ajax();
 	}
 	
-	setTimeout(jenkins,'60000');
+	setInterval(jenkins,'60000');
 	
 });
