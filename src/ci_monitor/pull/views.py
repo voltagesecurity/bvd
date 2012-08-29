@@ -14,7 +14,8 @@ def home(request,template='index.html'):
 def poll_jenkins_servers(request,*args,**kwargs):
 	if request.is_ajax():
 		jenkins = PollCI(settings.CI_INSTALLATIONS)
-		result = jenkins.poll()
+		entries,ns = jenkins.read_rss()
+		result = jenkins.poll(entries,ns)
 		if result == []:
 			raise RuntimeError('Please check jenkins URIs in settings.py')
 		return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')

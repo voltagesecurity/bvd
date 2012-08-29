@@ -12,7 +12,7 @@ def install_requirements(*args,**kwargs):
 	#TODO: If need be, we can add a local pypi mirror for any additional packages
 	#install = 'pip install -r requirements.txt --extra-index-url %s' % (pypi_mirror)
 	
-	install = 'pip install --user -r requirements.txt'
+	install = 'pip install --upgrade --user -r requirements.txt'
 	
 	if kwargs.get('remote'):
 		api.run('%(install)s' % dict(install=install))

@@ -41,11 +41,26 @@ body {
     text-shadow: 1px 1px 1px black;
 	background-color: #6BC231;
 }
-
 .widget.error {
-	
+        
     color: white;
     text-shadow: 1px 1px 1px black;
-	background-color: #FF4234;
+        background-color: #FF4234;
+        -webkit-animation-name: blink;
+        -webkit-animation-duration: 1s;
+        -webkit-animation-iteration-count: infinite;
+        -webkit-animation-direction: normal;
+        -webkit-animation-timing-function: ease;
 }
 
+@-webkit-keyframes blink {
+        from {
+                -webkit-box-shadow:0 -1px 10px rgba(225,100,90, 0.5), 0 -1px 20px rgba(225,100,90, 1);
+        }
+        50%{
+                -webkit-box-shadow:0 -1px 10px rgba(199,58,58, 0.5), 0 -1px 20px rgba(199,58,58, 0.5);
+        }
+        to {
+                -webkit-box-shadow:0 -1px 10px rgba(175,100,90, 0.5), 0 -1px 20px rgba(175,100,90, 1);
+        }
+}
