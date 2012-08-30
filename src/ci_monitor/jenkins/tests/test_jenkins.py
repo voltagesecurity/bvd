@@ -12,46 +12,18 @@ from ci_monitor.jenkins import jenkins
 
 def mock_url_open_conn_for_rss_feed():
     xml_string = """
-        <feed xmlns="http://www.w3.org/2005/Atom">
-        <entry>
-            <title>test1 #1 (broken since this build)</title>
-            <link type="text/html" href="http://localhost:8080/job/test1/1/" rel="alternate"/>
-            <id>tag:hudson.dev.java.net,2012:test1:2012-08-24_14-10-13</id>
-            <published>2012-08-24T21:10:13Z</published>
-            <updated>2012-08-24T21:10:13Z</updated>
-        </entry>
-        <entry>
-            <title>test1 #2 (broken for a long time)</title>
-            <link type="text/html" href="http://localhost:8080/job/test1/2/" rel="alternate"/>
-            <id>tag:hudson.dev.java.net,2012:test1:2012-08-24_14-10-17</id>
-            <published>2012-08-24T21:10:17Z</published>
-            <updated>2012-08-24T21:10:17Z</updated>
-        </entry>
-        <entry>
-            <title>test1 #2 (broken for a long time)</title>
-            <link type="text/html" href="http://localhost:8080/job/test1/2/" rel="alternate"/>
-            <id>tag:hudson.dev.java.net,2012:test1:2012-08-24_14-10-17</id>
-            <published>2012-08-24T21:10:17Z</published>
-            <updated>2012-08-24T20:10:17Z</updated>
-        </entry>
-        <entry>
-            <title>test1 #2 (broken for a long time)</title>
-            <link type="text/html" href="http://localhost:8080/job/test1/2/" rel="alternate"/>
-            <id>tag:hudson.dev.java.net,2012:test1:2012-08-24_14-10-17</id>
-            <published>2012-08-24T21:10:17Z</published>
-            <updated>2012-08-24T22:10:17Z</updated>
-        </entry>
-        </feed>
+          <feed xmlns="http://www.w3.org/2005/Atom"><title>All all builds</title><link type="text/html" href="http://localhost:8080/" rel="alternate"/><updated>2012-08-24T21:10:34Z</updated><author><name>Jenkins Server</name></author><id>urn:uuid:903deee0-7bfa-11db-9fe1-0800200c9a66</id><entry><title>test3 #1 (stable)</title><link type="text/html" href="http://localhost:8080/job/test3/1/" rel="alternate"/><id>tag:hudson.dev.java.net,2012:test3:2012-08-24_14-10-34</id><published>2012-08-24T21:10:34Z</published><updated>2012-08-24T21:10:34Z</updated></entry><entry><title>test2 #1 (stable)</title><link type="text/html" href="http://localhost:8080/job/test2/1/" rel="alternate"/><id>tag:hudson.dev.java.net,2012:test2:2012-08-24_14-10-26</id><published>2012-08-24T21:10:26Z</published><updated>2012-08-24T21:10:26Z</updated></entry><entry><title>test1 #2 (broken for a long time)</title><link type="text/html" href="http://localhost:8080/job/test1/2/" rel="alternate"/><id>tag:hudson.dev.java.net,2012:test1:2012-08-24_14-10-17</id><published>2012-08-24T21:10:17Z</published><updated>2012-08-24T21:10:17Z</updated></entry><entry><title>test1 #1 (broken since this build)</title><link type="text/html" href="http://localhost:8080/job/test1/1/" rel="alternate"/><id>tag:hudson.dev.java.net,2012:test1:2012-08-24_14-10-13</id><published>2012-08-24T21:10:13Z</published><updated>2012-08-24T21:10:13Z</updated></entry></feed>
     """
     return StringIO(xml_string)
     
 def mock_url_open_job_last_build():
-    return StringIO("""
+    json_str = """
             {"actions":[{"causes":[{"shortDescription":"Started by user anonymous","userId":null,"userName":"anonymous"}]}],"artifacts":[],"building":false,"description":null,"duration":54,"estimatedDuration":54,
             "fullDisplayName":"test3#1",
             "id":"2012-08-24_14-10-34","keepLog":false,"number":1,"result":"SUCCESS","timestamp":1345842634000,
             "url":"http://localhost:8080/job/test3/1/","builtOn":"","changeSet":{"items":[],"kind":null},"culprits":[]}
-            """)
+            """
+    return StringIO(json_str)
 
     
 def generate_xml_doc():
@@ -90,10 +62,6 @@ def generate_xml_doc():
     return doc
 
 class JenkinsMouleTests(unittest.TestCase):
-    
-    def setUp(self):
-        
-        pass
         
     def test_constructor_with_valid_argument(self):
         #test a normal constructor
@@ -122,14 +90,12 @@ class JenkinsMouleTests(unittest.TestCase):
         ns = doc.tag.replace('feed','')
         expected = doc.findall('%sentry' %ns)
         io = mock_url_open_conn_for_rss_feed()
-        io.seek(0)
         jenkins.urllib2.urlopen = Mock(return_value=io)
         conn = jenkins.urllib2.urlopen(settings.CI_INSTALLATIONS[0])
         poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
-        for host in poll.hosts:
-            actual,ns1 = poll.get_entries(conn)
-            self.assertEqual(len(actual),len(expected))
-            self.assertEqual(ns1,ns)
+        actual,ns1 = poll.get_entries(conn)
+        self.assertEqual(len(actual),len(expected))
+        self.assertEqual(ns1,ns)
             
     def test_get_entries_called_with_null_hostname(self):
         #test function when given a null hostname
@@ -279,47 +245,53 @@ class JenkinsMouleTests(unittest.TestCase):
         poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
         actual = poll.get_job_last_build_status(None,'http://localhost:8080/job/test3')
         self.assertEquals(actual,None)
-    
-    
-    def test_poll_with_null_parameter(self):
-        #test case when function is given a null param
-        poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
-        actual = poll.poll(None,None)
-        self.assertEquals(actual,[])
         
     def test_read_rss_feeds_when_hosts_are_null(self):
         #test case when function is given a null param
         io = mock_url_open_conn_for_rss_feed()
-        io.seek(0)
         jenkins.urllib2.urlopen = Mock(return_value=io)
         poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
         poll.hosts = None
         actual = poll.read_rss()
         self.assertEquals(actual,[])
+        io.truncate()
+        
+    def test_expected_read_rss_feeds(self):
+        doc = generate_xml_doc()
+        ns = doc.tag.replace('feed','')
+        elements = doc.findall('%sentry' % ns)
+        elements = elements[:-1]
+
+        expected = ([dict(
+            hostname = settings.CI_INSTALLATIONS[0],
+            elements = elements,
+                    )],
+                    ns)
+        io = mock_url_open_conn_for_rss_feed()
+        io.seek(0)
+        jenkins.urllib2.urlopen = Mock(return_value=io)
+        poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
+        actual = poll.read_rss()
+        self.assertEquals(len(actual[0][0].values()),len(expected[0][0].values()))
         
     def test_poll_with_expected_result(self):
+        #test when function gets expected result
         io = mock_url_open_job_last_build()
-        io.seek(0)
         jenkins.urllib2.urlopen = Mock(return_value=io)
         doc = generate_xml_doc()
         
-        expected = [
-            dict(
+        expected = dict(
                 job_name = "test3",
                 status = "SUCCESS"
                 )
-            ]
-
-
-        #test when function gets expected result
         poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
         ns = doc.tag.replace('feed','')
-        actual = poll.poll([doc.findall('%sentry' % ns)], ns)
-        expected = ["SUCCESS"]
-        actual_result = []
-        for item in actual:
-            for k,v in item.iteritems():
-                if k == 'status':
-                    actual_result.append(v)
-        self.assertEqual(actual_result,expected)
-        self.assertEqual(len(actual),len(expected))
+        actual = poll.poll(doc.findall('%sentry' % ns)[0], ns)
+        self.assertEqual(actual,expected)
+        
+    
+    def test_poll_with_null_parameter(self):
+        #test case when function is given a null param
+        poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
+        actual = poll.poll(None,None)
+        self.assertEquals(actual,dict())

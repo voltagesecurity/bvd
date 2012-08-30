@@ -160,34 +160,29 @@ class PollCI(object):
         
         if self.hosts is None:
             return results
-            
+
         for hostname in self.hosts:
             conn = urllib2.urlopen(hostname)
             entries,ns = self.get_entries(conn)
                 
             entries = self.filter_entries(entries,ns)
-            results.append(entries)
+            
+            d = dict(
+                hostname = hostname,
+                elements = entries
+            )
+            results.append(d)
 
         return results,ns
-    
-    def poll(self, entries, ns):
-        if entries is None:
-            return []
-            
-        results = []
-        for host in entries:
-            for entry in host:
-                if entry is None: continue
-                
-                job_link = self.get_job_link(entry,ns)
-                
-                if job_link is None: continue
-                
-                conn = urllib2.urlopen('%s/%s' % (job_link,self.last_build))
-                json = self.get_job_last_build_status(conn,job_link)
-                
-                if json is None: continue
-                
-                results.append(json)
         
-        return results
+    def poll(self, entry, ns):
+        if entry is None: return dict()
+        
+        job_link = self.get_job_link(entry,ns)
+        
+        if job_link is None: return dict()
+        
+        conn = urllib2.urlopen('%s/%s' % (job_link,self.last_build))
+        json = self.get_job_last_build_status(conn,job_link)
+        
+        return json or dict()
