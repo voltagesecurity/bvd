@@ -1,7 +1,9 @@
 var Poll = function(url) {
 	var self = this;
+	self.host_names = [];
+	
 	this.draw_widgets = function(data) {
-		create_or_update_widgets(eval(data));
+		self.host_names = create_or_update_widgets(eval(data));
 	}
 		
 	var success = function(data) {
@@ -14,10 +16,28 @@ var Poll = function(url) {
 	};
 	
 	this.ajax = function() {
-		return $.get(url)
-		.success(success)
-		.error(error)
-		.complete(function(data) {});
+	    if (self.host_names.length > 0) {
+    	    self.post_data = {
+    	        'hosts' : JSON.stringify(self.host_names)
+    	    };
+    	} else {
+    	    self.post_data =  {
+    	        
+    	    };
+    	}
+    	
+    	return $.ajax({
+    	                       url: url,
+    	                       type: 'post',
+    	                       data: self.post_data,
+    	                       headers: {
+    	                           "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val(),
+    	                       },
+    	                       success: success,
+    	                       error: error
+    	                       });
+		
+	    //$.ajax(url,JSON.stringify({'hosts' : self.host_names})).success(success);
 	}
 	
 	

@@ -1,7 +1,7 @@
-from xml.etree import ElementTree as et
 from dateutil import parser
 import simplejson
 from StringIO import StringIO
+import urllib2
 
 from django.utils import unittest
 from django.conf import settings
@@ -9,57 +9,7 @@ from django.conf import settings
 from mock import Mock
 
 from ci_monitor.jenkins import jenkins
-
-def mock_url_open_conn_for_rss_feed():
-    xml_string = """
-          <feed xmlns="http://www.w3.org/2005/Atom"><title>All all builds</title><link type="text/html" href="http://localhost:8080/" rel="alternate"/><updated>2012-08-24T21:10:34Z</updated><author><name>Jenkins Server</name></author><id>urn:uuid:903deee0-7bfa-11db-9fe1-0800200c9a66</id><entry><title>test3 #1 (stable)</title><link type="text/html" href="http://localhost:8080/job/test3/1/" rel="alternate"/><id>tag:hudson.dev.java.net,2012:test3:2012-08-24_14-10-34</id><published>2012-08-24T21:10:34Z</published><updated>2012-08-24T21:10:34Z</updated></entry><entry><title>test2 #1 (stable)</title><link type="text/html" href="http://localhost:8080/job/test2/1/" rel="alternate"/><id>tag:hudson.dev.java.net,2012:test2:2012-08-24_14-10-26</id><published>2012-08-24T21:10:26Z</published><updated>2012-08-24T21:10:26Z</updated></entry><entry><title>test1 #2 (broken for a long time)</title><link type="text/html" href="http://localhost:8080/job/test1/2/" rel="alternate"/><id>tag:hudson.dev.java.net,2012:test1:2012-08-24_14-10-17</id><published>2012-08-24T21:10:17Z</published><updated>2012-08-24T21:10:17Z</updated></entry><entry><title>test1 #1 (broken since this build)</title><link type="text/html" href="http://localhost:8080/job/test1/1/" rel="alternate"/><id>tag:hudson.dev.java.net,2012:test1:2012-08-24_14-10-13</id><published>2012-08-24T21:10:13Z</published><updated>2012-08-24T21:10:13Z</updated></entry></feed>
-    """
-    return StringIO(xml_string)
-    
-def mock_url_open_job_last_build():
-    json_str = """
-            {"actions":[{"causes":[{"shortDescription":"Started by user anonymous","userId":null,"userName":"anonymous"}]}],"artifacts":[],"building":false,"description":null,"duration":54,"estimatedDuration":54,
-            "fullDisplayName":"test3#1",
-            "id":"2012-08-24_14-10-34","keepLog":false,"number":1,"result":"SUCCESS","timestamp":1345842634000,
-            "url":"http://localhost:8080/job/test3/1/","builtOn":"","changeSet":{"items":[],"kind":null},"culprits":[]}
-            """
-    return StringIO(json_str)
-
-    
-def generate_xml_doc():
-    doc = et.fromstring("""
-        <feed xmlns="http://www.w3.org/2005/Atom">
-        <entry>
-            <title>test3 #1 (stable)</title>
-            <link type="text/html" href="http://localhost:8080/job/test3/1/" rel="alternate"/>
-            <id>tag:hudson.dev.java.net,2012:test3:2012-08-24_14-10-34</id>
-            <published>2012-08-24T21:10:34Z</published>
-            <updated>2012-08-24T21:10:34Z</updated>
-        </entry>
-        <entry>
-            <title>test2 #1 (stable)</title>
-            <link type="text/html" href="http://localhost:8080/job/test2/1/" rel="alternate"/>
-            <id>tag:hudson.dev.java.net,2012:test2:2012-08-24_14-10-26</id>
-            <published>2012-08-24T21:10:26Z</published>
-            <updated>2012-08-24T21:10:26Z</updated>
-        </entry>
-        <entry>
-            <title>test1 #2 (broken for a long time)</title>
-            <link type="text/html" href="http://localhost:8080/job/test1/2/" rel="alternate"/>
-            <id>tag:hudson.dev.java.net,2012:test1:2012-08-24_14-10-17</id>
-            <published>2012-08-24T21:10:17Z</published>
-            <updated>2012-08-24T21:10:17Z</updated>
-        </entry>
-        <entry>
-            <title>test1 #1 (broken since this build)</title>
-            <link type="text/html" href="http://localhost:8080/job/test1/1/" rel="alternate"/>
-            <id>tag:hudson.dev.java.net,2012:test1:2012-08-24_14-10-13</id>
-            <published>2012-08-24T21:10:13Z</published>
-            <updated>2012-08-24T21:10:13Z</updated>
-        </entry>
-        </feed>
-    """)
-    return doc
+from ci_monitor.tests.test_support import generate_xml_doc, mock_url_open_conn_for_rss_feed, mock_url_open_job_last_build
 
 class JenkinsMouleTests(unittest.TestCase):
         
@@ -71,17 +21,17 @@ class JenkinsMouleTests(unittest.TestCase):
     def test_constructor_with_null_argument(self):
         #test a constructor with null arguments
         poll = jenkins.PollCI(None)
-        self.assertEqual(poll.hosts,None)
+        self.assertEqual(poll.host,None)
         
     def test_constructor_with_extra_keyword_argument(self):
         #test constructor with extra keyword argument
         poll = jenkins.PollCI(settings.CI_INSTALLATIONS,test='test')
-        self.assertEqual(poll.hosts,settings.CI_INSTALLATIONS)
+        self.assertEqual(poll.host,settings.CI_INSTALLATIONS)
         
     def test_constructor_with_extra_positional_argument(self):
         #test constructor with extra positional arguments
         poll = jenkins.PollCI(settings.CI_INSTALLATIONS,'one','two')
-        self.assertEqual(poll.hosts,settings.CI_INSTALLATIONS)
+        self.assertEqual(poll.host,settings.CI_INSTALLATIONS)
         
 
     def test_get_four_entry_elements(self):
@@ -251,10 +201,10 @@ class JenkinsMouleTests(unittest.TestCase):
         io = mock_url_open_conn_for_rss_feed()
         jenkins.urllib2.urlopen = Mock(return_value=io)
         poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
-        poll.hosts = None
-        actual = poll.read_rss()
-        self.assertEquals(actual,[])
-        io.truncate()
+        poll.host = None
+        actual,ns = poll.read_rss()
+        self.assertEquals(actual,None)
+        self.assertEqual(ns,None)
         
     def test_expected_read_rss_feeds(self):
         doc = generate_xml_doc()
@@ -262,17 +212,30 @@ class JenkinsMouleTests(unittest.TestCase):
         elements = doc.findall('%sentry' % ns)
         elements = elements[:-1]
 
-        expected = ([dict(
+        expected = (dict(
             hostname = settings.CI_INSTALLATIONS[0],
             elements = elements,
-                    )],
+                    ),
                     ns)
         io = mock_url_open_conn_for_rss_feed()
-        io.seek(0)
         jenkins.urllib2.urlopen = Mock(return_value=io)
         poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
         actual = poll.read_rss()
-        self.assertEquals(len(actual[0][0].values()),len(expected[0][0].values()))
+        self.assertEquals(len(actual[0].values()),len(expected[0].values()))
+        
+    def test_read_rss_with_url_error(self):
+        io = mock_url_open_conn_for_rss_feed()
+        jenkins.urllib2.urlopen = Mock(return_value=io,side_effect=urllib2.URLError('bad url'))
+        expected,ns = jenkins.PollCI(settings.CI_INSTALLATIONS).read_rss()
+        self.assertEqual(expected,None)
+        self.assertEqual(type(ns),type(urllib2.URLError))
+        
+    def test_read_rss_with_http_error(self):
+        io = mock_url_open_conn_for_rss_feed()
+        jenkins.urllib2.urlopen = Mock(return_value=io,side_effect=urllib2.HTTPError('bad url',None,None,None,None))
+        expected,ns = jenkins.PollCI(settings.CI_INSTALLATIONS).read_rss()
+        self.assertEqual(expected,None)
+        self.assertEqual(type(ns),type(urllib2.URLError))
         
     def test_poll_with_expected_result(self):
         #test when function gets expected result
@@ -294,4 +257,4 @@ class JenkinsMouleTests(unittest.TestCase):
         #test case when function is given a null param
         poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
         actual = poll.poll(None,None)
-        self.assertEquals(actual,dict())
+        self.assertEquals(actual,None)

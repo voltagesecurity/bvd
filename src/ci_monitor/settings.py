@@ -147,6 +147,7 @@ LOGGING = {
 }
 
 CI_INSTALLATIONS = (
+	'ht://localhost:8080/view/BVD/rssAll',
 	'http://localhost:8080/view/BVD/rssAll',
 )
 

@@ -8,9 +8,9 @@ import simplejson
 
 class PollCI(object):
     """
-        This class enables the application to have access to last build status of multiple jobs on different jenkins installations.
+        This class enables the application to have access to last build status of multiple jobs on a single jenkins installations.
         
-        The constructor expected a tuple of strings where each element is a URI to a jenkins' view; that is a view that has been previously
+        The constructor expected a jenkins hostname that ponits to a jenkins' view; that is a view that has been previously
         created on that jenkins server of the jobs the application should display on the front end.
         
         The class then pulls the rss feed of the view (the rssAll feed), and creates a list of jobs, then gets each job's last build status
@@ -19,13 +19,13 @@ class PollCI(object):
         TODO:  Add logging for cases when the App is imporperly configured
     """
     
-    def __init__(self,ci_hosts_tuple,*args,**kwargs):
+    def __init__(self,ci_host,*args,**kwargs):
         """
-            Constructor to initialize the object, expects a tuple of URIs pointing to 1 or more jenkins views on 1 or more servers
+            Constructor to initialize the object: expects a URI pointing to a jenkins views
             
-            @param ci_hosts_tuple tuple
+            @param ci_host string
         """
-        self.hosts = ci_hosts_tuple
+        self.host = ci_host
         self.last_build = '/lastBuild/api/json'
     
     def sort_entry_list(self,entry_list,ns):
@@ -153,36 +153,41 @@ class PollCI(object):
         
     def read_rss(self):
         """
-            Function to be called by instantiator, to pull the RSS feed for all jenkins views given to the constructor, filter for individual jobs, and sort by DESC updated date,
-            and return a list of each job's latest build status as a json list
+            Function to be called by instantiator, to pull the RSS feed for the jenkins view given to the constructor, filter for individual jobs, and sort by DESC updated date,
+            and return a list of ElementTree elements after filtering and their xmlns namespace
         """
-        results = []
         
-        if self.hosts is None:
-            return results
-
-        for hostname in self.hosts:
-            conn = urllib2.urlopen(hostname)
-            entries,ns = self.get_entries(conn)
-                
-            entries = self.filter_entries(entries,ns)
+        if self.host is None:
+            return None,None
             
-            d = dict(
-                hostname = hostname,
-                elements = entries
-            )
-            results.append(d)
+        try:
+            conn = urllib2.urlopen(self.host)
+        except urllib2.URLError,e:
+            return (None,urllib2.URLError)
+        except urllib2.HTTPError, e:
+            return (None,urllib2.HTTPError)
+        except ValueError, e:
+            return (None,urllib2.URLError)
+                
+        entries,ns = self.get_entries(conn)
+                
+        entries = self.filter_entries(entries,ns)
+            
+        d = dict(
+            hostname = self.host,
+            elements = entries
+        )
 
-        return results,ns
+        return d,ns
         
     def poll(self, entry, ns):
-        if entry is None: return dict()
+        if entry is None: return None
         
         job_link = self.get_job_link(entry,ns)
         
-        if job_link is None: return dict()
+        if job_link is None: return None
         
         conn = urllib2.urlopen('%s/%s' % (job_link,self.last_build))
         json = self.get_job_last_build_status(conn,job_link)
         
-        return json or dict()
+        return json or None

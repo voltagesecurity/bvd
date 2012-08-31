@@ -1,4 +1,4 @@
-widget_map = {};
+var widget_map = {};
 
 /**
 	Function to create and return a widget object.  
@@ -32,6 +32,12 @@ function create_widget(job_name) {
 		this.removeClass('success');
 	}
 	
+	$widget.make_down = function() {
+	    this.addClass('down');
+	    this.removeClass('success');
+	    this.removeClass('error');
+	}
+	
 	$widget.set_size = function(count) {
 		var size = String(0.5/Math.log(count));
 		size = size.substring(2,5);
@@ -46,6 +52,23 @@ function create_widget(job_name) {
 	
 }
 
+
+function check_widget_status($widget, status) {
+    switch (json_list[j].status) {
+		case 'SUCCESS':
+			$widget.make_success();
+			break;
+		case 'FAILURE':
+			$widget.make_failure();
+			break;
+		case 'DOWN':
+		    $widget.make_down();
+		    break;
+		case '404':
+		    break;
+	}
+}
+
 /**
 	Function to construct a map of widgets based on the result of polling
 	all jenkins servers.
@@ -56,24 +79,41 @@ function create_widget(job_name) {
 	@param json_results JSON
 */
 function create_or_update_widgets(json_results) {
+    hosts = [];
+    var size = 1;
+    for (i =0; i < json_results.length; i++) {
+        var map = {};
+        hostname = json_results[i]['hostname'];
+        json_list = json_results[i]['json'];
+        if (!typeof(widget_map[hostname]) == 'undefied') {
+            $widgets = widget_map[hostname];
+            for (j = 0; j < $widgets.length; j++) {
+                $widget = $widget[j];
+                for (x = 0; x < json_list.length; x++) {
+                    if ($widget.job_name == json_list[x].job_name) {
+                        check_widget_status($widget,json_list[x].status);
+                    }
+                }
+                
+            }
+        }
+        
+        for (j =0; j < json_list.length; j++) {
+            size++;
+    		job_name = json_list[j].job_name;
+    		
+    		$widget = widget_map[job_name] || create_widget(job_name);
+
+    		
+    		$widget.set_size(size);
+
+    		
+    	}
+    	map[hostname] = json_list;
+    	hosts.push(map);
+    }
+	return hosts;
 	
-	for (i =0; i < json_results.length; i++) {
-		job_name = json_results[i].job_name;
-
-		$widget = widget_map[job_name] || create_widget(job_name);
-		
-		switch (json_results[i].status) {
-			case 'SUCCESS':
-				$widget.make_success();
-				break;
-			case 'FAILURE':
-				$widget.make_failure();
-				break;
-		}
-		$widget.set_size(json_results.length);
-
-		widget_map[job_name] = $widget;
-	}
 }
 
 

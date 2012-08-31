@@ -41,6 +41,7 @@ body {
     text-shadow: 1px 1px 1px black;
 	background-color: #6BC231;
 }
+
 .widget.error {
         
     color: white;
@@ -51,6 +52,13 @@ body {
         -webkit-animation-iteration-count: infinite;
         -webkit-animation-direction: normal;
         -webkit-animation-timing-function: ease;
+}
+
+.widget.down {
+        
+    color: white;
+    text-shadow: 1px 1px 1px black;
+    background-color: #A9A9A9;
 }
 
 @-webkit-keyframes blink {
