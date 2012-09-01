@@ -74,18 +74,13 @@ def poll_ci(hosts):
     
 def poll_jenkins_servers(request, *args, **kwargs):
     if request.is_ajax():
-        
-        
         print request.POST
             
         if 'hosts' in request.POST:
             l = simplejson.loads(request.POST['hosts'])
             hosts = []
             for d in l:
-                print d
                 for k,v in d.iteritems():
-                    print k
-                    print v
                     hosts.append(dict(hostname=k,json=v))
         else:
             hosts = settings.CI_INSTALLATIONS

@@ -97,12 +97,7 @@ class ViewTests(unittest.TestCase):
         #views.PollCI.poll = Mock(return_value=json)
         
         post_data = {'hosts' : simplejson.dumps([{'ht://localhost:8080/view/BVD/rssAll' : [json,json,json]}])}
-        
-        
-        print '????????????????????????'
-        
-        print post_data
-        
+
         request = self.factory.post('/pull/get_jenkins_views',data=post_data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
         
         actual = views.poll_jenkins_servers(request)

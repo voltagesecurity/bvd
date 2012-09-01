@@ -85,35 +85,26 @@ function create_or_update_widgets(json_results) {
         var map = {};
         hostname = json_results[i]['hostname'];
         json_list = json_results[i]['json'];
-        if (!typeof(widget_map[hostname]) == 'undefied') {
+        if (!typeof(widget_map[hostname]) == 'undefined') {
             $widgets = widget_map[hostname];
             for (j = 0; j < $widgets.length; j++) {
-                $widget = $widget[j];
+                $widget = $widgets[j];
                 for (x = 0; x < json_list.length; x++) {
                     if ($widget.job_name == json_list[x].job_name) {
                         check_widget_status($widget,json_list[x].status);
                     }
                 }
-                
             }
         }
-        
         for (j =0; j < json_list.length; j++) {
             size++;
     		job_name = json_list[j].job_name;
-    		
     		$widget = widget_map[job_name] || create_widget(job_name);
-
-    		
-    		$widget.set_size(size);
-
-    		
+			check_widget_status($widget,json_list[j].status);
+    		$widget.set_size(size);   		
     	}
     	map[hostname] = json_list;
     	hosts.push(map);
     }
 	return hosts;
-	
 }
-
-
