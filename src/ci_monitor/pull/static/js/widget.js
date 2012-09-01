@@ -109,13 +109,11 @@ function create_or_update_widgets(json_results) {
     	hosts.push(map);
 		widget_map[hostname] = json_list;
     }
-
-	if (typeof(widget_map[hostname]) == 'undefined') {
-		for (i=0; i < $widgets.length; i++) {
-			$widgets[i].set_size(size);
+    for (i =0; i < widget_map.length; i++) {
+		$widgets = widget_map[i];
+		for (j=0; j < $widgets.length; j++) {
+			$widgets[j].set_size(size);
 		}
 	}
-	
-    
 	return hosts;
 }
