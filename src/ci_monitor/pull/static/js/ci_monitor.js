@@ -62,9 +62,9 @@ $(function(){
 	    if ((curr_width/5) >= max_width && ratio <= 1) {
 	        curr_width = max_width;
 	        curr_height = max_width * ratio;
-        } else if(curr_height >= max_height) {
+        } else {
             curr_height = (current_width/5) * ratio;
-            curr_width = curr_height / ratio;
+            curr_width = curr_height;
         }
 	    
 	    for (hostname in widget_map) {
