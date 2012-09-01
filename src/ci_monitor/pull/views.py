@@ -35,9 +35,9 @@ def process_entries(jenkins, entries, _dictionary, host, toRTN, ns):
         json = to_return,
     )
     for entry in entries:
-	print 'entry is %s' % entry 
+    print 'entry is %s' % entry 
         json1 = jenkins.poll(entry,ns)
-	print 'json is %s' % json1
+    print 'json is %s' % json1
         if json1 is None:
             continue
         to_return.append(json1)
@@ -97,14 +97,26 @@ def poll_jenkins_servers(request, *args, **kwargs):
     else:
         raise RuntimeError('Improper use of View')
         
-def start_jenkins(request):
-	import subprocess
-	import shlex
-	subprocess.Popen(shlex.split('/srv/tomcat2/bin/startup.sh'),shell=True).communicate()
+def start_jenkins2(request):
+    import subprocess
+    import shlex
+    subprocess.Popen(shlex.split('/srv/tomcat2/bin/startup.sh'),shell=True).communicate()
         return HttpResponse(simplejson.dumps(['started']))
 
-def stop_jenkins(request):
-	import subprocess
-	import shlex
-	subprocess.Popen(shlex.split('/srv/tomcat2/bin/shutdown.sh'),shell=True).communicate()
-	return HttpResponse(simplejson.dumps(['stopped']))
+def stop_jenkins2(request):
+    import subprocess
+    import shlex
+    subprocess.Popen(shlex.split('/srv/tomcat2/bin/shutdown.sh'),shell=True).communicate()
+    return HttpResponse(simplejson.dumps(['stopped']))
+
+def start_jenkins3(request):
+    import subprocess
+    import shlex
+    subprocess.Popen(shlex.split('/srv/tomcat3/bin/startup.sh'),shell=True).communicate()
+    return HttpResponse(simplejson.dumps(['started']))
+
+def stop_jenkins3(request):
+    import subprocess
+    import shlex
+    subprocess.Popen(shlex.split('/srv/tomcat3/bin/shutdown.sh'),shell=True).communicate()
+    return HttpResponse(simplejson.dumps(['stopped']))
