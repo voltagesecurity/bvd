@@ -66,8 +66,6 @@ $(function(){
     			$widgets[i].resize(widget_width,widget_height);
     		}
     	}
-	    
-	    $("#buttons").append("<button>"+str+"</buttons>");
 	}
 	
 	$(window).resize(resize);
