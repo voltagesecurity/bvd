@@ -81,11 +81,12 @@ function check_widget_status($widget, status) {
 function create_or_update_widgets(json_results) {
     hosts = [];
     var size = 1;
+    var $widgets = [];
     for (i =0; i < json_results.length; i++) {
         var map = {};
         hostname = json_results[i]['hostname'];
         json_list = json_results[i]['json'];
-        if (!typeof(widget_map[hostname]) == 'undefined') {
+        if (typeof(widget_map[hostname]) != 'undefined') {
             $widgets = widget_map[hostname];
             for (j = 0; j < $widgets.length; j++) {
                 $widget = $widgets[j];
@@ -99,12 +100,16 @@ function create_or_update_widgets(json_results) {
         for (j =0; j < json_list.length; j++) {
             size++;
     		job_name = json_list[j].job_name;
-    		$widget = widget_map[job_name] || create_widget(job_name);
-			check_widget_status($widget,json_list[j].status);
-    		$widget.set_size(size);   		
+    		$widget = create_widget(job_name);
+		$widgets.push($widget);
+		check_widget_status($widget,json_list[j].status);
+    		//$widget.set_size(size);   		
     	}
     	map[hostname] = json_list;
     	hosts.push(map);
+    }
+    for (i = 0; i < $widgets.length; i++) {
+	$widgets[i].set_size(size);
     }
 	return hosts;
 }

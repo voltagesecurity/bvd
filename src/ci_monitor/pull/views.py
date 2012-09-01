@@ -15,6 +15,8 @@ def home(request,template='index.html'):
                               
 def poll_jenkins(jenkins, host, json_list):
     _dict,ns = jenkins.read_rss()
+    print 'IN POLL JENKINS' 
+    print _dict,ns
     if _dict is None:
         if ns == urllib2.URLError:
             for elem in json_list:
@@ -33,7 +35,9 @@ def process_entries(jenkins, entries, _dictionary, host, toRTN, ns):
         json = to_return,
     )
     for entry in entries:
+	print 'entry is %s' % entry 
         json1 = jenkins.poll(entry,ns)
+	print 'json is %s' % json1
         if json1 is None:
             continue
         to_return.append(json1)
@@ -96,7 +100,7 @@ def poll_jenkins_servers(request, *args, **kwargs):
 def start_jenkins(request):
 	import subprocess
 	import shlex
-	suprocess.Popen(shlex.split('/srv/tomcat2/bin/startup.sh'),shell=True).communicate()
+	subprocess.Popen(shlex.split('/srv/tomcat2/bin/startup.sh'),shell=True).communicate()
         return HttpResponse(simplejson.dumps(['started']))
 
 def stop_jenkins(request):

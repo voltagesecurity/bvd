@@ -3,11 +3,15 @@
 <script>
 $(function(){
 	$("#stop_j2").live('click',function (){
-		$.get('/pull/stop_j2/');
+		$.get('/pull/stop_j2/').success(function(){
+			alert('Jenkins 2 has been stopped');
+		});
 	});
 
 	$("#start_j2").live('click',function (){
-		$.get('/pull/start_j2/');
+		$.get('/pull/start_j2/').success(function() {
+              	  	alert('Jenkins 2 has been started');
+        	});
 	});
 });
 </script>
