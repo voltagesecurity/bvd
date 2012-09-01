@@ -54,4 +54,8 @@ $(function(){
 	
 	setInterval(jenkins,'60000');
 	
+	$.resize(data,function(){
+	    alert('test');
+	});
+	
 });
