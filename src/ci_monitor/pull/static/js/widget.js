@@ -97,13 +97,15 @@ function create_or_update_widgets(json_results) {
                 }
             }
         }
-        for (j =0; j < json_list.length; j++) {
-            size++;
-    		job_name = json_list[j].job_name;
-    		$widget = create_widget(job_name);
-			$widgets.push($widget);
-			check_widget_status($widget,json_list[j].status);
+        else{
+			for (j =0; j < json_list.length; j++) {
+            	size++;
+    			job_name = json_list[j].job_name;
+    			$widget = create_widget(job_name);
+				$widgets.push($widget);
+				check_widget_status($widget,json_list[j].status);
     		//$widget.set_size(size);   		
+			}
     	}
     	map[hostname] = json_list;
     	hosts.push(map);
