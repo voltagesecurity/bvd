@@ -25,11 +25,13 @@ function create_widget(job_name) {
 	$widget.make_success = function() {
 		this.addClass('success');
 		this.removeClass('error');
+		this.removeClass('down');
 	}
 	
 	$widget.make_failure = function() {
 		this.addClass('error');
 		this.removeClass('success');
+		this.removeClass('down');
 	}
 	
 	$widget.make_down = function() {
