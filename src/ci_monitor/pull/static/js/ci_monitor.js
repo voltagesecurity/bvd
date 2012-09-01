@@ -36,12 +36,7 @@ var Poll = function(url) {
     	                       success: success,
     	                       error: error
     	                       });
-		
-	    //$.ajax(url,JSON.stringify({'hosts' : self.host_names})).success(success);
 	}
-	
-	
-	
 }
 
 $(function(){
@@ -54,8 +49,27 @@ $(function(){
 	
 	setInterval(jenkins,'60000');
 	
-	$.resize(data,function(){
-	    alert('test');
-	});
+	var resize = function(data) {
+	    var width = $(this).width();
+	    var height = $(this).height();
+	    var count = widget_map['count'];
+	    
+	    var widget_width = String((0.75 * Math.log(width)) / Math.log(count));
+	    var widget_height = String((0.75 * Math.log(height)) / (0.75 * Math.log(count)));
+	    
+	    widget_width = widget_width.substring(0,4).replace('.','');
+	    widget_height = widget_height.substring(0,4).replace('.','');
+	    
+	    for (hostname in widget_map) {
+    		$widgets = widget_map[hostname];
+    		for (i=0; i < $widgets.length; i++) {
+    			$widgets[i].resize(widget_width,widget_height);
+    		}
+    	}
+	    
+	    $("#buttons").append("<button>"+str+"</buttons>");
+	}
+	
+	$(window).resize(resize);
 	
 });

@@ -49,6 +49,11 @@ function create_widget(job_name) {
 		this.css('width',size+'px');
 	}
 	
+	$widget.resize = function(width,height) {
+	    this.css('height',height+'px');
+	    this.css('width',width+'px');
+	}
+	
 	$widget.job_name = job_name;
 	return $widget;
 	
@@ -119,5 +124,6 @@ function create_or_update_widgets(json_results) {
 			$widgets[i].set_size(size);
 		}
 	}
+	widget_map['count'] = size;
 	return hosts;
 }
