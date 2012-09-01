@@ -63,7 +63,7 @@ $(function(){
 	        curr_width = max_width ;
 	        curr_height = max_width * ratio;
         } else {
-            curr_height = (current_width/5) * ratio;
+            curr_height = (curr_width/5) * ratio;
             curr_width = curr_height;
         }
 	    
