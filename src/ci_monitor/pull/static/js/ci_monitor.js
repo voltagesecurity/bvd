@@ -54,8 +54,8 @@ $(function(){
 	    
 	    var curr_width = $(this).width();
 	    var curr_height = $(this).height();
-	    var max_width = 1250;
-	    var max_height = 700;
+	    var max_width = 225;
+	    var max_height = 225;
 	    
 	    var ratio = curr_height / curr_width;
 	    
