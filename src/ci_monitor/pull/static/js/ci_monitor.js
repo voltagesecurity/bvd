@@ -40,6 +40,7 @@ var Poll = function(url) {
 }
 
 $(function(){
+    
 	var poll = new Poll('/pull/get_jenkins_views/');
 	poll.ajax();
 	
@@ -50,20 +51,26 @@ $(function(){
 	setInterval(jenkins,'60000');
 	
 	var resize = function(data) {
-	    var width = $(this).width();
-	    var height = $(this).height();
-	    var count = widget_map['count'];
 	    
-	    var widget_width = String((0.75 * Math.log(width)) / Math.log(count));
-	    var widget_height = String((0.75 * Math.log(height)) / (0.75 * Math.log(count)));
+	    var curr_width = $(this).width();
+	    var curr_height = $(this).height();
+	    var max_width = 1250;
+	    var max_height = 700;
 	    
-	    widget_width = widget_width.substring(0,4).replace('.','');
-	    widget_height = widget_height.substring(0,4).replace('.','');
+	    var ratio = curr_height / curr_width;
+	    
+	    if (curr_width >= maxW && ratio <= 1) {
+	        currW = max_width;
+	        curr_height = max_width * ratio;
+        } else if(currH >= maxH) {
+            curr_height = max_height;
+            curr_width = curr_height / ratio;
+        }
 	    
 	    for (hostname in widget_map) {
     		$widgets = widget_map[hostname];
     		for (i=0; i < $widgets.length; i++) {
-    			$widgets[i].resize(widget_width,widget_height);
+    			$widgets[i].resize(curr_width,curr_height);
     		}
     	}
 	}
