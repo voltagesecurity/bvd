@@ -81,8 +81,8 @@ function check_widget_status($widget, status) {
 function create_or_update_widgets(json_results) {
     hosts = [];
     var size = 1;
-    var $widgets = [];
     for (i =0; i < json_results.length; i++) {
+		var $widgets = [];
         var map = {};
         hostname = json_results[i]['hostname'];
         json_list = json_results[i]['json'];
@@ -107,7 +107,7 @@ function create_or_update_widgets(json_results) {
     	}
     	map[hostname] = json_list;
     	hosts.push(map);
-		widget_map[hostname] = json_list;
+		widget_map[hostname] = $widgets;
     }
     for (hostname in widget_map) {
 		$widgets = widget_map[hostname];
