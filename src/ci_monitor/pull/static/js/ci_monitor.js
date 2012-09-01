@@ -54,13 +54,13 @@ $(function(){
 	    
 	    var curr_width = $(this).width();
 	    var curr_height = $(this).height();
-	    var max_width = 225;
-	    var max_height = 225;
+	    var max_width = $("#widgets").children()[0].css('width');
+	    var max_height =  $("#widgets").children()[0].css('height');
 	    
 	    var ratio = curr_height / curr_width;
 	    
 	    if ((curr_width/5) >= max_width && ratio <= 1) {
-	        curr_width = max_width;
+	        curr_width = max_width ;
 	        curr_height = max_width * ratio;
         } else {
             curr_height = (current_width/5) * ratio;
