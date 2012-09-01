@@ -54,8 +54,8 @@ $(function(){
 	    
 	    var curr_width = $(this).width();
 	    var curr_height = $(this).height();
-	    var max_width = $("#widgets").children().css('width');
-	    var max_height =  $("#widgets").children().css('height');
+	    var max_width = $("#widgets").children(0).css('width');
+	    var max_height =  $("#widgets").children(0).css('height');
 	    
 	    var ratio = curr_height / curr_width;
 	    
