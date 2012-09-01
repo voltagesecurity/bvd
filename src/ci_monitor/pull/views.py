@@ -35,9 +35,9 @@ def process_entries(jenkins, entries, _dictionary, host, toRTN, ns):
         json = to_return,
     )
     for entry in entries:
-    print 'entry is %s' % entry 
+        print 'entry is %s' % entry 
         json1 = jenkins.poll(entry,ns)
-    print 'json is %s' % json1
+        print 'json is %s' % json1
         if json1 is None:
             continue
         to_return.append(json1)
