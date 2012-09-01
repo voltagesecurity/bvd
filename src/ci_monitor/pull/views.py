@@ -101,7 +101,7 @@ def start_jenkins2(request):
     import subprocess
     import shlex
     subprocess.Popen(shlex.split('/srv/tomcat2/bin/startup.sh'),shell=True).communicate()
-        return HttpResponse(simplejson.dumps(['started']))
+    return HttpResponse(simplejson.dumps(['started']))
 
 def stop_jenkins2(request):
     import subprocess
