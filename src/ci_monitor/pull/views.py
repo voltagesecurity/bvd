@@ -93,6 +93,14 @@ def poll_jenkins_servers(request, *args, **kwargs):
     else:
         raise RuntimeError('Improper use of View')
         
-        
-        
-    
+def start_jenkins(request):
+	import subprocess
+	import shlex
+	suprocess.Popen(shlex.split('/srv/tomcat2/bin/startup.sh'),shell=True).communicate()
+        return HttpResponse(simplejson.dumps(['started']))
+
+def stop_jenkins(request):
+	import subprocess
+	import shlex
+	subprocess.Popen(shlex.split('/srv/tomcat2/bin/shutdown.sh'),shell=True).communicate()
+	return HttpResponse(simplejson.dumps(['stopped']))
