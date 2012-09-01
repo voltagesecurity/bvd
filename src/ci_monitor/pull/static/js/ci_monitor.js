@@ -59,7 +59,7 @@ $(function(){
 	    
 	    var ratio = curr_height / curr_width;
 	    
-	    if (curr_width >= max_width && ratio <= 1) {
+	    if ((curr_width/5) >= max_width && ratio <= 1) {
 	        curr_width = max_width;
 	        curr_height = max_width * ratio;
         } else if(curr_height >= max_height) {
