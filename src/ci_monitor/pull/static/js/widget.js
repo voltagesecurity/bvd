@@ -101,15 +101,21 @@ function create_or_update_widgets(json_results) {
             size++;
     		job_name = json_list[j].job_name;
     		$widget = create_widget(job_name);
-		$widgets.push($widget);
-		check_widget_status($widget,json_list[j].status);
+			$widgets.push($widget);
+			check_widget_status($widget,json_list[j].status);
     		//$widget.set_size(size);   		
     	}
     	map[hostname] = json_list;
     	hosts.push(map);
+		widget_map[hostname] = json_list;
     }
-    for (i = 0; i < $widgets.length; i++) {
-	$widgets[i].set_size(size);
-    }
+
+	if (typeof(widget_map[hostname]) == 'undefined') {
+		for (i=0; i < $widgets.length; i++) {
+			$widgets[i].set_size(size);
+		}
+	}
+	
+    
 	return hosts;
 }
