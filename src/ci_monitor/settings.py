@@ -150,6 +150,7 @@ CI_INSTALLATIONS = (
 	'http://localhost:9080/jenkins/view/BVD/rssAll',
 	'http://localhost:9180/jenkins/view/BVD/rssAll',
 	'http://localhost:9280/jenkins/view/BVD/rssAll',
+	'http://localhost:8080/view/BVD/rssAll',
 )
 
 import os

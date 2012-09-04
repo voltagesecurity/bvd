@@ -32,6 +32,7 @@ body {
     background-image:-ms-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
     background-image: -o-linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
     background-image: linear-gradient(-45deg, rgba(255, 255, 255, .2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, .2) 50%, rgba(255, 255, 255, .2) 75%, transparent 75%, transparent);
+    
 	
 }
 
@@ -40,6 +41,9 @@ body {
     color: white;
     text-shadow: 1px 1px 1px black;
 	background-color: #6BC231;
+	background-image: url(../images/checkmark.png);
+	background-repeat:no-repeat;
+    background-position:center;
 }
 
 .widget.error {
@@ -52,6 +56,9 @@ body {
         -webkit-animation-iteration-count: infinite;
         -webkit-animation-direction: normal;
         -webkit-animation-timing-function: ease;
+        background-image: url(../images/x6.png);
+    	background-repeat:no-repeat;
+        background-position:center;
 }
 
 .widget.down {
