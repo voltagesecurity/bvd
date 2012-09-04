@@ -125,6 +125,10 @@ class PollCI(object):
             return None
             
         link = entry.find('%slink' % ns)
+        
+        if link.get('href').find('./label') > 0:
+            return None
+            
         return link.get('href').rstrip('/')[0:link.get('href').rstrip('/').rfind('/')]
         
     

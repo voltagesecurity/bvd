@@ -9,7 +9,7 @@ from django.conf import settings
 from mock import Mock
 
 from ci_monitor.jenkins import jenkins
-from ci_monitor.tests.test_support import generate_xml_doc, mock_url_open_conn_for_rss_feed, mock_url_open_job_last_build
+from ci_monitor.tests.test_support import generate_xml_doc, mock_url_open_conn_for_rss_feed, mock_url_open_job_last_build, generate_xml_doc_with_matrix
 
 class JenkinsMouleTests(unittest.TestCase):
         
@@ -258,3 +258,23 @@ class JenkinsMouleTests(unittest.TestCase):
         poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
         actual = poll.poll(None,None)
         self.assertEquals(actual,None)
+        
+    def test_filter_entries_with_matrix_jobs_returned_expected(self):
+        doc = generate_xml_doc_with_matrix()
+        ns = doc.tag.replace('feed','')
+        entries = doc.findall('%sentry' % ns)
+        poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
+        actual = poll.filter_entries(entries,ns)
+        self.assertEqual(len(actual),4)
+        import types
+        self.assertEqual(type(actual),types.ListType)
+        
+    def test_get_job_link_link_of_matrix_job(self):
+        doc = generate_xml_doc_with_matrix()
+        ns = doc.tag.replace('feed','')
+        entries = doc.findall('%sentry' % ns)
+        entry = entries[-2]
+        expected = None
+        poll = jenkins.PollCI(settings.CI_INSTALLATIONS)
+        actual = poll.get_job_link(entry,ns)
+        self.assertEqual(actual,expected)
