@@ -92,7 +92,7 @@ def poll_jenkins_servers(request, *args, **kwargs):
         results = poll_ci(hosts)
         """    
         results = []
-        for i in range(6):
+        for i in range(3):
             results.append(dict(hostname='http://localhost:80%d' % i, json = [dict(job_name = 'Server-%d-Job-%d' % (i,x),status='SUCCESS' if x%2 ==0 else 'FAILURE') for x in range(0,5)]))
         print '>>>>>>>>>>>>>>>>> results %s' % results
         return HttpResponse(simplejson.dumps(results), content_type = 'application/javascript; charset=utf8')

@@ -1,55 +1,37 @@
 var widget_map = {};
 
 /**
-	Function to create and return a widget object.  
+	Class to create and return a widget object, inherited from JQuery's $("<div></div>").  
+	
 	A widget object is an icon on the screen representing
-	a Jenkins build, that has either a success or failed status
+	a Jenkins build, that has either a success, failed, or down status
 	
 	The object returned can be later manipulated via helper methods
 	to change state, set its position on the page, set its size, etc.
 	
 	@param job_name String 
 */
-function create_widget(job_name) {
+var Widget = function(job_name, status){
 
-	var base = function(counter) {
-	 	
-		$widget = $('<div></div>');
-		$widget.attr('id','wdg'+counter);
-		$marquee = $('<div></div>');
-		$marquee.html(job_name);
-		$widget.attr('class','widget');
-		$widget.append($marquee);
-		$('#widgets').append($widget);
-//		$marquee.marquee();
-		$widget.draggable({
-		    stop : function(event,ui) {
-		        alert($(this).css('left'));
-		    }
-		})
-	}
-	
-	base();
-	
-	$widget.make_success = function() {
+	this.make_success = function() {
 		this.addClass('success');
 		this.removeClass('error');
 		this.removeClass('down');
 	}
 	
-	$widget.make_failure = function() {
+	this.make_failure = function() {
 		this.addClass('error');
 		this.removeClass('success');
 		this.removeClass('down');
 	}
 	
-	$widget.make_down = function() {
+	this.make_down = function() {
 	    this.addClass('down');
 	    this.removeClass('success');
 	    this.removeClass('error');
 	}
 	
-	$widget.set_size = function(count,prev_left,prev_top,counter) {
+	this.set_size = function(count,prev_left,prev_top,counter) {
 		var size = String(0.5/Math.log(count));
 		size = size.substring(2,5);
 		size = (size.indexOf("0") == 0) ? size.substring(1,3) : size;	
@@ -73,7 +55,7 @@ function create_widget(job_name) {
 		this.css('top',top+'px');
 	}
 	
-	$widget.set_status = function(status) {
+	this.set_status = function(status) {
 	    switch (status) {
     		case 'SUCCESS':
     			this.make_success();
@@ -89,12 +71,32 @@ function create_widget(job_name) {
     	}
 	}
 	
-	$widget.resize = function(width,height) {
+	this.resize = function(width,height) {
 	    this.css('height',height+'px');
 	    this.css('width',width+'px');
 	}
 	
-	$widget.job_name = job_name;
-	return $widget;
-	
-}
+	this.init = function() {
+	    
+	    $.extend(this,$("<div></div>"));
+	    
+        this.job_name = job_name;
+        this.status = status;
+        
+        //this.attr('id','wdg'+counter);
+		$marquee = $('<div></div>');
+		$marquee.html(this.job_name);
+		this.attr('class','widget');
+		this.append($marquee);
+		this.set_status(this.status);
+		$('#widgets').append(this);
+		$marquee.marquee();
+		this.draggable({
+		    stop : function(event,ui) {
+		        alert($(this).css('left'));
+		    }
+		})
+    }	
+    
+    this.init();
+};

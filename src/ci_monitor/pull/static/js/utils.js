@@ -13,10 +13,8 @@ function process_existing_widgets() {
 function process_new_widgets($widgets, size) {
     for (j =0; j < json_list.length; j++) {
     	size++;
-		job_name = json_list[j].job_name;
-		$widget = create_widget(job_name,size);
+		var $widget = new Widget(json_list[j].job_name,json_list[j].status);
 		$widgets.push($widget);
-		$widget.set_status(json_list[j].status);
 	}
 	return size;
 }
@@ -47,8 +45,8 @@ function set_size_of_widgets(size) {
 	Function to construct a map of widgets based on the result of polling
 	all jenkins servers.
 	
-	This function looks for an existing widget matching a job_name, if not found
-	it uses the create_widget function to construct it.
+	This function looks for a set of existing widgets for each hostname, if not found
+	it uses the create_widget function to construct them.
 	
 	@param json_results JSON
 */

@@ -52,7 +52,7 @@ $(function(){
 		poll.ajax();
 	}
 	
-	setInterval(jenkins,'60000');
+	//setInterval(jenkins,'60000');
 	
 	var resize = function(data) {
 	    
