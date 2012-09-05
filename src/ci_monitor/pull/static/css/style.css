@@ -2,6 +2,39 @@ body {
 	background: url(../images/black_linen_v2.png);
 }
 
+
+.modal div div input, .modal div div label {
+    margin-bottom: 15px;
+    margin-top: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border: 1px solid #BEBEBE;
+    background-color: #F0F8FF;
+    color: gray;
+    width: 400px;
+    height: 30px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-size: 8pt;
+    border-radius: 5px; 
+    font-family: Georgia, Arial, Helvetica, Serif;
+    padding: 2px 2 2 2px;
+    font-size: 8pt;
+    text-align: center;
+    float: left;
+    
+}
+
+.modal div div .error_label {
+    color: red;
+    border: 0px;
+    background-color: #FFFFFF;
+    width: 150px;
+    font-size: 10pt;
+    display: none;
+    
+}
+
 #widgets {
 	text-align: left;
 	width: 100%;

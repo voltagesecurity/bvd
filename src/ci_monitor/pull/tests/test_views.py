@@ -50,7 +50,7 @@ class ViewTests(unittest.TestCase):
 		
     def test_retrieve_job_returns_404(self):
     	request = self.factory.post('/pull/retrieve_job', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-    	views.RetrieveJob.lookup_hostname = Mock(return_value=ValueError)
+    	views.RetrieveJob.lookup_job = Mock(return_value=ValueError)
 
     	expected = [dict(status = 404)]
     	actual = views.retrieve_job(request)
@@ -60,12 +60,37 @@ class ViewTests(unittest.TestCase):
 
     def test_retrieve_job_returns_500(self):
     	request = self.factory.post('/pull/retrieve_job', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-    	views.RetrieveJob.lookup_hostname = Mock(return_value=urllib2.URLError)
+    	views.RetrieveJob.lookup_job = Mock(return_value=urllib2.URLError)
     	expected = [dict(status = 500)]
 
     	actual = views.retrieve_job(request)
     	self.assertEqual(actual.content,simplejson.dumps(expected))
     	self.assertEqual(actual.status_code,200)
+    	
+    def test_validate_hostname_returns_True(self):
+        request = self.factory.post('/pull/validate_hostname', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        views.RetrieveJob.lookup_hostname = Mock(return_value=StringIO())
+        expected = [dict(status = 200)]
+        actual = views.validate_hostname(request)
+        self.assertEqual(actual.content,simplejson.dumps(expected))
+        self.assertEqual(actual.status_code,200)
+        
+    def test_retrieve_job_returns_200(self):
+
+    	d = dict(jobname = 'Test1', status = 'SUCCESS')
+    	views.RetrieveJob.lookup_job = Mock(return_value=d)
+    	hostname = 'http://localhost:8080'
+    	
+    	expected = d.update(dict(hostname = hostname, status = 200))
+    	
+    	post_data = {'hostname' : hostname, 'jobname' : 'Test1'}
+
+        request = self.factory.post('/pull/retrieve_job',data=post_data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+
+    	actual = views.retrieve_job(request)
+    	self.assertEqual(actual.content,simplejson.dumps(expected))
+    	self.assertEqual(actual.status_code,200)
+        
 	
 """
     def test_poll_jenkins_view_with_no_post_data_when_host_gives_404(self):

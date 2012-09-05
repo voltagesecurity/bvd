@@ -1,3 +1,16 @@
+var do_ajax = function (type, url, data, success, error) {
+    $.ajax({
+            url: url,
+	        type: type,
+	        data: data,
+	        headers: {
+	               "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val(),
+	        },
+	        success: success,
+	        error: error
+	    });
+}
+
 function process_existing_widgets() {
     // $widgets = widget_map[hostname];
     //     for (j = 0; j < $widgets.length; j++) {

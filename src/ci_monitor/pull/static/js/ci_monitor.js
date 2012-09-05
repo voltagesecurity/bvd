@@ -41,12 +41,12 @@ var Poll = function(url) {
 
 $(function(){
 
-	var poll = new Poll('/pull/get_jenkins_views/');
-	poll.ajax();
-	
-	var jenkins = function() {
-		poll.ajax();
-	}
+	// var poll = new Poll('/pull/get_jenkins_views/');
+	//     poll.ajax();
+	//     
+	//     var jenkins = function() {
+	//         poll.ajax();
+	//     }
 	
 	//setInterval(jenkins,'60000');
 	

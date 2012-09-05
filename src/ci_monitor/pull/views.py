@@ -18,9 +18,9 @@ def validate_hostname(request):
     test = job.lookup_hostname()
     
     if test == urllib2.URLError:
-        result = [dict(status = 500)]
+        raise RuntimeError('To be caught by Front End')
     elif test == ValueError:
-        result = [dict(status = 404)]
+        raise RuntimeError('To be caught by Front End')
     else:
         result = [dict(status = 200)]
     
@@ -30,14 +30,24 @@ def retrieve_job(request):
     job = RetrieveJob(request.POST.get('hostname',None),request.POST.get('jobname',None))
     result = job.lookup_job()
     
-    if test == urllib2.URLError:
-        result = [dict(status = 500)]
-    elif test == ValueError:
-        result = [dict(status = 404)]
+    if result == urllib2.URLError:
+        raise RuntimeError('To be caught by Front End')
+    elif result == ValueError:
+        raise RuntimeError('To be caught by Front End')
     else:
-        result = result.update(dict(hostname, request.POST.get('hostname'), status = 200))
+        result = result.update(dict(hostname = request.POST.get('hostname'), status = 200))
 
     return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    
+def get_modal(request):
+    template = request.GET.get('template')
+    
+    if template == 'add_job':
+        template = 'add_job.html'
+    
+    return render_to_response(template,
+                  dict(title='Welcome to CI-Monitor'),
+                  context_instance=RequestContext(request))
                               
 def poll_jenkins(jenkins, host, json_list):
     _dict,ns = jenkins.read_rss()

@@ -89,7 +89,7 @@ var Widget = function(job_name, status, counter){
 		this.append($marquee);
 		this.set_status(this.status);
 		$('#widgets').append(this);
-		$marquee.marquee();
+		// $marquee.marquee();
 		this.draggable({
 		    stop : function(event,ui) {
 		        alert($(this).css('left'));
