@@ -24,7 +24,20 @@ def validate_hostname(request):
     else:
         result = [dict(status = 200)]
     
-    return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')    
+    return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    
+def retrieve_job(request):
+    job = RetrieveJob(request.POST.get('hostname',None),request.POST.get('jobname',None))
+    result = job.lookup_job()
+    
+    if test == urllib2.URLError:
+        result = [dict(status = 500)]
+    elif test == ValueError:
+        result = [dict(status = 404)]
+    else:
+        result = result.update(dict(hostname, request.POST.get('hostname'), status = 200))
+
+    return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
                               
 def poll_jenkins(jenkins, host, json_list):
     _dict,ns = jenkins.read_rss()

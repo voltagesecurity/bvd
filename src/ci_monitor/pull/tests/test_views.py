@@ -47,6 +47,25 @@ class ViewTests(unittest.TestCase):
 		actual = views.validate_hostname(request)
 		self.assertEqual(actual.content,simplejson.dumps(expected))
 		self.assertEqual(actual.status_code,200)
+		
+    def test_retrieve_job_returns_404(self):
+    	request = self.factory.post('/pull/retrieve_job', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    	views.RetrieveJob.lookup_hostname = Mock(return_value=ValueError)
+
+    	expected = [dict(status = 404)]
+    	actual = views.retrieve_job(request)
+
+    	self.assertEqual(actual.content,simplejson.dumps(expected))
+    	self.assertEqual(actual.status_code,200)
+
+    def test_retrieve_job_returns_500(self):
+    	request = self.factory.post('/pull/retrieve_job', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+    	views.RetrieveJob.lookup_hostname = Mock(return_value=urllib2.URLError)
+    	expected = [dict(status = 500)]
+
+    	actual = views.retrieve_job(request)
+    	self.assertEqual(actual.content,simplejson.dumps(expected))
+    	self.assertEqual(actual.status_code,200)
 	
 """
     def test_poll_jenkins_view_with_no_post_data_when_host_gives_404(self):
