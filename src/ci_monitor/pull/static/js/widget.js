@@ -12,12 +12,21 @@ var widget_map = {};
 */
 function create_widget(job_name) {
 
-	var base = function() {
+	var base = function(counter) {
 	 	
 		$widget = $('<div></div>');
-		$widget.html(job_name);
+		$widget.attr('id','wdg'+counter);
+		$marquee = $('<div></div>');
+		$marquee.html(job_name);
 		$widget.attr('class','widget');
+		$widget.append($marquee);
 		$('#widgets').append($widget);
+//		$marquee.marquee();
+		$widget.draggable({
+		    stop : function(event,ui) {
+		        alert($(this).css('left'));
+		    }
+		})
 	}
 	
 	base();
@@ -40,13 +49,44 @@ function create_widget(job_name) {
 	    this.removeClass('error');
 	}
 	
-	$widget.set_size = function(count) {
+	$widget.set_size = function(count,prev_left,prev_top,counter) {
 		var size = String(0.5/Math.log(count));
 		size = size.substring(2,5);
+		size = (size.indexOf("0") == 0) ? size.substring(1,3) : size;	
+		size = parseInt(size);
+		
+		var mod = 6;
+		
+		if ((count - 1) <= 10) {mod = 5;}
+		else if ((count - 1) >= 50) {mod = 7;}
+		
+		var left = (prev_left != -1) ? prev_left + size + 50 : 0;
+		
+		left = (counter % mod == 0 && left < 1400) ? 0 : left;
+		
+		var top = (counter % mod == 0 && left < 1400) ? (counter == 0) ? 0 : prev_top + size + 50  : prev_top;
+		
 		
 		this.css('height',size+'px');
-		//this.css('line-height',size+'px');
 		this.css('width',size+'px');
+		this.css('left',left+'px');
+		this.css('top',top+'px');
+	}
+	
+	$widget.set_status = function(status) {
+	    switch (status) {
+    		case 'SUCCESS':
+    			this.make_success();
+    			break;
+    		case 'FAILURE':
+    			this.make_failure();
+    			break;
+    		case 'DOWN':
+    		    this.make_down();
+    		    break;
+    		case '404':
+    		    break;
+    	}
 	}
 	
 	$widget.resize = function(width,height) {
@@ -57,73 +97,4 @@ function create_widget(job_name) {
 	$widget.job_name = job_name;
 	return $widget;
 	
-}
-
-
-function check_widget_status($widget, status) {
-    switch (json_list[j].status) {
-		case 'SUCCESS':
-			$widget.make_success();
-			break;
-		case 'FAILURE':
-			$widget.make_failure();
-			break;
-		case 'DOWN':
-		    $widget.make_down();
-		    break;
-		case '404':
-		    break;
-	}
-}
-
-/**
-	Function to construct a map of widgets based on the result of polling
-	all jenkins servers.
-	
-	This function looks for an existing widget matching a job_name, if not found
-	it uses the create_widget function to construct it.
-	
-	@param json_results JSON
-*/
-function create_or_update_widgets(json_results) {
-    hosts = [];
-    var size = 1;
-    for (i =0; i < json_results.length; i++) {
-		var $widgets = [];
-        var map = {};
-        hostname = json_results[i]['hostname'];
-        json_list = json_results[i]['json'];
-        if (typeof(widget_map[hostname]) != 'undefined') {
-            $widgets = widget_map[hostname];
-            for (j = 0; j < $widgets.length; j++) {
-                $widget = $widgets[j];
-                for (x = 0; x < json_list.length; x++) {
-                    if ($widget.job_name == json_list[x].job_name) {
-                        check_widget_status($widget,json_list[x].status);
-                    }
-                }
-            }
-        }
-        else{
-			for (j =0; j < json_list.length; j++) {
-            	size++;
-    			job_name = json_list[j].job_name;
-    			$widget = create_widget(job_name);
-				$widgets.push($widget);
-				check_widget_status($widget,json_list[j].status);
-    		//$widget.set_size(size);   		
-			}
-    	}
-    	map[hostname] = json_list;
-    	hosts.push(map);
-		widget_map[hostname] = $widgets;
-    }
-    for (hostname in widget_map) {
-		$widgets = widget_map[hostname];
-		for (i=0; i < $widgets.length; i++) {
-			$widgets[i].set_size(size);
-		}
-	}
-	widget_map['count'] = size;
-	return hosts;
 }

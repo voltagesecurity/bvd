@@ -41,6 +41,10 @@ var Poll = function(url) {
 
 $(function(){
     
+    
+    
+   
+    
 	var poll = new Poll('/pull/get_jenkins_views/');
 	poll.ajax();
 	
@@ -75,6 +79,7 @@ $(function(){
     	}
 	}
 	
-	$(window).resize(resize);
+	//$(window).resize(resize);
 	
+    
 });
