@@ -28,36 +28,29 @@ class ViewTests(unittest.TestCase):
                     ),
                     ns)
     
-    """
-        
-    def test_poll_jenkins_view_with_post_data_when_host_gives_url_error(self):
-        json = dict(   
-                    job_name = "test1 #2",
-                    status = "DOWN"
-                )
-                    
-        expected = dict(
-                hostname = 'http://localhost:8080/view/BVD/rssAll',
-                json = [json,json,json]
-            )
-            
-        post_data = dict(
-            hosts = [expected,]
-        )
-        
-        request = self.factory.post('/pull/get_jenkins_views',data=post_data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
 
-        views.PollCI.read_rss = Mock(return_value=(None,urllib2.URLError))
-
-        actual = views.poll_jenkins_servers(request)
-
-        self.assertEqual(actual.content,simplejson.dumps(expected))
-        self.assertEqual(actual.status_code,200)
+    def test_validate_hostname_returns_404(self):
+		request = self.factory.post('/pull/validate_hostname', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+		views.RetrieveJob.lookup_hostname = Mock(return_value=ValueError)
+		
+		expected = [dict(status = 404)]
+		actual = views.validate_hostname(request)
+		
+		self.assertEqual(actual.content,simplejson.dumps(expected))
+		self.assertEqual(actual.status_code,200)
         
-    """
-        
+    def test_validate_hostname_returns_500(self):
+		request = self.factory.post('/pull/validate_hostname', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+		views.RetrieveJob.lookup_hostname = Mock(return_value=urllib2.URLError)
+		expected = [dict(status = 500)]
+		
+		actual = views.validate_hostname(request)
+		self.assertEqual(actual.content,simplejson.dumps(expected))
+		self.assertEqual(actual.status_code,200)
+	
+"""
     def test_poll_jenkins_view_with_no_post_data_when_host_gives_404(self):
-        request = self.factory.post('/pull/get_jenkins_views',HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request = self.factory.post('/pull/get_jenkins_views', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
             
         expected = []
         
@@ -182,3 +175,4 @@ class ViewTests(unittest.TestCase):
 
         self.assertEqual(actual.content,simplejson.dumps(expected))
         self.assertEqual(actual.status_code,200)
+"""

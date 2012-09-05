@@ -11,7 +11,7 @@ var widget_map = {};
 	
 	@param job_name String 
 */
-var Widget = function(job_name, status){
+var Widget = function(job_name, status, counter){
 
 	this.make_success = function() {
 		this.addClass('success');
@@ -39,15 +39,14 @@ var Widget = function(job_name, status){
 		
 		var mod = 6;
 		
-		if ((count - 1) <= 10) {mod = 5;}
-		else if ((count - 1) >= 50) {mod = 7;}
+		if (count <= 15) {mod = 5;}
+		else if (count >= 50) {mod = 7;}
 		
-		var left = (prev_left != -1) ? prev_left + size + 50 : 0;
+		var left = prev_left + size + 50;
 		
 		left = (counter % mod == 0 && left < 1400) ? 0 : left;
 		
 		var top = (counter % mod == 0 && left < 1400) ? (counter == 0) ? 0 : prev_top + size + 50  : prev_top;
-		
 		
 		this.css('height',size+'px');
 		this.css('width',size+'px');
@@ -83,7 +82,7 @@ var Widget = function(job_name, status){
         this.job_name = job_name;
         this.status = status;
         
-        //this.attr('id','wdg'+counter);
+        this.attr('id','wdg'+counter);
 		$marquee = $('<div></div>');
 		$marquee.html(this.job_name);
 		this.attr('class','widget');

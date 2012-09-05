@@ -4,6 +4,44 @@ from dateutil import parser
 import types
 import xml.etree.ElementTree as et
 import simplejson
+
+class RetrieveJob(object):
+    
+    def __init__(self, hostname, jobname):
+        self.hostname = hostname
+        self.jobname = jobname
+        
+    def lookup_hostname(self):
+        try:
+            conn = urllib2.urlopen(self.hostname)
+            conn.close()
+            return True
+        except ValueError:
+            return ValueError
+        except urllib2.URLError:
+            return urllib2.URLError
+            
+    def lookup_job(self):
+        try:
+            conn = urllib2.urlopen('%s/job/%s/lastBuild/api/json' % (self.hostname,self.jobname))
+            json = simplejson.load(conn)
+
+            if 'result' in json and 'fullDisplayName' in json:
+                jobname = json.get('fullDisplayName')
+                status   = json.get('result')
+            else:
+                return None
+                
+        except ValueError:
+            return ValueError
+        except urllib2.URLError:
+            return urllib2.URLError
+            
+        conn.close()
+        return dict(
+            jobname = jobname,
+            status   = status,
+        )
     
 
 class PollCI(object):

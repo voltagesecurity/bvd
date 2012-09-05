@@ -6,12 +6,25 @@ from django.utils import simplejson
 from django.http import HttpResponse
 from django.conf import settings
 
-from ci_monitor.jenkins.jenkins import PollCI
+from ci_monitor.jenkins.jenkins import PollCI, RetrieveJob
 
 def home(request,template='index.html'):
     return render_to_response(template,
                               dict(title='Welcome to CI-Monitor'),
                               context_instance=RequestContext(request))
+            
+def validate_hostname(request):
+    job = RetrieveJob(request.POST.get('hostname',None),None)
+    test = job.lookup_hostname()
+    
+    if test == urllib2.URLError:
+        result = [dict(status = 500)]
+    elif test == ValueError:
+        result = [dict(status = 404)]
+    else:
+        result = [dict(status = 200)]
+    
+    return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')    
                               
 def poll_jenkins(jenkins, host, json_list):
     _dict,ns = jenkins.read_rss()
@@ -92,7 +105,7 @@ def poll_jenkins_servers(request, *args, **kwargs):
         results = poll_ci(hosts)
         """    
         results = []
-        for i in range(3):
+        for i in range(5):
             results.append(dict(hostname='http://localhost:80%d' % i, json = [dict(job_name = 'Server-%d-Job-%d' % (i,x),status='SUCCESS' if x%2 ==0 else 'FAILURE') for x in range(0,5)]))
         print '>>>>>>>>>>>>>>>>> results %s' % results
         return HttpResponse(simplejson.dumps(results), content_type = 'application/javascript; charset=utf8')
