@@ -59,7 +59,7 @@ function process_existing_widgets() {
 
 function set_size_of_widgets(count) {
     
-    var $prev_widget = $.extend(Widget.prototype,$("#widgets"));
+    var $prev_widget = $.extend(,$("#widgets"));
     var counter = 0;
     var db_map = {};
     var db_list = [];

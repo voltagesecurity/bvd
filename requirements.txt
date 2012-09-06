@@ -4,3 +4,5 @@ setuptools-git
 python-dateutil==2.1
 mock
 python-memcached
+psycopg2==2.4.5
+
