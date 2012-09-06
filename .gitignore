@@ -5,3 +5,4 @@ build/
 dist/
 *.db
 nohup.out
+.DS_STORE

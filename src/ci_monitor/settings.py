@@ -170,3 +170,6 @@ AD_CERT_FILE='/path/to/your/cert.txt'
 AUTHENTICATION_BACKENDS = ('ci_monitor.accounts.backends.ActiveDirectoryGroupMembershipSSLBackend','django.contrib.auth.backends.ModelBackend')
 AD_DEBUG=True
 AD_DEBUG_FILE='/path/to/writable/log/file/ldap.debug'
+
+import dj_database_url
+DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
