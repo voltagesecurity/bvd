@@ -186,5 +186,5 @@ AUTHENTICATION_BACKENDS = ('ci_monitor.accounts.backends.ActiveDirectoryGroupMem
 AD_DEBUG=True
 AD_DEBUG_FILE='/path/to/writable/log/file/ldap.debug'
 
-import dj_database_url
-DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
+#import dj_database_url
+#DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}

@@ -84,9 +84,11 @@ var Widget = function(job_name, status, counter){
 	    this.css(dimensions);
 	}
 	
-	this.getWidgetDimensions = function() {
+	this.getWidgetDimensions = function(id1) {
 
-        var ele = document.getElementById(this.id);
+        if (typeof(id) == 'undefined') {var ele = document.getElementById(this.id);}
+        else {var ele = document.getElementById(id1);}
+        
         var width = ele.offsetWidth;
         var height = ele.offsetHeight;
         var top = 0;

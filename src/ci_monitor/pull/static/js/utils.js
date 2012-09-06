@@ -59,14 +59,15 @@ function process_existing_widgets() {
 
 function set_size_of_widgets(count) {
     
-    var $prev_widget = $.extend(,$("#widgets"));
+    var $prev_widget = $("<div></div>");
     var counter = 0;
     var db_map = {};
     var db_list = [];
     for (hostname in widget_map) {
 		$widgets = widget_map[hostname];
 		for (i=0; i < $widgets.length; i++) {
-		    dimensions = $prev_widget.getWidgetDimensions();
+		    if (counter == 0) {Widget.getWidgetDimensions('widgets')}
+		    else {dimensions = $prev_widget.getWidgetDimensions();}
 			var $current_widget = $widgets[i];
 			$current_widget.set_size(count,
 			                                dimensions['left'],
