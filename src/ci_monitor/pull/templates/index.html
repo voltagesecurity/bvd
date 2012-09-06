@@ -12,10 +12,26 @@ div.button {
 <button id="stop_j2">Stop Jenkins 2</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id="start_j2">Start Jenkins 2</button>
 &nbsp;&nbsp;&nbsp;&nbsp;<button id="stop_j3">Stop Jenkins 3</button>&nbsp;&nbsp;&nbsp;&nbsp;<button id="start_j3">Start Jenkins 3</button></div>-->
 
-<div id="buttons" style="width:100%;height:25px;">
+<div id="buttons" style="width:100%;height:50px;">
 	<button id="add_job">+ Job</button>
 </div>
 <div id="widgets">
+	{%for job in jobs %}
+		<script>
+			var count = $("#widgets").children().length + 3;
+		    var $widget = new Widget('{{job.displayname}}', '{{job.status}}', count);
+		
+			if (typeof(widget_map['{{job.ci_server.hostname}}']) != 'undefined') {
+		        widget_map['{{job.ci_server.hostname}}'].push($widget);
+		    } else {
+		        $widgets = [$widget];
+		        widget_map['{{job.ci_server.hostname}}'] = $widgets;
+		    }
+			
+			$widget.draw('{{job.width}}','{{job.height}}','{{job.left_position}}','{{job.top_position}}');
+		    
+		</script>
+	{%endfor%}
 </div>
 <script>
 $(function(){

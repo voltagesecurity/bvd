@@ -75,6 +75,30 @@ var Widget = function(job_name, status, counter){
 	    this.css('width',width+'px');
 	}
 	
+	this.draw = function (width, height, left, top) {
+	    this.css({'top' : top, 'width' : width, 'height' : height, 'left' : left});
+	}
+	
+	this.refresh = function() {
+	    var dimensions = this.getWidgetDimensions();
+	    this.css(dimensions);
+	}
+	
+	this.getWidgetDimensions = function() {
+
+        var ele = document.getElementById(this.id);
+        var width = ele.offsetWidth;
+        var height = ele.offsetHeight;
+        var top = 0;
+        var left = 0;
+        while(ele.tagName != "BODY") {
+            top += ele.offsetTop;
+            left += ele.offsetLeft;
+            ele = ele.offsetParent;
+        }
+        return { top: top, left: left, height: height, width: width };
+    }
+	
 	this.init = function() {
 	    
 	    $.extend(this,$("<div></div>"));
@@ -83,9 +107,11 @@ var Widget = function(job_name, status, counter){
         this.status = status;
         
         this.attr('id','wdg'+counter);
+        this.id = this.attr('id');
 		$marquee = $('<div></div>');
 		$marquee.html(this.job_name);
 		this.attr('class','widget');
+		this.css('position','absolute')
 		this.append($marquee);
 		this.set_status(this.status);
 		$('#widgets').append(this);

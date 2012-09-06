@@ -5,39 +5,128 @@ from django.template import RequestContext
 from django.utils import simplejson
 from django.http import HttpResponse
 from django.conf import settings
+from django.core.exceptions import ObjectDoesNotExist
+
+import memcache
+memc = memcache.Client(['127.0.0.1:11211'], debug=1)
 
 from ci_monitor.jenkins.jenkins import PollCI, RetrieveJob
+from ci_monitor.pull import models
+
+def append_http(hostname):
+    if not hostname: return 'http://'
+    
+    if hostname.find('http') > -1 or hostname.find('https') > -1:
+        return hostname
+    else:
+        return 'http://%s' % hostname
 
 def home(request,template='index.html'):
+    jobs = models.CiJob.objects.filter(entity_active=True)
     return render_to_response(template,
-                              dict(title='Welcome to CI-Monitor'),
+                              dict(title='Welcome to CI-Monitor', jobs = jobs),
                               context_instance=RequestContext(request))
             
 def validate_hostname(request):
-    job = RetrieveJob(request.POST.get('hostname',None),None)
+    job = RetrieveJob(append_http(request.POST.get('hostname',None)),None)
     test = job.lookup_hostname()
     
     if test == urllib2.URLError:
-        raise RuntimeError('To be caught by Front End')
+        result = dict(status = 500)
     elif test == ValueError:
-        raise RuntimeError('To be caught by Front End')
+        result = dict(status = 404)
     else:
-        result = [dict(status = 200)]
+        result = dict(status = 200)
     
-    return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
-def retrieve_job(request):
-    job = RetrieveJob(request.POST.get('hostname',None),request.POST.get('jobname',None))
+def validate_job(request):
+    hostname = append_http(request.POST.get('hostname',''))
+    jobname = request.POST.get('jobname',None)
+    
+    if hostname.strip() == 'http://' or not jobname:
+        result = dict(status = 500)
+        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
+        
+    job = RetrieveJob(hostname,jobname)
     result = job.lookup_job()
     
     if result == urllib2.URLError:
-        raise RuntimeError('To be caught by Front End')
+        result = dict(status = 500)
+        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     elif result == ValueError:
-        raise RuntimeError('To be caught by Front End')
+        result = dict(status = 404)
+        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     else:
-        result = result.update(dict(hostname = request.POST.get('hostname'), status = 200))
+        result.update(dict(hostname = request.POST.get('hostname')))
+        
+    key = str('%s/%s' % (hostname, jobname))
+    
+    memc.set(key,result)
 
+    return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
+    
+def retrieve_job(request):
+    hostname = append_http(request.POST.get('hostname',''))
+    jobname = request.POST.get('jobname',None)
+    displayname = request.POST.get('displayname')
+    if not bool(displayname): displayname = jobname
+    
+    if hostname.strip() == 'http://' or not jobname:
+        result = [dict(status = 500)]
+        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    
+    key = str('%s/%s' % (hostname, jobname))
+    result = memc.get(key)
+    
+    if not result:
+        result = dict(status = 500)
+        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
+        
+    result.update(dict(displayname = displayname))
+        
+    return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
+    
+def save_job(request):
+    hostname = append_http(request.POST.get('hostname',''))
+    jobname = request.POST.get('jobname')
+    left = request.POST.get('left')
+    top = request.POST.get('top')
+    status = request.POST.get('status')
+    displayname = request.POST.get('displayname')
+    width = request.POST.get('width')
+    height = request.POST.get('height')
+    
+    if hostname.strip() == '' or not bool(jobname) or not bool(left) or not bool(top):
+        result = [dict(status = 500)]
+        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+        
+    try:
+        server = models.CiServer.objects.get(hostname=hostname)
+    except ObjectDoesNotExist:
+        server = models.CiServer(hostname=hostname)
+        server.save()
+        
+    try:
+        job = models.CiJob.objects.get(jobname=jobname,ci_server__hostname=hostname,entity_active=True)
+        job.left_positon = left
+        job.top_position = top
+        job.save()
+    except ObjectDoesNotExist:
+        job = models.CiJob(jobname=jobname, left_position=left, top_position=top, entity_active=True, status=status, displayname=displayname, width=width, height=height)
+        job.ci_server = server
+        job.save()
+        
+    result = dict(status = 200)
+    return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
+    
+def autocomplete_hostname(request):
+    txt = request.POST.get('txt')
+    servers = models.CiServer.objects.filter(hostname__icontains=txt)
+    result = [server.hostname for server in servers]
+    #result = ['http://localhost:80%d' % i for i in range(5)]
     return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    
     
 def get_modal(request):
     template = request.GET.get('template')

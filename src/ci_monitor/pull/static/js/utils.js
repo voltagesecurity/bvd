@@ -1,5 +1,5 @@
 var do_ajax = function (type, url, data, success, error) {
-    $.ajax({
+    return $.ajax({
             url: url,
 	        type: type,
 	        data: data,
@@ -9,6 +9,29 @@ var do_ajax = function (type, url, data, success, error) {
 	        success: success,
 	        error: error
 	    });
+}
+
+function create_new_widget(json) {
+    var count = $("#widgets").children().length + 3;
+    var $widget = new Widget(json.displayname, json.status, count);
+    
+    if (typeof(widget_map[json.hostname]) != 'undefined') {
+        widget_map[json.hostname].push($widget);
+    } else {
+        $widgets = [$widget];
+        widget_map[json.hostname] = $widgets;
+    }
+    
+    set_size_of_widgets(count);
+    
+    $widget.refresh();
+    data = $widget.getWidgetDimensions();
+    data['hostname'] = json.hostname;
+    data['displayname'] = json.displayname;
+    data['jobname'] = json.jobname;
+    data['status'] = json.status;
+    do_ajax('post','/pull/save_job/',data);
+   
 }
 
 function process_existing_widgets() {
@@ -23,32 +46,33 @@ function process_existing_widgets() {
     //     }
 }
 
-function create_new_widgets($widgets, json_list, count) {
-    for (j =0; j < json_list.length; j++) {
-		var $widget = new Widget(json_list[j].job_name, json_list[j].status, count);
-		$widgets.push($widget);
-    	count++;
-	}
-	return count;
-}
+// function create_new_widgets($widgets, json_list, count) {
+//     for (j =0; j < json_list.length; j++) {
+//      var $widget = new Widget(json_list[j].job_name, json_list[j].status, count);
+//      $widgets.push($widget);
+//      count++;
+//  }
+//  return count;
+// }
+
+
 
 function set_size_of_widgets(count) {
-    var $prev_widget = $("<div></div>");
-    $prev_widget.css({'left' : -1, 'top' : -1});
+    
+    var $prev_widget = $.extend(Widget.prototype,$("#widgets"));
     var counter = 0;
     var db_map = {};
     var db_list = [];
     for (hostname in widget_map) {
 		$widgets = widget_map[hostname];
 		for (i=0; i < $widgets.length; i++) {
+		    dimensions = $prev_widget.getWidgetDimensions();
 			var $current_widget = $widgets[i];
 			$current_widget.set_size(count,
-			                                parseInt($prev_widget.css('left').replace('px','')),
-			                                parseInt($prev_widget.css('top').replace('px','')),
+			                                dimensions['left'],
+			                                dimensions['top'],
 			                                counter
 			                            );
-			db_map[$current_widget.attr('id')] = {'top' : parseInt($current_widget.css('top').replace('px','')), 'left' : parseInt($current_widget.css('top').replace('px',''))}
-			
 			$prev_widget = $current_widget;
 		    counter++;
 		}

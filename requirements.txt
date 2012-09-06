@@ -3,3 +3,4 @@ Django==1.3.1
 setuptools-git
 python-dateutil==2.1
 mock
+python-memcached
