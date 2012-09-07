@@ -151,14 +151,15 @@ def autocomplete_hostname(request):
     
     
 def get_modal(request):
-    template = request.GET.get('template')
-    
-    if template == 'add_job':
-        template = 'add_job.html'
+    template = request.GET.get('template')    
+    template = '%s.html' % template
     
     return render_to_response(template,
                   dict(title='Welcome to CI-Monitor'),
                   context_instance=RequestContext(request))
+    
+def signup(request):
+    pass
     
 def poll_jenkins_servers(request, *args, **kwargs):
     

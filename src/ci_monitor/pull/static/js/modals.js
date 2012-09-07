@@ -6,14 +6,98 @@ function modal_factory (url, id, opts) {
 var txt_map = {
     hostname    : {url : '/pull/validate_hostname/', value : 'PLEASE ENTER JENKINS HOSTNAME'},
     jobname     : {url : '/pull/validate_job/', value : 'PLEASE ENTER JOB NAME'},
-    displayname : {value: 'PLEASE ENTER DESIRED DISPLAY NAME'}
+    displayname : {value: 'PLEASE ENTER DESIRED DISPLAY NAME'},
+    username    : {value: 'USERNAME'}
 }
 
+function load_signup_form() {
+	id = 'signup_modal';
+	var $modal;
+	
+	var buttons = [
+		{
+			text: 'Signup',
+			click: function() {
+				
+			}
+		},
+		{
+			text: "Cancel",
+			click: function() {
+				$modal.remove();
+			}
+		},
+		{
+			text: 'Login',
+			click: function() {
+				$modal.remove();
+				load_login_form();
+			}
+		}
+	]
+	var opts =      {
+        width : 600,
+    	height : 400,
+        autoOpen: true,
+        title: 'Signup',
+        resizable : false,
+        modal : true,
+        buttons: buttons
+    }
+    
+    
+    $modal = modal_factory('/pull/get_modal?template=signup',id, opts);
+}
+
+function load_login_form() {
+	id = 'login_modal';
+	var $modal;
+    	
+    var buttons = [
+    	{
+    		text: 'Login',
+    		click: function() {
+    			
+    		}
+    	},
+    	{
+    		text: "Signup",
+    		click: function() {
+    			$modal.remove();
+    			load_signup_form();
+    		}
+    	},
+    	{
+    		text: "Cancel",
+    		click: function() {
+    			$modal.remove();
+    		}
+    	}
+    ]
+    	
+    var opts =      {
+        width : 600,
+    	height : 300,
+        autoOpen: true,
+        title: 'Login',
+        resizable : false,
+        modal : true,
+        buttons: buttons
+    }
+    
+    
+    $modal = modal_factory('/pull/get_modal?template=login',id, opts);
+}
 
 $(function(){
 
 
     $("#add_job").button();
+    $("#login").button();
+    
+    $("#login").on("click",function(){
+    	load_login_form();
+    });
 
     $("#add_job").on("click",function () {
     
@@ -76,7 +160,7 @@ $(function(){
     
     });
     
-    $(document).on('focus', '#hostname, #jobname, #displayname', function () {
+    $(document).on('focus', 'input[type=text]', function () {
         $("#" + $(this).attr('id') + "_err").css('display','none');
         
         if ($(this).val().toUpperCase() == txt_map[$(this).attr('id')]['value'].toUpperCase()) {
@@ -84,7 +168,7 @@ $(function(){
         }
     });
     
-    $(document).on('blur', '#hostname, #jobname', function () {
+    $(document).on('blur', '#hostname, #jobname, #username', function () {
         var self = $(this);
         if ($(this).val() == '') {
             $(this).val(txt_map[$(this).attr('id')]['value']);
