@@ -23,9 +23,10 @@ function create_new_widget(json) {
     }
     
     set_size_of_widgets(count);
-    
-    $widget.refresh();
     data = $widget.getWidgetDimensions();
+    alert($widget.id);
+    alert(data['left']);
+    alert(data['top']);
     data['hostname'] = json.hostname;
     data['displayname'] = json.displayname;
     data['jobname'] = json.jobname;
@@ -66,12 +67,13 @@ function set_size_of_widgets(count) {
     for (hostname in widget_map) {
 		$widgets = widget_map[hostname];
 		for (i=0; i < $widgets.length; i++) {
-		    if (counter == 0) {Widget.getWidgetDimensions('widgets')}
+		    if (counter == 0) {dimensions = {left : '0px', top: '0px'}}
 		    else {dimensions = $prev_widget.getWidgetDimensions();}
 			var $current_widget = $widgets[i];
+			
 			$current_widget.set_size(count,
-			                                dimensions['left'],
-			                                dimensions['top'],
+			                                parseInt(dimensions['left'].replace('px','')),
+			                                parseInt(dimensions['top'].replace('px','')),
 			                                counter
 			                            );
 			$prev_widget = $current_widget;

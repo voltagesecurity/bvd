@@ -31,7 +31,7 @@ var Widget = function(job_name, status, counter){
 	    this.removeClass('error');
 	}
 	
-	this.set_size = function(count,prev_left,prev_top,counter) {
+	this.set_size = function(count, prev_left, prev_top, counter) {
 		var size = String(0.5/Math.log(count));
 		size = size.substring(2,5);
 		size = (size.indexOf("0") == 0) ? size.substring(1,3) : size;	
@@ -46,7 +46,7 @@ var Widget = function(job_name, status, counter){
 		
 		left = (counter % mod == 0 && left < 1400) ? 0 : left;
 		
-		var top = (counter % mod == 0 && left < 1400) ? (counter == 0) ? 0 : prev_top + size + 50  : prev_top;
+		var top = (counter % mod == 0 && left < 1400) ? (counter == 0) ? 0 : prev_top + size + 50  : prev_top
 		
 		this.css('height',size+'px');
 		this.css('width',size+'px');
@@ -84,21 +84,10 @@ var Widget = function(job_name, status, counter){
 	    this.css(dimensions);
 	}
 	
-	this.getWidgetDimensions = function(id1) {
-
-        if (typeof(id) == 'undefined') {var ele = document.getElementById(this.id);}
-        else {var ele = document.getElementById(id1);}
+	this.getWidgetDimensions = function() {
+        var ele = document.getElementById(this.id);
         
-        var width = ele.offsetWidth;
-        var height = ele.offsetHeight;
-        var top = 0;
-        var left = 0;
-        while(ele.tagName != "BODY") {
-            top += ele.offsetTop;
-            left += ele.offsetLeft;
-            ele = ele.offsetParent;
-        }
-        return { top: top, left: left, height: height, width: width };
+        return { top: ele.style.top, left: ele.style.left, height: ele.style.height, width: ele.style.width };
     }
 	
 	this.init = function() {
