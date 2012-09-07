@@ -7,7 +7,30 @@ var txt_map = {
     hostname    : {url : '/pull/validate_hostname/', value : 'PLEASE ENTER JENKINS HOSTNAME'},
     jobname     : {url : '/pull/validate_job/', value : 'PLEASE ENTER JOB NAME'},
     displayname : {value: 'PLEASE ENTER DESIRED DISPLAY NAME'},
-    username    : {value: 'USERNAME'}
+    username    : {value: 'USERNAME'},
+    email       : {value: 'Email'}
+}
+
+function validate_signup() {
+	if ($("#password1").val() == '' || $("#password2").val() == '') {
+		$("#signuperror").css('display','block');
+		$("#signuperror").html('Empty password fields');
+		return false;
+	}
+	if ($("#password1").val() != $("#password2").val()) {
+		$("#signuperror").css('display','block');
+		$("#signuperror").html('Passwords do not match');
+		return false;
+	} 
+	
+	if (!validate_email($("#email").val())) {
+		$("#signuperror").css('display','block');
+		$("#signuperror").html('Invalid email');
+		return false;
+	} 
+	$("#signuperror").css('display','none');
+	return true;
+	
 }
 
 function load_signup_form() {
@@ -18,6 +41,7 @@ function load_signup_form() {
 		{
 			text: 'Signup',
 			click: function() {
+				if (!validate_signup()) {return;}
 				
 			}
 		},
@@ -168,7 +192,7 @@ $(function(){
         }
     });
     
-    $(document).on('blur', '#hostname, #jobname, #username', function () {
+    $(document).on('blur', 'input[type=text]', function () {
         var self = $(this);
         if ($(this).val() == '') {
             $(this).val(txt_map[$(this).attr('id')]['value']);

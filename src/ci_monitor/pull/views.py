@@ -6,12 +6,14 @@ from django.utils import simplejson
 from django.http import HttpResponse
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
+from django.contrib.auth import authenticate, login
 
 import memcache
 memc = memcache.Client(['127.0.0.1:11211'], debug=1)
 
 from ci_monitor.jenkins.jenkins import PollCI, RetrieveJob
 from ci_monitor.pull import models
+from ci_monitor.pull import forms
 
 def append_http(hostname):
     if not hostname: return 'http://'
@@ -159,7 +161,13 @@ def get_modal(request):
                   context_instance=RequestContext(request))
     
 def signup(request):
-    pass
+    form = forms.SignupForm(request.POST)
+    if form.is_valid():
+        user = form.save()
+        login(user)
+        return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
+    else:
+        return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
     
 def poll_jenkins_servers(request, *args, **kwargs):
     
@@ -177,27 +185,3 @@ def poll_jenkins_servers(request, *args, **kwargs):
             results.append(result)
     
     return HttpResponse(simplejson.dumps(results), content_type = 'application/javascript; charset=utf8')
-        
-def start_jenkins2(request):
-    import subprocess
-    import shlex
-    subprocess.Popen(shlex.split('/srv/tomcat2/bin/startup.sh'),shell=True).communicate()
-    return HttpResponse(simplejson.dumps(['started']))
-
-def stop_jenkins2(request):
-    import subprocess
-    import shlex
-    subprocess.Popen(shlex.split('/srv/tomcat2/bin/shutdown.sh'),shell=True).communicate()
-    return HttpResponse(simplejson.dumps(['stopped']))
-
-def start_jenkins3(request):
-    import subprocess
-    import shlex
-    subprocess.Popen(shlex.split('/srv/tomcat3/bin/startup.sh'),shell=True).communicate()
-    return HttpResponse(simplejson.dumps(['started']))
-
-def stop_jenkins3(request):
-    import subprocess
-    import shlex
-    subprocess.Popen(shlex.split('/srv/tomcat3/bin/shutdown.sh'),shell=True).communicate()
-    return HttpResponse(simplejson.dumps(['stopped']))
