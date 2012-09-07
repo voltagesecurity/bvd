@@ -16,26 +16,6 @@ var Poll = function(url) {
 	};
 	
 	this.ajax = function() {
-	    // if (self.created.length > 0) {
-	    //             self.post_data = {
-	    //                 'hosts' : JSON.stringify(self.created['hosts'])
-	    //             };
-	    //         } else {
-	    //             self.post_data =  {
-	    //                 
-	    //             };
-	    //         }
-	    //         
-	    //         return $.ajax({
-	    //                         url: url,
-	    //                         type: 'post',
-	    //                         data: self.post_data,
-	    //                         headers: {
-	    //                                "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val(),
-	    //                         },
-	    //                         success: success,
-	    //                         error: error
-	    //                         });
 	    var widgets = {};
     	var list = [];
     	for (hostname in widget_map) {
@@ -92,7 +72,7 @@ $(function(){
     	}
 	}
 	
-	//$(window).resize(resize);
+	$(window).resize(resize);
 	
     
 });
