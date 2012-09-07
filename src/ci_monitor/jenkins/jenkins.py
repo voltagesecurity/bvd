@@ -27,7 +27,7 @@ class RetrieveJob(object):
             json = simplejson.load(conn)
 
             if 'result' in json and 'fullDisplayName' in json:
-                jobname = json.get('fullDisplayName')
+                jobname = self.jobname
                 status   = json.get('result')
             else:
                 return None

@@ -100,6 +100,15 @@ body {
     background-color: #A9A9A9;
 }
 
+.widget.unstable {
+    color: white;
+    text-shadow: 1px 1px 1px black;
+    background-color: #ffd700;
+    background-image: url(../images/cloudy.png);
+    background-repeat:no-repeat;
+    background-position:center;
+}
+
 @-webkit-keyframes blink {
         from {
                 -webkit-box-shadow:0 -1px 10px rgba(225,100,90, 0.5), 0 -1px 20px rgba(225,100,90, 1);

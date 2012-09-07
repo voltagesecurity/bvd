@@ -19,7 +19,7 @@ div.button {
 	{%for job in jobs %}
 		<script>
 			var count = $("#widgets").children().length + 3;
-		    var $widget = new Widget('{{job.displayname}}', '{{job.status}}', count);
+		    var $widget = new Widget('{{job.jobname}}', '{{job.displayname}}','{{job.status}}', count);
 		
 			if (typeof(widget_map['{{job.ci_server.hostname}}']) != 'undefined') {
 		        widget_map['{{job.ci_server.hostname}}'].push($widget);

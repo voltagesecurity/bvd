@@ -16,39 +16,56 @@ var Poll = function(url) {
 	};
 	
 	this.ajax = function() {
-	    if (self.created.length > 0) {
-    	    self.post_data = {
-    	        'hosts' : JSON.stringify(self.created['hosts'])
-    	    };
-    	} else {
-    	    self.post_data =  {
-    	        
-    	    };
+	    // if (self.created.length > 0) {
+	    //             self.post_data = {
+	    //                 'hosts' : JSON.stringify(self.created['hosts'])
+	    //             };
+	    //         } else {
+	    //             self.post_data =  {
+	    //                 
+	    //             };
+	    //         }
+	    //         
+	    //         return $.ajax({
+	    //                         url: url,
+	    //                         type: 'post',
+	    //                         data: self.post_data,
+	    //                         headers: {
+	    //                                "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val(),
+	    //                         },
+	    //                         success: success,
+	    //                         error: error
+	    //                         });
+	    var widgets = {};
+    	var list = [];
+    	for (hostname in widget_map) {
+    		$widgets = widget_map[hostname];
+    		for (i=0; i < $widgets.length; i++) {
+    			$widget = $widgets[i];
+    			data = {};
+    			data['hostname'] = hostname;
+        		data['jobname'] = $widget.jobname;
+        		list.push(data);
+    		}
     	}
-    	
-    	return $.ajax({
-    	                url: url,
-    	                type: 'post',
-    	                data: self.post_data,
-    	                headers: {
-    	                       "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val(),
-    	                },
-    	                success: success,
-    	                error: error
-    	                });
+    	widgets['widgets'] = JSON.stringify(list);
+    	do_ajax('post','/pull/update_jobs/',widgets, function(data) {
+    	    data = eval(data);
+    	    update_widgets(data);
+    	    save_widgets();
+    	});
 	}
 }
 
 $(function(){
 
-	// var poll = new Poll('/pull/get_jenkins_views/');
-	//     poll.ajax();
-	//     
-	//     var jenkins = function() {
-	//         poll.ajax();
-	//     }
+	var poll = new Poll('/pull/get_jenkins_views/');
+   
+    var jenkins = function() {
+        poll.ajax();
+    }
 	
-	//setInterval(jenkins,'60000');
+	setInterval(jenkins,'60000');
 	
 	var resize = function(data) {
 	    

@@ -12,8 +12,8 @@ var do_ajax = function (type, url, data, success, error) {
 }
 
 function save_widgets() {
-	widgets = {};
-	list = [];
+	var widgets = {};
+	var list = [];
 	for (hostname in widget_map) {
 		$widgets = widget_map[hostname];
 		for (i=0; i < $widgets.length; i++) {
@@ -140,4 +140,20 @@ function create_or_update_widgets(json_results) {
 
 	return created;
 }
+
+function update_widgets(json_results) {
+    for (i =0; i < json_results.length; i++) {
+        if (typeof(widget_map[json_results[i]['hostname']]) != 'undefined') {
+            $widgets = widget_map[json_results[i]['hostname']];
+            for (j = 0; j < $widgets.length; j++) {
+                $widget = $widgets[j];
+                if ($widget.jobname == json_results[i].jobname) {
+                    $widget.set_status(json_results[i].status);
+                }
+            }
+            widget_map[json_results[i]['hostname']] = $widgets;
+        }
+    }	
+}
+
 

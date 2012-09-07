@@ -70,11 +70,23 @@ def retrieve_job(request):
     hostname = append_http(request.POST.get('hostname',''))
     jobname = request.POST.get('jobname',None)
     displayname = request.POST.get('displayname')
-    if not bool(displayname): displayname = jobname
+    
+    
     
     if hostname.strip() == 'http://' or not jobname:
         result = [dict(status = 500)]
         return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+        
+    #check to see if job already exists in DB with entity active
+    try:
+        job = models.CiJob.objects.get(jobname=jobname,ci_server__hostname=hostname,entity_active=True)
+        exists = True
+    except ObjectDoesNotExist:
+        exists = False
+    
+    if exists:
+        result = dict(status = 100)
+        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
     key = str('%s/%s' % (hostname, jobname))
     result = memc.get(key)
@@ -83,7 +95,7 @@ def retrieve_job(request):
         result = dict(status = 500)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
         
-    result.update(dict(displayname = displayname))
+    result.update(dict(displayname = displayname, jobname = displayname))
         
     return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
@@ -96,6 +108,8 @@ def save_job(**widget):
     displayname = widget.get('displayname')
     width = widget.get('width')
     height = widget.get('height')
+    print '>>>>>>>>>>>> widget'
+    print widget
     
     if hostname.strip() == '' or not bool(jobname) or not bool(left) or not bool(top):
         result = [dict(status = 500)]
@@ -109,8 +123,11 @@ def save_job(**widget):
         
     try:
         job = models.CiJob.objects.get(jobname=jobname,ci_server__hostname=hostname,entity_active=True)
-        job.left_positon = left
+        job.left_position = left
         job.top_position = top
+        job.width = width
+        job.height = height
+        job.status = status
         job.save()
     except ObjectDoesNotExist:
         job = models.CiJob(jobname=jobname, left_position=left, top_position=top, entity_active=True, status=status, displayname=displayname, width=width, height=height)
@@ -124,7 +141,7 @@ def save_jobs(request):
     widgets = simplejson.loads(request.POST['widgets'])
     for widget in widgets:
         save_job(**widget)
-    result = dict(status = 200)
+    result = [dict(status = 200)]
     return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
     
 def autocomplete_hostname(request):
@@ -209,29 +226,44 @@ def poll_ci(hosts):
     
     
 def poll_jenkins_servers(request, *args, **kwargs):
-    if request.is_ajax():
-        print request.POST
-        """
-        if 'hosts' in request.POST:
-            l = simplejson.loads(request.POST['hosts'])
-            hosts = []
-            for d in l:
-                for k,v in d.iteritems():
-                    hosts.append(dict(hostname=k,json=v))
+    
+    results = []
+    widgets = simplejson.loads(request.POST['widgets'])
+    for widget in widgets:
+        print widget
+        job = RetrieveJob(widget.get('hostname'),widget.get('jobname'))
+        result = job.lookup_job()
+        if result == urllib2.URLError:
+            result = dict(status = 500)
+        elif result == ValueError:
+            result = dict(status = 404)
         else:
-            hosts = settings.CI_INSTALLATIONS
-        
-        results = poll_ci(hosts)
-        """    
-        results = []
-        for i in range(5):
-            results.append(dict(hostname='http://localhost:80%d' % i, json = [dict(job_name = 'Server-%d-Job-%d' % (i,x),status='SUCCESS' if x%2 ==0 else 'FAILURE') for x in range(0,5)]))
-        print '>>>>>>>>>>>>>>>>> results %s' % results
-        return HttpResponse(simplejson.dumps(results), content_type = 'application/javascript; charset=utf8')
-        #if results == []:
-        #   raise RuntimeError('Please check jenkins URIs in settings.py')
-    else:
-        raise RuntimeError('Improper use of View')
+            result.update({'hostname' : widget.get('hostname')})
+            results.append(result)
+    
+    return HttpResponse(simplejson.dumps(results), content_type = 'application/javascript; charset=utf8')
+    
+    # if request.is_ajax():
+    #         if 'hosts' in request.POST:
+    #             l = simplejson.loads(request.POST['hosts'])
+    #             hosts = []
+    #             for d in l:
+    #                 for k,v in d.iteritems():
+    #                     hosts.append(dict(hostname=k,json=v))
+    #         else:
+    #             #hosts = settings.CI_INSTALLATIONS
+    #             return HttpResponse(simplejson.dumps([dict(status='no hosts')]), content_type = 'application/javascript; charset=utf8')
+    #         
+    #         results = poll_ci(hosts) 
+    #         # results = []
+    #         #        for i in range(5):
+    #         #            results.append(dict(hostname='http://localhost:80%d' % i, json = [dict(job_name = 'Server-%d-Job-%d' % (i,x),status='SUCCESS' if x%2 ==0 else 'FAILURE') for x in range(0,5)]))
+    #         #        print '>>>>>>>>>>>>>>>>> results %s' % results
+    #         return HttpResponse(simplejson.dumps(results), content_type = 'application/javascript; charset=utf8')
+    #         #if results == []:
+    #         #   raise RuntimeError('Please check jenkins URIs in settings.py')
+    #     else:
+    #         raise RuntimeError('Improper use of View')
         
 def start_jenkins2(request):
     import subprocess

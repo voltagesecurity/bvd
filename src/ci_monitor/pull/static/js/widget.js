@@ -17,18 +17,29 @@ var Widget = function(jobname, displayname, status, counter){
 		this.addClass('success');
 		this.removeClass('error');
 		this.removeClass('down');
+		this.removeClass('unstable');
 	}
 	
 	this.make_failure = function() {
 		this.addClass('error');
 		this.removeClass('success');
 		this.removeClass('down');
+		this.removeClass('unstable');
 	}
 	
 	this.make_down = function() {
 	    this.addClass('down');
 	    this.removeClass('success');
 	    this.removeClass('error');
+	    this.removeClass('unstable');
+	    
+	}
+	
+	this.make_unstable = function () {
+	    this.addClass('unstable');
+	    this.removeClass('success');
+	    this.removeClass('error');
+	    this.removeClass('down');
 	}
 	
 	this.set_size = function(count, prev_left, prev_top, counter) {
@@ -44,9 +55,9 @@ var Widget = function(jobname, displayname, status, counter){
 		
 		var left = prev_left + size + 50;
 		
-		left = (counter % mod == 0 && left < 1400) ? 0 : left;
+		left = (counter % mod == 0 && left < $(window).width()) ? 0 : left;
 		
-		var top = (counter % mod == 0 && left < 1400) ? (counter == 0) ? 0 : prev_top + size + 50  : prev_top
+		var top = (counter % mod == 0 && left < $(window).width()) ? (counter == 0) ? 0 : prev_top + size + 50  : prev_top
 		
 		this.css('height',size+'px');
 		this.css('width',size+'px');
@@ -55,6 +66,7 @@ var Widget = function(jobname, displayname, status, counter){
 	}
 	
 	this.set_status = function(status) {
+	    this.status = status;
 	    switch (status) {
     		case 'SUCCESS':
     			this.make_success();
@@ -65,6 +77,9 @@ var Widget = function(jobname, displayname, status, counter){
     		case 'DOWN':
     		    this.make_down();
     		    break;
+    		case 'UNSTABLE':
+        	    this.make_unstable();
+        	    break;
     		case '404':
     		    break;
     	}
