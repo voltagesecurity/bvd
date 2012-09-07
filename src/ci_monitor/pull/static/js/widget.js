@@ -11,7 +11,7 @@ var widget_map = {};
 	
 	@param job_name String 
 */
-var Widget = function(job_name, status, counter){
+var Widget = function(jobname, displayname, status, counter){
 
 	this.make_success = function() {
 		this.addClass('success');
@@ -94,13 +94,14 @@ var Widget = function(job_name, status, counter){
 	    
 	    $.extend(this,$("<div></div>"));
 	    
-        this.job_name = job_name;
+        this.jobname = jobname;
         this.status = status;
+        this.displayname = displayname;
         
         this.attr('id','wdg'+counter);
         this.id = this.attr('id');
 		$marquee = $('<div></div>');
-		$marquee.html(this.job_name);
+		$marquee.html(this.jobname);
 		this.attr('class','widget');
 		this.css('position','absolute')
 		this.append($marquee);

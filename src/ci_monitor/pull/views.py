@@ -87,19 +87,19 @@ def retrieve_job(request):
         
     return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
-def save_job(request):
-    hostname = append_http(request.POST.get('hostname',''))
-    jobname = request.POST.get('jobname')
-    left = request.POST.get('left')
-    top = request.POST.get('top')
-    status = request.POST.get('status')
-    displayname = request.POST.get('displayname')
-    width = request.POST.get('width')
-    height = request.POST.get('height')
+def save_job(**widget):
+    hostname = append_http(widget.get('hostname',''))
+    jobname = widget.get('jobname')
+    left = widget.get('left')
+    top = widget.get('top')
+    status = widget.get('status')
+    displayname = widget.get('displayname')
+    width = widget.get('width')
+    height = widget.get('height')
     
     if hostname.strip() == '' or not bool(jobname) or not bool(left) or not bool(top):
         result = [dict(status = 500)]
-        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+        #return result
         
     try:
         server = models.CiServer.objects.get(hostname=hostname)
@@ -118,7 +118,14 @@ def save_job(request):
         job.save()
         
     result = dict(status = 200)
-    return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
+    #return result
+
+def save_jobs(request):
+    widgets = simplejson.loads(request.POST['widgets'])
+    for widget in widgets:
+        save_job(**widget)
+    result = dict(status = 200)
+    return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
     
 def autocomplete_hostname(request):
     txt = request.POST.get('txt')

@@ -11,9 +11,28 @@ var do_ajax = function (type, url, data, success, error) {
 	    });
 }
 
+function save_widgets() {
+	widgets = {};
+	list = [];
+	for (hostname in widget_map) {
+		$widgets = widget_map[hostname];
+		for (i=0; i < $widgets.length; i++) {
+			$widget = $widgets[i];
+			data = $widget.getWidgetDimensions();
+			data['hostname'] = hostname;
+    		data['displayname'] = $widget.displayname;
+    		data['jobname'] = $widget.jobname;
+    		data['status'] = $widget.status;
+    		list.push(data);
+		}
+	}
+	widgets['widgets'] = JSON.stringify(list);
+	do_ajax('post','/pull/save_jobs/',widgets);
+}
+
 function create_new_widget(json) {
     var count = $("#widgets").children().length + 3;
-    var $widget = new Widget(json.displayname, json.status, count);
+    var $widget = new Widget(json.jobname, json.displayname, json.status, count);
     
     if (typeof(widget_map[json.hostname]) != 'undefined') {
         widget_map[json.hostname].push($widget);
@@ -23,15 +42,16 @@ function create_new_widget(json) {
     }
     
     set_size_of_widgets(count);
-    data = $widget.getWidgetDimensions();
-    alert($widget.id);
-    alert(data['left']);
-    alert(data['top']);
-    data['hostname'] = json.hostname;
-    data['displayname'] = json.displayname;
-    data['jobname'] = json.jobname;
-    data['status'] = json.status;
-    do_ajax('post','/pull/save_job/',data);
+    save_widgets();
+    // data = $widget.getWidgetDimensions();
+    // alert($widget.id);
+    // alert(data['left']);
+    // alert(data['top']);
+    // data['hostname'] = json.hostname;
+    // data['displayname'] = json.displayname;
+    // data['jobname'] = json.jobname;
+    // data['status'] = json.status;
+    // do_ajax('post','/pull/save_job/',data);
    
 }
 
@@ -120,3 +140,4 @@ function create_or_update_widgets(json_results) {
 
 	return created;
 }
+

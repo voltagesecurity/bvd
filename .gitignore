@@ -6,3 +6,5 @@ dist/
 *.db
 nohup.out
 .DS_STORE
+.project
+.pydevproject
