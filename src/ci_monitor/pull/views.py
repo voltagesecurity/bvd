@@ -108,9 +108,7 @@ def save_job(**widget):
     displayname = widget.get('displayname')
     width = widget.get('width')
     height = widget.get('height')
-    print '>>>>>>>>>>>> widget'
-    print widget
-    
+
     if hostname.strip() == '' or not bool(jobname) or not bool(left) or not bool(top):
         result = [dict(status = 500)]
         #return result
@@ -230,7 +228,6 @@ def poll_jenkins_servers(request, *args, **kwargs):
     results = []
     widgets = simplejson.loads(request.POST['widgets'])
     for widget in widgets:
-        print widget
         job = RetrieveJob(widget.get('hostname'),widget.get('jobname'))
         result = job.lookup_job()
         if result == urllib2.URLError:
