@@ -25,7 +25,11 @@ $(function(){
     });
     
     $(document).on('blur', 'input[type=text]', function () {
-        txtfield_blur($(this));
+        txtfield_blur(txtfield_map,$(this));
+    });
+    
+    $(document).on('blur', 'input[type=password]', function () {
+        passfield_blur($(this));
     });
     
     hostname_autocomplete();

@@ -1,4 +1,8 @@
-function load_login_form() {
+var login_ok_button = function () {
+	
+}
+
+var load_login_form = function() {
 	id = 'login_modal';
 	var $modal;
     	
@@ -35,5 +39,5 @@ function load_login_form() {
     }
     
     
-    $modal = modal_factory('/pull/get_modal?template=login',id, opts);
+    $modal = modal_factory(get_url('modal','?template=login'),id, opts);
 }

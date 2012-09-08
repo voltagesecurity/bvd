@@ -21,7 +21,7 @@ var add_job_ok_click = function($modal,txt_map) {
 	}
 	var data = {};
 	for (id in txt_map) {data[id] = $("#" + id + "").val();}                            
-    do_ajax('post', '/pull/retrieve_job/', data,function(data){add_job_success(data,$modal);});
+    do_ajax('post', get_url('retrieve_job'), data,function(data){add_job_success(data,$modal);});
 }
 
 function add_job(txt_map) {
@@ -50,7 +50,7 @@ function add_job(txt_map) {
 	}
     
     
-    $modal = modal_factory('/pull/get_modal?template=add_job',id, opts);
+    $modal = modal_factory(get_url('modal','?template=add_job'),id, opts);
 }
 
 var hostname_autocomplete = function () {
@@ -60,7 +60,7 @@ var hostname_autocomplete = function () {
             source : function(request,response) {
                 var data = {};
                 data['txt'] = request.term;
-                var result = do_ajax('post','/pull/autocomplete_hostname/',data,function(data) {response(eval(data))});
+                var result = do_ajax('post',get_url('ac_hostname'),data,function(data) {response(eval(data))});
             }
         });
     });

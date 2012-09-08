@@ -44,6 +44,19 @@ class ViewTests(unittest.TestCase):
         self.job1.save()
         
     
+    def test_signup_form_is_valid(self):
+        expected = [dict(status = 200)]
+        post_data = {'email' : 'sam.mohamed@voltage.com', 
+                     'username' : 'sammohamed', 
+                     'password1' : 'testpass' , 
+                     'passsword2' : 'testpass'}
+        
+        request = self.factory.post('/pull/signup',data=post_data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        actual = views.signup(request)
+        
+        self.assertEqual(actual.content,simplejson.dumps(expected))
+        self.assertEqual(actual.status_code,200)
+        
 
     def test_validate_hostname_returns_404(self):
 		request = self.factory.post('/pull/validate_hostname', HTTP_X_REQUESTED_WITH='XMLHttpRequest')

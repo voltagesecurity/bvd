@@ -43,7 +43,6 @@ def validate_hostname(request):
     return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
 def validate_job(request):
-    print request.POST
     hostname = append_http(request.POST.get('hostname',''))
     jobname = request.POST.get('jobname',None)
     
@@ -74,8 +73,6 @@ def retrieve_job(request):
     jobname = request.POST.get('jobname',None)
     displayname = request.POST.get('displayname')
     
-    
-    
     if hostname.strip() == 'http://' or not jobname:
         result = [dict(status = 500)]
         return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
@@ -95,6 +92,7 @@ def retrieve_job(request):
     result = memc.get(key)
     
     if not result:
+        print 'NO MEMCACHED'
         result = dict(status = 500)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
         
