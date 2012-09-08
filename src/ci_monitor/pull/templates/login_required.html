@@ -1,0 +1,15 @@
+<div class="login_required">&nbsp;</div>
+<script>
+	var buttons = [
+		{
+			text: 'Login',
+			click: function() {
+				$("#add_job_modal").remove();
+				load_login_form();
+			}
+		}
+	];
+	
+	$("#add_job_modal").dialog('option','buttons',buttons);
+	$("#add_job_modal").dialog( "option", "title", "Please login!" );
+</script>

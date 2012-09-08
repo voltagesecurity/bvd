@@ -6,7 +6,8 @@ var urls = {
 	ac_hostname      : '/pull/autocomplete_hostname/',
 	signup           : '/pull/signup/',
 	username         : '/pull/validate_username/',
-	login            : '/pull/login/'
+	login            : '/pull/login/',
+	logout           : '/pull/logout/'
 }
 
 function get_txtfield_map() {

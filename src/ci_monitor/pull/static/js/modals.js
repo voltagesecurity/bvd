@@ -16,6 +16,10 @@ $(function(){
     $("#login").on("click",function(){
     	load_login_form();
     });
+    
+    $("#logout").on("click",function(){
+    	do_logout();
+    });
 
     $("#add_job").on("click",function () {
     	add_job(txtfield_map);

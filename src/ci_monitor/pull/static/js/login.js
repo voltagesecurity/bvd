@@ -76,3 +76,37 @@ var load_login_form = function() {
     
     $modal = modal_factory(get_url('modal','?template=login'),id, opts);
 }
+
+var logout_success = function() {
+	
+	$("#logout").css('display','none');
+	$("#login").css('display','block');
+	
+	id = 'logout_modal';
+	
+	var $modal;
+	
+	var buttons = [
+    	{
+			text: "OK",
+			click: function() { $modal.remove(); }
+		}
+		
+	];
+                    
+	var opts =      {
+		width : 600,
+		height : 400,
+		autoOpen: true,
+		title: 'Logout complete!',
+		resizable : false,
+		modal : true,
+		buttons: buttons
+	}
+	
+	$modal = modal_factory(get_url('modal','?template=logout_success'),id, opts);	
+}
+
+var do_logout = function() {
+	do_ajax('post', get_url('logout'), {},function(data){logout_success();});	
+}

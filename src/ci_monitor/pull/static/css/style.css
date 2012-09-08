@@ -109,6 +109,24 @@ body {
     background-position:center;
 }
 
+.login_required {
+	background-image: url(../images/login-required.jpg);
+	background-size:550px 171px;
+    background-repeat:no-repeat;
+    background-position:top;
+    width: 600px;
+    height: 300px;
+}
+
+.logout_success {
+	background-image: url(../images/logout_icon.png);
+	background-size:256px 256px;
+    background-repeat:no-repeat;
+    background-position:top;
+    width: 600px;
+    height: 300px;
+}
+
 @-webkit-keyframes blink {
         from {
                 -webkit-box-shadow:0 -1px 10px rgba(225,100,90, 0.5), 0 -1px 20px rgba(225,100,90, 1);

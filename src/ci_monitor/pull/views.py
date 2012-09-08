@@ -6,7 +6,7 @@ from django.utils import simplejson
 from django.http import HttpResponse
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth import authenticate, login as django_login
+from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.contrib.auth.models import User
 
 import memcache
@@ -39,6 +39,10 @@ def login(request):
         return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
     
     return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
+
+def logout(request):
+    django_logout(request)
+    return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
             
 def validate_username(request):
     username = request.POST.get('username')
@@ -126,7 +130,7 @@ def retrieve_job(request):
         
     return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
-def save_job(**widget):
+def save_job(request, **widget):
     hostname = append_http(widget.get('hostname',''))
     jobname = widget.get('jobname')
     left = widget.get('left')
@@ -162,10 +166,35 @@ def save_job(**widget):
     result = dict(status = 200)
     #return result
 
+def save_user_job(request):
+    if not request.user.is_authenticated():
+        result = [dict(status = 401)]
+        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    
+    widget = request.POST.get('widget',None)
+    if not widget:
+        result = [dict(status = 500)]
+        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    
+    save_job(request, **widget)
+    result = [dict(status = 200)]
+    return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    
+    
+
 def save_jobs(request):
+    if not request.user.is_authenticated():
+        result = [dict(status = 401)]
+        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    
     widgets = simplejson.loads(request.POST['widgets'])
+    
+    if not widgets:
+        result = [dict(status = 500)]
+        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    
     for widget in widgets:
-        save_job(**widget)
+        save_job(request, **widget)
     result = [dict(status = 200)]
     return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
     
@@ -178,11 +207,18 @@ def autocomplete_hostname(request):
     
     
 def get_modal(request):
-    template = request.GET.get('template')    
+    template = request.GET.get('template') 
+    if template == 'add_job':
+        if not request.user.is_authenticated():
+            template = 'login_required.html'
+            return render_to_response(template,
+                  dict(),
+                  context_instance=RequestContext(request))
+       
     template = '%s.html' % template
     
     return render_to_response(template,
-                  dict(title='Welcome to CI-Monitor'),
+                  dict(),
                   context_instance=RequestContext(request))
     
 def signup(request):
