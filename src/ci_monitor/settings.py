@@ -182,7 +182,7 @@ AD_NT4_DOMAIN='YOURDOMAIN'
 AD_SEARCH_FIELDS= ['mail','givenName','sn','sAMAccountName','memberOf']
 AD_MEMBERSHIP_REQ=['Group_Required','Alternative_Group']
 AD_CERT_FILE='/path/to/your/cert.txt'
-AUTHENTICATION_BACKENDS = ('ci_monitor.accounts.backends.ActiveDirectoryGroupMembershipSSLBackend','django.contrib.auth.backends.ModelBackend')
+#AUTHENTICATION_BACKENDS = ('ci_monitor.accounts.backends.ActiveDirectoryGroupMembershipSSLBackend','django.contrib.auth.backends.ModelBackend')
 AD_DEBUG=True
 AD_DEBUG_FILE='/path/to/writable/log/file/ldap.debug'
 

@@ -1,4 +1,4 @@
-
+"""
 class ActiveDirectoryGroupMembershipSSLBackend:
 
 	def authenticate(self,username=None,password=None):
@@ -24,3 +24,4 @@ class ActiveDirectoryGroupMembershipSSLBackend:
 			
 		except MultipleObjectsReturned:
 			return None
+"""

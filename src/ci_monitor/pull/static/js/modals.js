@@ -11,6 +11,7 @@ $(function(){
     $("#add_job").button();
     
     $("#login").button();
+    $("#logout").button();
     
     $("#login").on("click",function(){
     	load_login_form();

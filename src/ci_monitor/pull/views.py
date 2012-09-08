@@ -7,6 +7,7 @@ from django.http import HttpResponse
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate, login
+from django.contrib.auth.models import User
 
 import memcache
 memc = memcache.Client(['127.0.0.1:11211'], debug=1)
@@ -29,6 +30,16 @@ def home(request,template='index.html'):
                               dict(title='Welcome to CI-Monitor', jobs = jobs),
                               context_instance=RequestContext(request))
             
+def validate_username(request):
+    username = request.POST.get('username')
+    
+    try:
+        User.objects.get(username=username)
+    except User.DoesNotExist:
+        return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
+
+    return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
+ 
 def validate_hostname(request):
     job = RetrieveJob(append_http(request.POST.get('hostname',None)),None)
     test = job.lookup_hostname()
@@ -69,6 +80,11 @@ def validate_job(request):
     return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
     
 def retrieve_job(request):
+    
+    if not request.user.is_authenticated():
+        result = [dict(status = 401)]
+        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+    
     hostname = append_http(request.POST.get('hostname',''))
     jobname = request.POST.get('jobname',None)
     displayname = request.POST.get('displayname')
@@ -162,10 +178,12 @@ def get_modal(request):
 def signup(request):
     form = forms.SignupForm(request.POST)
     if form.is_valid():
-        user = form.save()
-        login(user)
+        form.save()
+        user = authenticate(username=request.POST.get('username'),password=request.POST.get('password1'))
+        login(request, user)
         return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
     else:
+        print form.errors
         return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
     
 def poll_jenkins_servers(request, *args, **kwargs):

@@ -1,5 +1,5 @@
 var password_txt = ['txt_password1','txt_password2'];
-var call_ajax = ['hostname','jobname'];
+var call_ajax = ['hostname','jobname','username'];
 
 var blur_success = function(data,$this) {
 	data = eval(data);

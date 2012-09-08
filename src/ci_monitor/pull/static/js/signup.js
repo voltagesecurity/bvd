@@ -36,6 +36,8 @@ var signup_success = function (data, $modal) {
 		$("#signuperror").html('Server Error');
 	} else {
 		$modal.remove();
+		$("#login").css('display','none');
+		$("#logout").css('display','block');
 	}
 }
 

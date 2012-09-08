@@ -1,6 +1,6 @@
 var add_job_success = function(data,$modal) {
 	data = eval(data);
-	if (data[0].status != 100 && data[0].status != 500){
+	if (data[0].status != 100 && data[0].status != 500 && data[0].status != 401){
 		$("#hostname_err").css('display','none');
 			$("#hostname_err").html('Invalid URL');
 			create_new_widget(data[0]);
@@ -9,6 +9,9 @@ var add_job_success = function(data,$modal) {
 	} else if (data[0].status == 100) {
 		$("#hostname_err").css('display','block');
 		$("#hostname_err").html('Job Already Exists!');
+	} else if (data[0].status == 401) {
+		$("#hostname_err").css('display','block');
+		$("#hostname_err").html('Please login first!');
 	} else {
 		$("#hostname_err").css('display','block');
 		$("#hostname_err").html('Server Error!');

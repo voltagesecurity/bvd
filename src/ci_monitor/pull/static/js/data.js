@@ -4,7 +4,8 @@ var urls = {
 	retrieve_job     : '/pull/retrieve_job/',
 	modal            : '/pull/get_modal',
 	ac_hostname      : '/pull/autocomplete_hostname/',
-	signup           : '/pull/signup/'
+	signup           : '/pull/signup/',
+	username         : '/pull/validate_username/'
 }
 
 function get_txtfield_map() {
