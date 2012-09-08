@@ -5,7 +5,8 @@ var urls = {
 	modal            : '/pull/get_modal',
 	ac_hostname      : '/pull/autocomplete_hostname/',
 	signup           : '/pull/signup/',
-	username         : '/pull/validate_username/'
+	username         : '/pull/validate_username/',
+	login            : '/pull/login/'
 }
 
 function get_txtfield_map() {

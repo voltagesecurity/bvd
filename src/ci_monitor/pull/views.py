@@ -6,7 +6,7 @@ from django.utils import simplejson
 from django.http import HttpResponse
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login as django_login
 from django.contrib.auth.models import User
 
 import memcache
@@ -29,6 +29,16 @@ def home(request,template='index.html'):
     return render_to_response(template,
                               dict(title='Welcome to CI-Monitor', jobs = jobs),
                               context_instance=RequestContext(request))
+def login(request):
+    username = request.POST.get('username')
+    password = request.POST.get('password1')
+    
+    user = authenticate(username=username,password=password)
+    if user and user.is_active:
+        django_login(request,user)
+        return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
+    
+    return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
             
 def validate_username(request):
     username = request.POST.get('username')
@@ -180,7 +190,7 @@ def signup(request):
     if form.is_valid():
         form.save()
         user = authenticate(username=request.POST.get('username'),password=request.POST.get('password1'))
-        login(request, user)
+        django_login(request, user)
         return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
     else:
         print form.errors
