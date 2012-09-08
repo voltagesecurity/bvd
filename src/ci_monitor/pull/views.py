@@ -43,6 +43,7 @@ def validate_hostname(request):
     return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
 def validate_job(request):
+    print request.POST
     hostname = append_http(request.POST.get('hostname',''))
     jobname = request.POST.get('jobname',None)
     
