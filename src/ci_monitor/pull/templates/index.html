@@ -14,6 +14,20 @@ div.button {
 	<div style="float: right;"><button id="logout" style="display:{%if user.is_authenticated %}block;{%else%}none;{%endif%}">Logout</button></div>
 </div>
 <div id="widgets">
+	{%for job in jobs%}
+		<script>
+			var count = $("#widgets").children().length;
+			$widget = new Widget('{{job.ci_job.jobname}}','{{job.displayname}}','{{job.ci_job.status}}',count);
+			$widget.draw('{{job.width}}','{{job.height}}','{{job.left}}','{{job.top}}');
+			
+			if (typeof(widget_map['{{job.ci_job.ci_server.hostname}}']) != 'undefined') {
+				widget_map['{{job.ci_job.ci_server.hostname}}'].push($widget);
+			} else {
+				$widgets = [$widget];
+				widget_map['{{job.ci_job.ci_server.hostname}}'] = $widgets; 
+			}
+		</script>
+	{%endfor%}
 </div>
 <div>{%if request.user %}<input id="userid" value="{{request.user.id}}"/>{%endif%}</div>
 {%csrf_token%}

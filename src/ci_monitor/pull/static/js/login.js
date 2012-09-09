@@ -23,6 +23,18 @@ var login_success = function(data,$modal) {
 		$modal.remove();
 		$("#login").css('display','none');
 		$("#logout").css('display','block');
+		$.each(data[0].jobs, function(){
+			var count = $("#widgets").children().length;
+			$widget = new Widget(''+this.jobname+'',''+this.displayname+'',''+this.status+'',count);
+			$widget.draw(''+this.width+'',''+this.height+'',''+this.left+'',''+this.top+'');
+			
+			if (typeof(widget_map[''+this.hostname+'']) != 'undefined') {
+				widget_map[''+this.hostname+''].push($widget);
+			} else {
+				$widgets = [$widget];
+				widget_map[''+this.hostnamee+''] = $widgets; 
+			}
+		});
 	}
 }
 
@@ -73,7 +85,6 @@ var load_login_form = function() {
         buttons: buttons
     }
     
-    
     $modal = modal_factory(get_url('modal','?template=login'),id, opts);
 }
 
@@ -103,6 +114,10 @@ var logout_success = function() {
 		modal : true,
 		buttons: buttons
 	}
+	
+	$.each($("#widgets").children(),function(){
+    	$(this).remove();
+    });
 	
 	$modal = modal_factory(get_url('modal','?template=logout_success'),id, opts);	
 }

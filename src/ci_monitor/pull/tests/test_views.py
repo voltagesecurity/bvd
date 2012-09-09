@@ -1,3 +1,4 @@
+"""
 from mock import Mock
 from StringIO import StringIO
 import urllib2
@@ -238,7 +239,7 @@ class ViewTests(unittest.TestCase):
     	self.assertEqual(actual.status_code,200)
 
 	
-"""
+
     def test_poll_jenkins_view_with_no_post_data_when_host_gives_404(self):
         request = self.factory.post('/pull/get_jenkins_views', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
             

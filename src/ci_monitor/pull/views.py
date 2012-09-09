@@ -13,8 +13,7 @@ import memcache
 memc = memcache.Client(['127.0.0.1:11211'], debug=1)
 
 from ci_monitor.jenkins.jenkins import PollCI, RetrieveJob
-from ci_monitor.pull import models
-from ci_monitor.pull import forms
+from ci_monitor.pull import models, forms
 
 def append_http(hostname):
     if not hostname: return 'http://'
@@ -25,9 +24,14 @@ def append_http(hostname):
         return 'http://%s' % hostname
 
 def home(request,template='index.html'):
-    jobs = models.CiJob.objects.filter(entity_active=True)
+    if not request.user.is_authenticated():
+        jobs = []
+        pass
+    else:
+        jobs = models.UserCiJob.objects.filter(entity_active=True,user__username=request.user.username)
+    #jobs = models.CiJob.objects.filter(entity_active=True)
     return render_to_response(template,
-                              dict(title='Welcome to CI-Monitor', jobs = jobs),
+                              dict(title='Welcome to CI-Monitor',jobs = jobs),
                               context_instance=RequestContext(request))
 def login(request):
     username = request.POST.get('username')
@@ -36,7 +40,24 @@ def login(request):
     user = authenticate(username=username,password=password)
     if user and user.is_active:
         django_login(request,user)
-        return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
+        from django.core import serializers
+        jobs =  models.UserCiJob.objects.filter(entity_active=True,user__username=user.username)
+        list = []
+        for job in jobs:
+            d = dict(
+                hostname = job.ci_job.ci_server.hostname,
+                jobname = job.ci_job.jobname,
+                displayname = job.displayname,
+                left = job.left,
+                top = job.top,
+                width = job.width,
+                height = job.height,
+                status = job.ci_job.status,
+                
+            )
+            list.append(d)
+        
+        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list)]), content_type = 'application/javascript; charset=utf8')
     
     return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
 
@@ -85,12 +106,11 @@ def validate_job(request):
         result = dict(status = 404)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     else:
-        result.update(dict(hostname = request.POST.get('hostname')))
+        result.update(dict(hostname = hostname))
         
     key = str('%s/%s' % (hostname, jobname))
     
     memc.set(key,result)
-
     return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
     
 def retrieve_job(request):
@@ -108,85 +128,61 @@ def retrieve_job(request):
         return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
         
     #check to see if job already exists in DB with entity active
-    try:
-        job = models.CiJob.objects.get(jobname=jobname,ci_server__hostname=hostname,entity_active=True)
-        exists = True
-    except ObjectDoesNotExist:
-        exists = False
+#    try:
+#        job = models.CiJob.objects.get(jobname=jobname,ci_server__hostname=hostname)
+#        exists = True
+#    except ObjectDoesNotExist:
+#        exists = False
     
-    if exists:
-        result = dict(status = 100)
-        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
+#    if exists:
+#        result = dict(status = 100)
+#        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
     key = str('%s/%s' % (hostname, jobname))
     result = memc.get(key)
     
     if not result:
-        print 'NO MEMCACHED'
         result = dict(status = 500)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
         
     result.update(dict(displayname = displayname, jobname = displayname))
         
     return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
-    
-def save_job(request, **widget):
-    hostname = append_http(widget.get('hostname',''))
-    jobname = widget.get('jobname')
-    left = widget.get('left')
-    top = widget.get('top')
-    status = widget.get('status')
-    displayname = widget.get('displayname')
-    width = widget.get('width')
-    height = widget.get('height')
 
-    if hostname.strip() == '' or not bool(jobname) or not bool(left) or not bool(top):
-        result = [dict(status = 500)]
-        #return result
-        
+def save_ci_server(**widget):
     try:
-        server = models.CiServer.objects.get(hostname=hostname)
-    except ObjectDoesNotExist:
-        server = models.CiServer(hostname=hostname)
-        server.save()
-        
-    try:
-        job = models.CiJob.objects.get(jobname=jobname,ci_server__hostname=hostname,entity_active=True)
-        job.left_position = left
-        job.top_position = top
-        job.width = width
-        job.height = height
-        job.status = status
-        job.save()
-    except ObjectDoesNotExist:
-        job = models.CiJob(jobname=jobname, left_position=left, top_position=top, entity_active=True, status=status, displayname=displayname, width=width, height=height)
-        job.ci_server = server
-        job.save()
-        
-    result = dict(status = 200)
-    #return result
+        ci_server = models.CiServer.objects.get(hostname=append_http(widget['hostname']))
+    except models.CiServer.DoesNotExist:
+        ci_server = forms.CiServerForm(data=widget).save()
+    
+    return ci_server
 
-def save_user_job(request):
-    if not request.user.is_authenticated():
-        result = [dict(status = 401)]
-        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+def save_ci_job(**widget):
+    try:
+        ci_job =  models.CiJob.objects.get(ci_server__hostname=widget['ci_server'],jobname=widget['jobname'])
+    except models.CiJob.DoesNotExist:
+        ci_job = forms.CiJobForm(data=widget).save()
+        
+    return ci_job
     
-    widget = request.POST.get('widget',None)
-    if not widget:
-        result = [dict(status = 500)]
-        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
+def save_user_ci_job(**widget):
+    ci_server = save_ci_server(**widget)
+    widget['ci_server'] = ci_server.pk
+    ci_job = save_ci_job(**widget)
+    widget['ci_job'] = ci_job.pk
     
-    save_job(request, **widget)
-    result = [dict(status = 200)]
-    return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
-    
-    
+    try:
+        user_ci_job = models.UserCiJob.objects.get(user__pk=widget['user'], ci_job__jobname=ci_job.jobname)
+        forms.UserCiJobForm(data=widget,instance=user_ci_job).save()
+    except models.UserCiJob.DoesNotExist:
+        user_ci_job = forms.UserCiJobForm(data=widget).save()
 
 def save_jobs(request):
     if not request.user.is_authenticated():
         result = [dict(status = 401)]
         return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
     
+    user = request.user
     widgets = simplejson.loads(request.POST['widgets'])
     
     if not widgets:
@@ -194,7 +190,9 @@ def save_jobs(request):
         return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
     
     for widget in widgets:
-        save_job(request, **widget)
+        widget['user'] = user.pk
+        widget['entity_active'] = True
+        save_user_ci_job(**widget)
     result = [dict(status = 200)]
     return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
     
