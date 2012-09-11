@@ -31,12 +31,6 @@ DATABASES = {
     }
 }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '127.0.0.1:11211',
-    }
-}
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -133,6 +127,8 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_openid_auth',
+    'django.contrib.admin',
 	'pull',
 	'jenkins',
 	
@@ -169,22 +165,35 @@ CI_INSTALLATIONS = (
 	'http://edge-master.voltage.com:8080/view/BVD/rssAll',
 )
 
+AUTHENTICATION_BACKENDS = (
+    'django_openid_auth.auth.OpenIDBackend',
+    #'django_auth_ldap.backend.LDAPBackend',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+# Tell django.contrib.auth to use the OpenID signin URLs.
+OPENID_CREATE_USERS = True
+OPENID_UPDATE_DETAILS_FROM_SREG = True
+OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'
+
+
+#import ldap
+#from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
+
+#AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(
+#    LDAPSearch("ou=employees,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+#    LDAPSearch("ou=miscellaneous accounts,ou=contractors,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+#)
+
+AUTH_LDAP_SERVER_URI = "ldap://narcolepsy.voltage.com"
+AUTH_LDAP_USER_ATTR_MAP = {
+    "first_name": "givenName",
+    "last_name": "sn",
+    "email": "mail"
+}
+
 import os
 PROJECT_ROOT = os.getcwd()
-
-
-AD_DNS_NAME='your-ldap-server.com'
-# If using SSL use these:
-AD_LDAP_PORT=636
-AD_LDAP_URL='ldaps://%s:%s' % (AD_DNS_NAME,AD_LDAP_PORT)
-AD_SEARCH_DN='dc=mygroup,dc=net,dc=com'
-AD_NT4_DOMAIN='YOURDOMAIN'
-AD_SEARCH_FIELDS= ['mail','givenName','sn','sAMAccountName','memberOf']
-AD_MEMBERSHIP_REQ=['Group_Required','Alternative_Group']
-AD_CERT_FILE='/path/to/your/cert.txt'
-#AUTHENTICATION_BACKENDS = ('ci_monitor.accounts.backends.ActiveDirectoryGroupMembershipSSLBackend','django.contrib.auth.backends.ModelBackend')
-AD_DEBUG=True
-AD_DEBUG_FILE='/path/to/writable/log/file/ldap.debug'
 
 #import dj_database_url
 #DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}

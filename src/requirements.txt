@@ -4,7 +4,6 @@ setuptools-git
 python-dateutil==2.1
 mock
 psycopg2==2.4.5
-django-auth-ldap
 python-openid
-django-openid-consumer
-
+django-openid-auth
+dj-database-url

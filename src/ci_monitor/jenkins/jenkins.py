@@ -13,7 +13,15 @@ class RetrieveJob(object):
         
     def lookup_hostname(self):
         try:
-            conn = urllib2.urlopen(self.hostname)
+            if self.hostname.find('cloudbees') > -1:
+                req = urllib2.Request(self.hostname)
+                import base64
+                base64string = base64.encodestring('%s:%s' % ('sam.mohamed@voltage.com', 'voltage321'))[:-1]
+                authheader =  "Basic %s" % base64string
+                req.add_header("Authorization", authheader)
+                conn = urllib2.urlopen(req)
+            else:
+                conn = urllib2.urlopen(self.hostname)
             conn.close()
             return True
         except ValueError:
@@ -23,7 +31,16 @@ class RetrieveJob(object):
             
     def lookup_job(self):
         try:
-            conn = urllib2.urlopen('%s/job/%s/lastBuild/api/json' % (self.hostname,self.jobname))
+            if self.hostname.find('cloudbees') > -1:
+                req = urllib2.Request('%s/job/%s/lastBuild/api/json' % (self.hostname,self.jobname))
+                import base64
+                base64string = base64.encodestring('%s:%s' % ('sam.mohamed@voltage.com', 'voltage321'))[:-1]
+                authheader =  "Basic %s" % base64string
+                req.add_header("Authorization", authheader)
+                conn = urllib2.urlopen(req)
+            else:
+                conn = urllib2.urlopen('%s/job/%s/lastBuild/api/json' % (self.hostname,self.jobname))
+            
             json = simplejson.load(conn)
 
             if 'result' in json and 'fullDisplayName' in json:

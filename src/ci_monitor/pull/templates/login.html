@@ -1,4 +1,17 @@
-<div class="modal">
+<!--<div class="modal">
 	<div><div><input type="text" id="username" value="Username"></div><div><label class="error_label" id="loginerror">Invalid Login!</label></div></div>
 	<div><div><input type="text" id="txt_password1" value="Password" ><input type="password" id="password1" style="display:none;" ></div></div>
-</div>
+</div>-->
+
+<div style="width:100%;height:100px;display: block;text-align:center;"><button id="ad_login">AD Login</button></div>
+<div style="width:100%;height:100px;display: block;text-align:center;"><button id="gmail_login">GMail Login</button></div>
+
+<script>
+	$("#ad_login").button();
+	$("#gmail_login").button();
+	
+	$("#gmail_login").on("click", function(){
+		window.location.href = '/openid/login';
+	});
+	
+</script>

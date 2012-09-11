@@ -16,9 +16,5 @@ urlpatterns = patterns('ci_monitor.pull.views',
 	url(r'^get_modal/$','get_modal',name='get_modal'),
     url(r'^login/$','login',name='login'),
     url(r'^logout/$','logout',name='logout'),
-	url(r'^start_j2/$','start_jenkins2'),
-	url(r'^stop_j2/$','stop_jenkins2'),
-	url(r'^start_j3/$','start_jenkins3'),
-	url(r'^stop_j3/$','stop_jenkins3'),
 	
 )

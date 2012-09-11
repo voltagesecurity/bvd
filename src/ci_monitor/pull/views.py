@@ -3,14 +3,12 @@ import urllib2, types
 from django.shortcuts import render_to_response
 from django.template import RequestContext
 from django.utils import simplejson
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.contrib.auth.models import User
 
-import memcache
-memc = memcache.Client(['127.0.0.1:11211'], debug=1)
 
 from ci_monitor.jenkins.jenkins import PollCI, RetrieveJob
 from ci_monitor.pull import models, forms
@@ -22,6 +20,9 @@ def append_http(hostname):
         return hostname
     else:
         return 'http://%s' % hostname
+    
+def redirect_to_home(request):
+    return HttpResponseRedirect('/')
 
 def home(request,template='index.html'):
     if not request.user.is_authenticated():
@@ -110,7 +111,7 @@ def validate_job(request):
         
     key = str('%s/%s' % (hostname, jobname))
     
-    memc.set(key,result)
+    request.session[key] = result
     return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
     
 def retrieve_job(request):
@@ -126,20 +127,9 @@ def retrieve_job(request):
     if hostname.strip() == 'http://' or not jobname:
         result = [dict(status = 500)]
         return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
-        
-    #check to see if job already exists in DB with entity active
-#    try:
-#        job = models.CiJob.objects.get(jobname=jobname,ci_server__hostname=hostname)
-#        exists = True
-#    except ObjectDoesNotExist:
-#        exists = False
-    
-#    if exists:
-#        result = dict(status = 100)
-#        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
     key = str('%s/%s' % (hostname, jobname))
-    result = memc.get(key)
+    result = request.session[key]
     
     if not result:
         result = dict(status = 500)
