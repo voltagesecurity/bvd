@@ -131,6 +131,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 	'pull',
 	'jenkins',
+    'django_auth_ldap',
 	
 )
 
@@ -167,7 +168,7 @@ CI_INSTALLATIONS = (
 
 AUTHENTICATION_BACKENDS = (
     'django_openid_auth.auth.OpenIDBackend',
-    #'django_auth_ldap.backend.LDAPBackend',
+    'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -177,15 +178,16 @@ OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'
 
 
-#import ldap
-#from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
+import ldap
+from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 
-#AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(
-#    LDAPSearch("ou=employees,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
-#    LDAPSearch("ou=miscellaneous accounts,ou=contractors,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
-#)
+AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(
+    LDAPSearch("ou=people,dc=example,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=employees,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=miscellaneous accounts,ou=contractors,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+)
 
-AUTH_LDAP_SERVER_URI = "ldap://narcolepsy.voltage.com"
+AUTH_LDAP_SERVER_URI = "ldap://192.168.210.129"
 AUTH_LDAP_USER_ATTR_MAP = {
     "first_name": "givenName",
     "last_name": "sn",

@@ -8,6 +8,39 @@
 
 <script>
 	$("#ad_login").button();
+	
+	$("#ad_login").on("click",function() {
+		id = 'login_ad';
+		var $modal;
+		
+		var buttons = [
+    	{
+    		text: 'Login',
+    		click: function() {
+    			login_ok_button($modal);
+    		}
+    	},
+    	{
+    		text: "Cancel",
+    		click: function() {
+    			$modal.remove();
+    		}
+    	}
+    ]
+	
+		var opts =      {
+        	width : 500,
+    		height : 300,
+        	autoOpen: true,
+        title: 'Login',
+        resizable : false,
+        modal : true,
+        buttons: buttons
+    }
+    
+    $modal = modal_factory(get_url('modal','?template=login_ad'),id, opts);
+	});
+	
 	$("#gmail_login").button();
 	
 	$("#gmail_login").on("click", function(){
