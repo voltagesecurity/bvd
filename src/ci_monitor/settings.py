@@ -182,13 +182,23 @@ import ldap
 from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
 
 AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(
-    LDAPSearch("ou=people,dc=example,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    LDAPSearch("ou=miscellaneous accounts,ou=contractors,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),                                    
+    #LDAPSearch("ou=people,dc=example,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
     LDAPSearch("ou=employees,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
-    LDAPSearch("ou=miscellaneous accounts,ou=contractors,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
+    
 )
 
-AUTH_LDAP_SERVER_URI = "ldap://192.168.210.129"
+import logging
+
+logger = logging.getLogger('django_auth_ldap')
+logger.addHandler(logging.StreamHandler())
+logger.setLevel(logging.DEBUG)
+
+AUTH_LDAP_BIND_DN = "voltage\sam.mohamed"
+AUTH_LDAP_BIND_PASSWORD = "BurhanBadawi12"
+AUTH_LDAP_SERVER_URI = "ldap://narcolepsy.voltage.com"
 AUTH_LDAP_USER_ATTR_MAP = {
+    "username" : "uid",
     "first_name": "givenName",
     "last_name": "sn",
     "email": "mail"

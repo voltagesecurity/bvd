@@ -35,6 +35,12 @@ function save_widgets() {
 	do_ajax('post','/pull/save_jobs/',widgets);
 }
 
+var remove_old_widgets = function() {
+	$.each($("#widgets").children(),function(){
+    	$(this).remove();
+    });
+}
+
 function create_new_widget(json) {
     var count = $("#widgets").children().length + 3;
     var $widget = new Widget(json.jobname, json.displayname, json.status, count);
@@ -93,6 +99,21 @@ function update_widgets(json_results) {
             widget_map[json_results[i]['hostname']] = $widgets;
         }
     }	
+}
+
+function redraw_widgets(data) {
+	$.each(data[0].jobs, function(){
+		var count = $("#widgets").children().length;
+		$widget = new Widget(''+this.jobname+'',''+this.displayname+'',''+this.status+'',count);
+		$widget.draw(''+this.width+'',''+this.height+'',''+this.left+'',''+this.top+'');
+			
+		if (typeof(widget_map[''+this.hostname+'']) != 'undefined') {
+			widget_map[''+this.hostname+''].push($widget);
+		} else {
+			$widgets = [$widget];
+			widget_map[''+this.hostnamee+''] = $widgets; 
+		}
+	});
 }
 
 

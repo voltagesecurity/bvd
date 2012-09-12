@@ -23,18 +23,7 @@ var login_success = function(data,$modal) {
 		$modal.remove();
 		$("#login").css('display','none');
 		$("#logout").css('display','block');
-		$.each(data[0].jobs, function(){
-			var count = $("#widgets").children().length;
-			$widget = new Widget(''+this.jobname+'',''+this.displayname+'',''+this.status+'',count);
-			$widget.draw(''+this.width+'',''+this.height+'',''+this.left+'',''+this.top+'');
-			
-			if (typeof(widget_map[''+this.hostname+'']) != 'undefined') {
-				widget_map[''+this.hostname+''].push($widget);
-			} else {
-				$widgets = [$widget];
-				widget_map[''+this.hostnamee+''] = $widgets; 
-			}
-		});
+		redraw_widgets(data);
 	}
 }
 
@@ -67,45 +56,6 @@ var load_login_form = function() {
 	
 }
 
-// var load_login_form = function() {
-	// id = 'login_modal';
-	// var $modal;
-//     	
-    // var buttons = [
-    	// {
-    		// text: 'Login',
-    		// click: function() {
-    			// login_ok_button($modal);
-    		// }
-    	// },
-    	// // {
-    		// // text: "Signup",
-    		// // click: function() {
-    			// // $modal.remove();
-    			// // load_signup_form();
-    		// // }
-    	// // },
-    	// {
-    		// text: "Cancel",
-    		// click: function() {
-    			// $modal.remove();
-    		// }
-    	// }
-    // ]
-//     	
-    // var opts =      {
-        // width : 600,
-    	// height : 300,
-        // autoOpen: true,
-        // title: 'Login',
-        // resizable : false,
-        // modal : true,
-        // buttons: buttons
-    // }
-//     
-    // $modal = modal_factory(get_url('modal','?template=login'),id, opts);
-// }
-
 var logout_success = function() {
 	
 	$("#logout").css('display','none');
@@ -133,9 +83,7 @@ var logout_success = function() {
 		buttons: buttons
 	}
 	
-	$.each($("#widgets").children(),function(){
-    	$(this).remove();
-    });
+	remove_old_widgets();
 	
 	$modal = modal_factory(get_url('modal','?template=logout_success'),id, opts);	
 }

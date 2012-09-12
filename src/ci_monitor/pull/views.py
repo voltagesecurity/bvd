@@ -8,6 +8,7 @@ from django.conf import settings
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.contrib.auth.models import User
+from django.core import serializers
 
 
 from ci_monitor.jenkins.jenkins import PollCI, RetrieveJob
@@ -20,6 +21,25 @@ def append_http(hostname):
         return hostname
     else:
         return 'http://%s' % hostname
+    
+def get_jobs_for_user(user):
+    jobs =  models.UserCiJob.objects.filter(entity_active=True,user__username=user.username)
+    list = []
+    for job in jobs:
+        d = dict(
+            hostname = job.ci_job.ci_server.hostname,
+            jobname = job.ci_job.jobname,
+            displayname = job.displayname,
+            left = job.left,
+            top = job.top,
+            width = job.width,
+            height = job.height,
+            status = job.ci_job.status,
+                
+        )
+        list.append(d)
+        
+    return list
     
 def redirect_to_home(request):
     return HttpResponseRedirect('/')
@@ -41,22 +61,7 @@ def login(request):
     user = authenticate(username=username,password=password)
     if user and user.is_active:
         django_login(request,user)
-        from django.core import serializers
-        jobs =  models.UserCiJob.objects.filter(entity_active=True,user__username=user.username)
-        list = []
-        for job in jobs:
-            d = dict(
-                hostname = job.ci_job.ci_server.hostname,
-                jobname = job.ci_job.jobname,
-                displayname = job.displayname,
-                left = job.left,
-                top = job.top,
-                width = job.width,
-                height = job.height,
-                status = job.ci_job.status,
-                
-            )
-            list.append(d)
+        list = get_jobs_for_user(request.user)
         
         return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list)]), content_type = 'application/javascript; charset=utf8')
     
@@ -163,6 +168,7 @@ def save_user_ci_job(**widget):
     
     try:
         user_ci_job = models.UserCiJob.objects.get(user__pk=widget['user'], ci_job__jobname=ci_job.jobname)
+        print "<>>>>><<<>> %s " % widget
         forms.UserCiJobForm(data=widget,instance=user_ci_job).save()
     except models.UserCiJob.DoesNotExist:
         user_ci_job = forms.UserCiJobForm(data=widget).save()
@@ -220,19 +226,8 @@ def signup(request):
         print form.errors
         return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
     
-def poll_jenkins_servers(request, *args, **kwargs):
+def pull_jobs(request, *args, **kwargs):
     
-    results = []
-    widgets = simplejson.loads(request.POST['widgets'])
-    for widget in widgets:
-        job = RetrieveJob(widget.get('hostname'),widget.get('jobname'))
-        result = job.lookup_job()
-        if result == urllib2.URLError:
-            result = dict(status = 500)
-        elif result == ValueError:
-            result = dict(status = 404)
-        else:
-            result.update({'hostname' : widget.get('hostname')})
-            results.append(result)
-    
-    return HttpResponse(simplejson.dumps(results), content_type = 'application/javascript; charset=utf8')
+    if request.user.is_authenticated():
+        list = get_jobs_for_user(request.user)
+        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list)]), content_type = 'application/javascript; charset=utf8')

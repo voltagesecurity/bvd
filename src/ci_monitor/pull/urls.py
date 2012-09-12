@@ -4,7 +4,7 @@ from django.views.generic.simple import direct_to_template
 urlpatterns = patterns('ci_monitor.pull.views',
     
     url(r'^$', 'home',name='home'),
-	url(r'^update_jobs/$','poll_jenkins_servers',name='poll_jenkins_view'),
+    url(r'^pull_jobs/$','pull_jobs',name='pull_jobs'),
 	url(r'^validate_hostname/$','validate_hostname',name='validate_hostname'),
     url(r'^validate_username/$','validate_username',name='validate_username'),
 	url(r'^validate_job/$','validate_job',name='validate_job'),
