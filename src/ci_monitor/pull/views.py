@@ -139,6 +139,12 @@ def retrieve_job(request):
     if not result:
         result = dict(status = 500)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
+    
+    #check to see if the user has already added the job
+    old_job = models.UserCiJob.objects.filter(entity_active=True,ci_job__jobname=jobname,user__username=request.user.username)
+    if len(old_job) > 0:
+        result = dict(status = 100)
+        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
         
     result.update(dict(displayname = displayname, jobname = displayname))
         
