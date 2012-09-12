@@ -29,7 +29,9 @@ $(function(){
 	var poll = new Poll('/pull/pull_jobs/');
    
     var jenkins = function() {
-        poll.ajax();
+    	if ($("#add_job_modal").length == 0) {
+        	poll.ajax();
+        }
     }
 	
 	setInterval(jenkins,'60000');

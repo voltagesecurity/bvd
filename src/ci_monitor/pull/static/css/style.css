@@ -78,19 +78,29 @@ body {
     background-position:center;
 }
 
+.icon {
+	float:right;
+	background-image: url(../images/gear-icon.png);
+	background-repeat:no-repeat;
+    background-position:center;
+    width: 30px;
+    height: 30px;
+    position: absolute;
+}
+
 .widget.error {
         
     color: white;
     text-shadow: 1px 1px 1px black;
-        background-color: #FF4234;
-        -webkit-animation-name: blink;
-        -webkit-animation-duration: 1s;
-        -webkit-animation-iteration-count: infinite;
-        -webkit-animation-direction: normal;
-        -webkit-animation-timing-function: ease;
-        background-image: url(../images/x6.png);
-    	background-repeat:no-repeat;
-        background-position:center;
+	background-color: #FF4234;
+	-webkit-animation-name: blink;
+	-webkit-animation-duration: 1s;
+	-webkit-animation-iteration-count: infinite;
+	-webkit-animation-direction: normal;
+	-webkit-animation-timing-function: ease;
+	background-image: url(../images/x6.png);
+	background-repeat:no-repeat;
+	background-position:center;
 }
 
 .widget.down {

@@ -53,10 +53,9 @@ var Widget = function(jobname, displayname, status, counter){
 		if (count <= 15) {mod = 5;}
 		else if (count >= 50) {mod = 7;}
 		
-		var left = prev_left + size + 50;
-		
+		var left = prev_left + size + 50; 		
 		left = (counter % mod == 0 && left < $(window).width()) ? 0 : left;
-		
+
 		var top = (counter % mod == 0 && left < $(window).width()) ? (counter == 0) ? 0 : prev_top + size + 50  : prev_top
 		
 		this.css('height',size+'px');
@@ -115,12 +114,20 @@ var Widget = function(jobname, displayname, status, counter){
         
         this.attr('id','wdg'+counter);
         this.id = this.attr('id');
+        
+        $icon = $('<div>&nbsp;</div>');
+		$icon.attr('class','icon');
+		this.append($icon);
+		
 		$marquee = $('<div></div>');
 		$marquee.html(this.jobname);
 		this.attr('class','widget');
 		this.css('position','absolute')
 		this.append($marquee);
 		this.set_status(this.status);
+		
+		
+		
 		$('#widgets').append(this);
 		// $marquee.marquee();
 		this.draggable({
