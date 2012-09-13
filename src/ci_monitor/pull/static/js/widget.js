@@ -11,7 +11,7 @@ var widget_map = {};
 	
 	@param job_name String 
 */
-var Widget = function(jobname, displayname, status, id, counter){
+var Widget = function(hostname, jobname, displayname, status, id, counter){
 
 	this.make_success = function() {
 		this.addClass('success');
@@ -108,6 +108,9 @@ var Widget = function(jobname, displayname, status, id, counter){
 	    
 	    $.extend(this,$("<div></div>"));
 	    
+	    var self = this;
+	    
+	    this.hostname = hostname;
         this.jobname = jobname;
         this.status = status;
         this.displayname = displayname;
@@ -121,12 +124,42 @@ var Widget = function(jobname, displayname, status, id, counter){
 		
 		$menu = $('<div></div>');
 		$ul = $('<ul></ul>');
+		
 		$li = $('<li></li>');
 		$li.html('Remove Job');
+		$li.attr('class','remove-job');
+		
+		$li.hover(function(){
+			$(this).addClass('menu-on');
+		},function(){
+			$(this).removeClass('menu-on');
+		});
+		
+		$li1 = $('<li></li>');
+		$li1.html('View Job');
+		
+		$li1.hover(function(){
+			$(this).addClass('menu-on');
+		},function(){
+			$(this).removeClass('menu-on');
+		});
+		
+		$li1.click(function(){
+			window.location.href = self.hostname + '/job/' + self.jobname;
+		});
+		
 		$ul.append($li);
+		$ul.append($li1);
+		
 		$menu.append($ul);
 		
 		$icon.append($menu);
+		
+		$icon.hover(function(){
+			$(this).children(0).toggle(400);
+		},function(){
+			$(this).children(0).toggle(400);
+		});
 		
 		$marquee = $('<div></div>');
 		$marquee.html(this.jobname);

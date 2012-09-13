@@ -43,7 +43,7 @@ var remove_old_widgets = function() {
 
 function create_new_widget(json) {
     var count = $("#widgets").children().length + 3;
-    var $widget = new Widget(json.jobname, json.displayname, json.status,json.pk, count);
+    var $widget = new Widget(json.hostname, json.jobname, json.displayname, json.status,json.pk, count);
     
     if (typeof(widget_map[json.hostname]) != 'undefined') {
         widget_map[json.hostname].push($widget);
@@ -91,7 +91,7 @@ function redraw_widgets(data) {
 	widget_map = {};
 	$.each(data[0].jobs, function(){
 		var count = $("#widgets").children().length;
-		$widget = new Widget(this.jobname,this.displayname,this.status,this.pk,count);
+		$widget = new Widget(json.hostname,this.jobname,this.displayname,this.status,this.pk,count);
 		$widget.draw(this.width,this.height,this.left,this.top);
 			
 		if (typeof(widget_map[this.hostname]) != 'undefined') {
