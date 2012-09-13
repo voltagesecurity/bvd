@@ -66,18 +66,13 @@ def save_user_ci_job(**widget):
     
     try:
         user_ci_job = models.UserCiJob.objects.get(user__pk=widget['user'], ci_job__jobname=ci_job.jobname)
-        print "<>>>>><<<>> %s " % widget
         form = forms.UserCiJobForm(data=widget,instance=user_ci_job)
         if form.is_valid():
             user_ci_job = form.save()
-        else:
-            print form.errors
     except models.UserCiJob.DoesNotExist:
         form = forms.UserCiJobForm(data=widget)
         if form.is_valid():
             user_ci_job = form.save()
-        else:
-            print form.errors
     return user_ci_job 
     
 def redirect_to_home(request):
@@ -250,11 +245,23 @@ def signup(request):
         django_login(request, user)
         return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
     else:
-        print form.errors
         return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
     
 def pull_jobs(request, *args, **kwargs):
     
     if request.user.is_authenticated():
         list = get_jobs_for_user(request.user)
+        for job in list:
+            jenkins = RetrieveJob(job['hostname'],job['jobname'])
+            result = jenkins.lookup_job()
+            
+            if result == urllib2.URLError:
+                #TODO: add an additional state other than down 
+                job['status'] = "DOWN"
+            elif result == ValueError:
+                #TODO: add an additional state other than down
+                job['status'] = "DOWN"
+            else:
+                job['status'] = result['status'] 
+            
         return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list)]), content_type = 'application/javascript; charset=utf8')

@@ -19,9 +19,9 @@ class RetrieveJob(object):
                 base64string = base64.encodestring('%s:%s' % ('sam.mohamed@voltage.com', 'voltage321'))[:-1]
                 authheader =  "Basic %s" % base64string
                 req.add_header("Authorization", authheader)
-                conn = urllib2.urlopen(req)
+                conn = urllib2.urlopen(req,timeout=5)
             else:
-                conn = urllib2.urlopen(self.hostname)
+                conn = urllib2.urlopen(self.hostname,timeout=5)
             conn.close()
             return True
         except ValueError:
@@ -37,9 +37,9 @@ class RetrieveJob(object):
                 base64string = base64.encodestring('%s:%s' % ('sam.mohamed@voltage.com', 'voltage321'))[:-1]
                 authheader =  "Basic %s" % base64string
                 req.add_header("Authorization", authheader)
-                conn = urllib2.urlopen(req)
+                conn = urllib2.urlopen(req,timeout=5)
             else:
-                conn = urllib2.urlopen('%s/job/%s/lastBuild/api/json' % (self.hostname,self.jobname))
+                conn = urllib2.urlopen('%s/job/%s/lastBuild/api/json' % (self.hostname,self.jobname),timeout=5)
             
             json = simplejson.load(conn)
 
