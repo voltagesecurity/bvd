@@ -91,7 +91,7 @@ function redraw_widgets(data) {
 	widget_map = {};
 	$.each(data[0].jobs, function(){
 		var count = $("#widgets").children().length;
-		$widget = new Widget(json.hostname,this.jobname,this.displayname,this.status,this.pk,count);
+		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count);
 		$widget.draw(this.width,this.height,this.left,this.top);
 			
 		if (typeof(widget_map[this.hostname]) != 'undefined') {

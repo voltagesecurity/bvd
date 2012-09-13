@@ -7,7 +7,8 @@ var urls = {
 	signup           : '/pull/signup/',
 	username         : '/pull/validate_username/',
 	login            : '/pull/login/',
-	logout           : '/pull/logout/'
+	logout           : '/pull/logout/',
+	remove           : '/pull/remove_job/'
 }
 
 function get_txtfield_map() {

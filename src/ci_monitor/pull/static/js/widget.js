@@ -110,6 +110,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter){
 	    
 	    var self = this;
 	    
+	    this.pk = id;
 	    this.hostname = hostname;
         this.jobname = jobname;
         this.status = status;
@@ -138,6 +139,31 @@ var Widget = function(hostname, jobname, displayname, status, id, counter){
 		$li1 = $('<li></li>');
 		$li1.html('View Job');
 		
+		$li.click(function(){
+			data = {};
+			data['pk'] = self.pk;
+			do_ajax('post',get_url('remove'),data,function(data){
+				//remove the element from the widget map
+				var $widgets = widget_map[self.hostname];
+				var index = 0;
+				var $widget;
+				for (i =0; i < $widgets.length; i++) {
+					if ($widgets[i].pk == self.pk) {
+						index = i;
+						$widget = $widgets[i];
+						break;
+					}
+				}
+				$widgets.splice(index,1);
+				$widget.remove();
+				widget_map[self.hostname] = $widgets;
+				set_size_of_widgets($("#widgets").children().length+3);
+				save_widgets();
+				var poll = new Poll('/pull/pull_jobs/');
+				poll.ajax();
+			});
+		});
+		
 		$li1.hover(function(){
 			$(this).addClass('menu-on');
 		},function(){
@@ -156,9 +182,9 @@ var Widget = function(hostname, jobname, displayname, status, id, counter){
 		$icon.append($menu);
 		
 		$icon.hover(function(){
-			$(this).children(0).toggle(400);
+			$(this).children(0).toggle();
 		},function(){
-			$(this).children(0).toggle(400);
+			$(this).children(0).toggle();
 		});
 		
 		$marquee = $('<div></div>');

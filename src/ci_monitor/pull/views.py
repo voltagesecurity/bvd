@@ -247,6 +247,13 @@ def signup(request):
     else:
         return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
     
+    
+def remove_job(request):
+    user_ci_job = models.UserCiJob.objects.get(pk=int(request.POST.get('pk')))
+    user_ci_job.entity_active = False
+    user_ci_job.save()
+    return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
+
 def pull_jobs(request, *args, **kwargs):
     
     if request.user.is_authenticated():
