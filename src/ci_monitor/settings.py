@@ -172,6 +172,9 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 
+#keep the session alive
+SESSION_SAVE_EVERY_REQUEST = True
+
 # Tell django.contrib.auth to use the OpenID signin URLs.
 OPENID_CREATE_USERS = True
 OPENID_UPDATE_DETAILS_FROM_SREG = True
