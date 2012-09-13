@@ -43,7 +43,7 @@ var remove_old_widgets = function() {
 
 function create_new_widget(json) {
     var count = $("#widgets").children().length + 3;
-    var $widget = new Widget(json.jobname, json.displayname, json.status, count);
+    var $widget = new Widget(json.jobname, json.displayname, json.status,json.pk, count);
     
     if (typeof(widget_map[json.hostname]) != 'undefined') {
         widget_map[json.hostname].push($widget);
@@ -86,25 +86,25 @@ function set_size_of_widgets(count) {
 	return db_list;
 }
 
-function update_widgets(json_results) {
-    for (i =0; i < json_results.length; i++) {
-        if (typeof(widget_map[json_results[i]['hostname']]) != 'undefined') {
-            $widgets = widget_map[json_results[i]['hostname']];
-            for (j = 0; j < $widgets.length; j++) {
-                $widget = $widgets[j];
-                if ($widget.jobname == json_results[i].jobname) {
-                    $widget.set_status(json_results[i].status);
-                }
-            }
-            widget_map[json_results[i]['hostname']] = $widgets;
-        }
-    }	
-}
+// function update_widgets(json_results) {
+    // for (i =0; i < json_results.length; i++) {
+        // if (typeof(widget_map[json_results[i]['hostname']]) != 'undefined') {
+            // $widgets = widget_map[json_results[i]['hostname']];
+            // for (j = 0; j < $widgets.length; j++) {
+                // $widget = $widgets[j];
+                // if ($widget.jobname == json_results[i].jobname) {
+                    // $widget.set_status(json_results[i].status);
+                // }
+            // }
+            // widget_map[json_results[i]['hostname']] = $widgets;
+        // }
+    // }	
+// }
 
 function redraw_widgets(data) {
 	$.each(data[0].jobs, function(){
 		var count = $("#widgets").children().length;
-		$widget = new Widget(''+this.jobname+'',''+this.displayname+'',''+this.status+'',count);
+		$widget = new Widget(''+this.jobname+'',''+this.displayname+'',''+this.status+'',this.pk,count);
 		$widget.draw(''+this.width+'',''+this.height+'',''+this.left+'',''+this.top+'');
 			
 		if (typeof(widget_map[''+this.hostname+'']) != 'undefined') {

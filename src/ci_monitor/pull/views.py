@@ -27,6 +27,7 @@ def get_jobs_for_user(user):
     list = []
     for job in jobs:
         d = dict(
+            pk      = job.pk,
             hostname = job.ci_job.ci_server.hostname,
             jobname = job.ci_job.jobname,
             displayname = job.displayname,
@@ -40,6 +41,44 @@ def get_jobs_for_user(user):
         list.append(d)
         
     return list
+
+def save_ci_server(**widget):
+    try:
+        ci_server = models.CiServer.objects.get(hostname=append_http(widget['hostname']))
+    except models.CiServer.DoesNotExist:
+        ci_server = forms.CiServerForm(data=widget).save()
+    
+    return ci_server
+
+def save_ci_job(**widget):
+    try:
+        ci_job =  models.CiJob.objects.get(ci_server__hostname=widget['ci_server'],jobname=widget['jobname'])
+    except models.CiJob.DoesNotExist:
+        ci_job = forms.CiJobForm(data=widget).save()
+        
+    return ci_job
+    
+def save_user_ci_job(**widget):
+    ci_server = save_ci_server(**widget)
+    widget['ci_server'] = ci_server.pk
+    ci_job = save_ci_job(**widget)
+    widget['ci_job'] = ci_job.pk
+    
+    try:
+        user_ci_job = models.UserCiJob.objects.get(user__pk=widget['user'], ci_job__jobname=ci_job.jobname)
+        print "<>>>>><<<>> %s " % widget
+        form = forms.UserCiJobForm(data=widget,instance=user_ci_job)
+        if form.is_valid():
+            user_ci_job = form.save()
+        else:
+            print form.errors
+    except models.UserCiJob.DoesNotExist:
+        form = forms.UserCiJobForm(data=widget)
+        if form.is_valid():
+            user_ci_job = form.save()
+        else:
+            print form.errors
+    return user_ci_job 
     
 def redirect_to_home(request):
     return HttpResponseRedirect('/')
@@ -141,43 +180,25 @@ def retrieve_job(request):
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
     #check to see if the user has already added the job
-    old_job = models.UserCiJob.objects.filter(entity_active=True,ci_job__jobname=jobname,user__username=request.user.username)
-    if len(old_job) > 0:
+    user_ci_job = models.UserCiJob.objects.filter(entity_active=True,ci_job__jobname=jobname,user__username=request.user.username)
+    if len(user_ci_job) > 0:
         result = dict(status = 100)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
-        
-    result.update(dict(displayname = displayname, jobname = displayname))
+    
+    widget = dict(
+         hostname = hostname,
+         jobname = jobname,
+         displayname = displayname,
+         status = result['status'],
+         user = request.user.pk,
+         entity_active = True,
+     )
+    user_ci_job = save_user_ci_job(**widget)
+    result.update(dict(displayname = displayname, jobname = jobname, pk = user_ci_job.pk))
         
     return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
 
-def save_ci_server(**widget):
-    try:
-        ci_server = models.CiServer.objects.get(hostname=append_http(widget['hostname']))
-    except models.CiServer.DoesNotExist:
-        ci_server = forms.CiServerForm(data=widget).save()
-    
-    return ci_server
 
-def save_ci_job(**widget):
-    try:
-        ci_job =  models.CiJob.objects.get(ci_server__hostname=widget['ci_server'],jobname=widget['jobname'])
-    except models.CiJob.DoesNotExist:
-        ci_job = forms.CiJobForm(data=widget).save()
-        
-    return ci_job
-    
-def save_user_ci_job(**widget):
-    ci_server = save_ci_server(**widget)
-    widget['ci_server'] = ci_server.pk
-    ci_job = save_ci_job(**widget)
-    widget['ci_job'] = ci_job.pk
-    
-    try:
-        user_ci_job = models.UserCiJob.objects.get(user__pk=widget['user'], ci_job__jobname=ci_job.jobname)
-        print "<>>>>><<<>> %s " % widget
-        forms.UserCiJobForm(data=widget,instance=user_ci_job).save()
-    except models.UserCiJob.DoesNotExist:
-        user_ci_job = forms.UserCiJobForm(data=widget).save()
 
 def save_jobs(request):
     if not request.user.is_authenticated():

@@ -11,7 +11,7 @@ var widget_map = {};
 	
 	@param job_name String 
 */
-var Widget = function(jobname, displayname, status, counter){
+var Widget = function(jobname, displayname, status, id, counter){
 
 	this.make_success = function() {
 		this.addClass('success');
@@ -112,12 +112,21 @@ var Widget = function(jobname, displayname, status, counter){
         this.status = status;
         this.displayname = displayname;
         
-        this.attr('id','wdg'+counter);
+        this.attr('id','wdg'+id);
         this.id = this.attr('id');
         
         $icon = $('<div>&nbsp;</div>');
 		$icon.attr('class','icon');
 		this.append($icon);
+		
+		$menu = $('<div></div>');
+		$ul = $('<ul></ul>');
+		$li = $('<li></li>');
+		$li.html('Remove Job');
+		$ul.append($li);
+		$menu.append($ul);
+		
+		$icon.append($menu);
 		
 		$marquee = $('<div></div>');
 		$marquee.html(this.jobname);

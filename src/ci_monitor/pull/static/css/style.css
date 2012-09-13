@@ -2,6 +2,25 @@ body {
 	background: url(../images/black_linen_v2.png);
 }
 
+.icon div {
+	background: url(../images/black_linen_v2.png);
+	height: 30px;
+	width:120px;
+	-moz-border-radius: 25px 10px / 10px 25px;
+	border-radius: 25px 10px / 10px 25px;
+	margin-top:-1.2em;
+}
+.icon div ul li {
+	
+	font-size: 7pt;
+	font-family: Georgia, Arial, Helvetica, Serif;
+	text-transform: uppercase;
+	text-align: left;
+	list-style-type: none;
+	padding: 10px 10px 0px 10px;
+	margin-left: -3em;
+}
+
 
 .modal div div input, .modal div div label {
     margin-bottom: 15px;
