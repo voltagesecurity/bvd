@@ -11,7 +11,7 @@ from django.contrib.auth.models import User
 from django.core import serializers
 
 
-from ci_monitor.jenkins.jenkins import PollCI, RetrieveJob
+from ci_monitor.jenkins.jenkins import RetrieveJob
 from ci_monitor.pull import models, forms
 
 def append_http(hostname):
