@@ -134,10 +134,12 @@ def login(request):
     
     return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
 
+@secure_required
 def logout(request):
     django_logout(request)
     return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
             
+@secure_required
 def validate_username(request):
     username = request.POST.get('username')
     
@@ -148,6 +150,7 @@ def validate_username(request):
 
     return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
  
+@secure_required
 def validate_hostname(request):
     job = RetrieveJob(append_http(request.POST.get('hostname',None)),None)
     test = job.lookup_hostname()
@@ -161,6 +164,7 @@ def validate_hostname(request):
     
     return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
+@secure_required
 def validate_job(request):
     hostname = append_http(request.POST.get('hostname',''))
     jobname = request.POST.get('jobname',None)
@@ -186,6 +190,7 @@ def validate_job(request):
     request.session[key] = result
     return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
     
+@secure_required
 def retrieve_job(request):
     
     if not request.user.is_authenticated():
@@ -227,7 +232,7 @@ def retrieve_job(request):
     return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
 
 
-
+@secure_required
 def save_jobs(request):
     if not request.user.is_authenticated():
         result = [dict(status = 401)]
@@ -246,7 +251,8 @@ def save_jobs(request):
         save_user_ci_job(**widget)
     result = [dict(status = 200)]
     return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
-    
+
+@secure_required    
 def autocomplete_hostname(request):
     txt = request.POST.get('txt')
     servers = models.CiServer.objects.filter(hostname__icontains=txt)
@@ -254,7 +260,8 @@ def autocomplete_hostname(request):
     #result = ['http://localhost:80%d' % i for i in range(5)]
     return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
     
-    
+
+@secure_required    
 def get_modal(request):
     template = request.GET.get('template') 
     if template == 'add_job':
@@ -280,13 +287,14 @@ def signup(request):
     else:
         return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
     
-    
+@secure_required    
 def remove_job(request):
     user_ci_job = models.UserCiJob.objects.get(pk=int(request.POST.get('pk')))
     user_ci_job.entity_active = False
     user_ci_job.save()
     return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
 
+@secure_required
 def pull_jobs(request, *args, **kwargs):
     
     if request.user.is_authenticated():
