@@ -41,6 +41,7 @@ from django.core import serializers
 
 from ci_monitor.jenkins.jenkins import RetrieveJob
 from ci_monitor.pull import models, forms
+from ci_monitor.decorators.decorators import secure_required
 
 def append_http(hostname):
     if not hostname: return 'http://'
@@ -106,6 +107,8 @@ def save_user_ci_job(**widget):
 def redirect_to_home(request):
     return HttpResponseRedirect('/')
 
+
+@secure_required
 def home(request,template='index.html'):
     if not request.user.is_authenticated():
         jobs = []
@@ -116,6 +119,8 @@ def home(request,template='index.html'):
     return render_to_response(template,
                               dict(title='Welcome to CI-Monitor',jobs = jobs),
                               context_instance=RequestContext(request))
+
+@secure_required
 def login(request):
     username = request.POST.get('username')
     password = request.POST.get('password1')

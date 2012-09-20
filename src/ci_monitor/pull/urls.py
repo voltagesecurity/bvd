@@ -29,6 +29,8 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic.simple import direct_to_template
 
+from django.conf import settings
+
 urlpatterns = patterns('ci_monitor.pull.views',
     
     url(r'^$', 'home',name='home'),
