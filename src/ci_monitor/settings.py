@@ -29,8 +29,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 # Django settings for ci_monitor project.
 
 DEBUG = True
-SSL = False
-USE_TLS = False
+USE_SSL = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
