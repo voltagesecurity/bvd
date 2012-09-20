@@ -109,8 +109,8 @@ var Widget = function(hostname, jobname, displayname, status, id, counter){
     		case 'UNSTABLE':
         	    this.make_unstable();
         	    break;
-    		case '404':
-    		    break;
+    		default:
+    			this.make_success();
     	}
 	}
 	
