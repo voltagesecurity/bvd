@@ -181,31 +181,7 @@ OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'
 
 
-import ldap
-from django_auth_ldap.config import LDAPSearch, LDAPSearchUnion
-
-AUTH_LDAP_USER_SEARCH = LDAPSearchUnion(
-    LDAPSearch("ou=miscellaneous accounts,ou=contractors,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),                                    
-    #LDAPSearch("ou=people,dc=example,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
-    LDAPSearch("ou=employees,dc=voltage,dc=com", ldap.SCOPE_SUBTREE, "(uid=%(user)s)"),
-    
-)
-
-import logging
-
-logger = logging.getLogger('django_auth_ldap')
-logger.addHandler(logging.StreamHandler())
-logger.setLevel(logging.DEBUG)
-
-AUTH_LDAP_BIND_DN = "voltage\sam.mohamed"
-AUTH_LDAP_BIND_PASSWORD = "BurhanBadawi12"
-AUTH_LDAP_SERVER_URI = "ldap://narcolepsy.voltage.com"
-AUTH_LDAP_USER_ATTR_MAP = {
-    "username" : "uid",
-    "first_name": "givenName",
-    "last_name": "sn",
-    "email": "mail"
-}
+from ldapsettings import *
 
 import os
 PROJECT_ROOT = os.getcwd()
