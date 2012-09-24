@@ -4,4 +4,6 @@ python-dateutil==2.1
 mock
 django-auth-ldap
 python-openid
+django-openid-auth
+python-ldap
 

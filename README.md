@@ -32,6 +32,10 @@ Insallation Requirements
 
 3) SqlLite-3 (Required)
 
+4) To install python-ldap successfully with pip, following development libraries are needed (package names taken from ubuntu environment):
+
+    python-dev libldap2-dev libsasl2-dev libssl-dev
+
 Automated Installation
 ======================
 
