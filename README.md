@@ -67,6 +67,10 @@ which will store all required libraries at the user level, and not the system le
 
 the script then runs the following command
 
+    $ python manage.py syncdb
+
+which will create the required database and associated database tables, then the installer will run
+
     $ python manage.py runserver
 
 which starts the django developement server, such that you can view the application for testing purposes
