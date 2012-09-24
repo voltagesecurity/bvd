@@ -39,12 +39,12 @@ Automated Installation
 1) Install fabric, via easy_install: ex: 
 
     $ sudo apt-get install python-distribute #will install easy_install 
-    $ easy_install fabric
+    $ sudo easy_install fabric
 
 
 2) Install pip via via easy_install: ex: 
 
-    $ easy_install pip
+    $ sudo easy_install pip
 
 3) Navigate to the project root, where the file fabfile.py exists
 
