@@ -17,6 +17,7 @@ The CI-Montior GUI allows you to monitor CI builds by entering the following par
     3) Display name (Optional).  This is the name that will be displayed on the widget
 
 CI-Monitor reports on the various statuses of CI builds via colored widgets with icons representing each state, ex:
+
     1) A successful last build: Green Widget with Check Mark icon
     2) A failed last build    : Red Widget with X icon
     3) An unstable build      : Yellow Widget with Cloud icon
@@ -45,13 +46,15 @@ Automated Installation Explanation
 
 The automated install script will download and install all required libraries via the folowing command:
 
-$ pip install --user -r requirements.txt
+    $ pip install --user -r requirements.txt
 
 which will store all required libraries at the user level, and not the system leve, thereby not needing sudo access
 
 the script then runs the following command
 
-$ python manage.py runserver
+    $ python manage.py runserver
 
 which starts the django developement server, such that you can view the application for testing purposes
+
+
 
