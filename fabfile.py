@@ -67,8 +67,8 @@ def start_django_dev_server(*args,**kwargs):
 	print 'CI Monitor is running under http://localhost:8000'
 
 def sync_db(*args,**kwargs):
-	cmd = 'cd ./src/ci_monitor && python manage.py syncdb'
-	subprocess.Popen(cmd,shell=True)
+	cmd = 'cd ./src/ci_monitor && python manage.py syncdb --noinput'
+	subprocess.call(cmd,shell=True)
 	
 def local(*args,**kwargs):
 	"""
