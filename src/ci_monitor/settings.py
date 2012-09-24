@@ -197,7 +197,7 @@ CI_INSTALLATIONS = (
 
 AUTHENTICATION_BACKENDS = (
     'django_openid_auth.auth.OpenIDBackend',
-    'django_auth_ldap.backend.LDAPBackend',
+    #'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
