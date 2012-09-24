@@ -38,6 +38,7 @@ Automated Installation
 
 1) Install fabric, via easy_install: ex: 
 
+    $ sudo apt-get install python-distribute #will install easy_install 
     $ easy_install fabric
 
 
