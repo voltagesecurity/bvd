@@ -65,6 +65,10 @@ def start_django_dev_server(*args,**kwargs):
 	subprocess.Popen(cmd)
 	
 	print 'CI Monitor is running under http://localhost:8000'
+
+def sync_db(*args,**kwargs):
+	cmd = shlex.split('python ./src/ci_monitor/manage.py syncdb')
+	subprocess.Popen(cmd)
 	
 def local(*args,**kwargs):
 	"""
@@ -73,6 +77,7 @@ def local(*args,**kwargs):
 		Before running this function, check to make sure the CI_INSTALLATIONS tuple in settings.py is properly set to your CI servers
 	"""
 	install_requirements()
+	sync_db()
 	start_django_dev_server()
 	
 def ci_build(*args,**kwargs):
