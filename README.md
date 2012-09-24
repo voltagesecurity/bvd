@@ -26,7 +26,7 @@ CI-Monitor reports on the various statuses of CI builds via colored widgets with
 Insallation Requirements
 ========================
 
-1) You should install pip (but is not required), which will simplify the installation of required libraries, which can be found in the requirements.txt in the project root / src directory
+1) You should install pip (but is not required), which will simplify the installation of required libraries, which can be found in the requirements.txt in the project root directory
 
 2) If you would like an automated install, you will need to install fabric.
 
