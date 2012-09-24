@@ -35,11 +35,24 @@ Insallation Requirements
 Automated Installation
 ======================
 
-1) Install fabric, via easy_install: ex: $ easy_install fabric
-2) Install pip via via easy_install: ex: $ easy_install pip
+1) Install fabric, via easy_install: ex: 
+
+    $ easy_install fabric
+
+
+2) Install pip via via easy_install: ex: 
+
+    $ easy_install pip
+
 3) Navigate to the project root, where the file fabfile.py exists
-4) Run the following command (notice: you DO NOT need sudo access): $ fab local
-5) Open your browser and point it to: http://localhost:8000
+
+4) Run the following command (notice: you DO NOT need sudo access): 
+
+    $ fab local
+
+5) Open your browser and point it to: 
+    
+    http://localhost:8000
 
 Automated Installation Explanation
 ==================================
