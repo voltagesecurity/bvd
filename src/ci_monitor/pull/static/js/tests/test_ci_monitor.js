@@ -29,6 +29,8 @@
 
 **/
 
+/**
+
 function createAsyncCounter(count) {
     count = count || 1; // count defaults to 1
     return function () { --count || start(); };
@@ -148,3 +150,5 @@ test("create a set of widgets based on some json results", function(){
 	equal(widget_map['job3'].length,obj1.length);
 	equal(widget_map['job3'].job_name,obj1.job_name);
 });
+
+*/

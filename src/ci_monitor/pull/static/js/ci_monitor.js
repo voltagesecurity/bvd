@@ -29,13 +29,11 @@
 
 **/
 
+var CIMonitor = CIMonitor || {};
+
 var Poll = function(url) {
 	var self = this;
 	self.created = {};
-	
-	this.draw_widgets = function(data) {
-		self.created = create_or_update_widgets(eval(data));
-	};
 		
 	var success = function(data) {
 		self.draw_widgets(data);
@@ -47,10 +45,10 @@ var Poll = function(url) {
 	};
 	
 	this.ajax = function() {
-		do_ajax('get',url,{}, function(data) {
+		CIMonitor.utils.do_ajax('get',url,{}, function(data) {
     	    data = eval(data);
-    	    remove_old_widgets();
-    	    redraw_widgets(data);
+    	    CIMonitor.utils.remove_old_widgetsremove_old_widgets();
+    	    CIMonitor.utils.remove_old_widgetsredraw_widgets(data);
     	});
 	}
 }
@@ -84,8 +82,8 @@ $(function(){
             curr_width = curr_height;
         }
 	    
-	    for (hostname in widget_map) {
-    		$widgets = widget_map[hostname];
+	    for (hostname in CIMonitor.widget_map) {
+    		$widgets = CIMonitor.widget_map[hostname];
     		for (i=0; i < $widgets.length; i++) {
     			$widgets[i].resize(curr_width,curr_height);
     		}

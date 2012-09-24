@@ -28,7 +28,11 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **/
-var validate_login_form = function() {
+
+var CIMonitor = CIMonitor || {};
+CIMonitor.login = {};
+
+CIMonitor.login.validate_login_form = function() {
 	if ($("#username").val().toUpperCase() == 'username'.toUpperCase()) {
 		$("#loginerror").css('display','block');
 		$("#loginerror").html('Invalid username');
@@ -44,7 +48,7 @@ var validate_login_form = function() {
 	return true;
 }
 
-var login_success = function(data,$modal) {
+CIMonitor.login.login_success = function(data,$modal) {
 	data = eval(data);
 	if (data[0].status != 200) {
 		$("#loginerror").css('display','block');
@@ -54,22 +58,22 @@ var login_success = function(data,$modal) {
 		$("#login_modal").remove();
 		$("#login").css('display','none');
 		$("#logout").css('display','block');
-		redraw_widgets(data);
+		CIMonitor.utils.redraw_widgets(data);
 	}
 }
 
-var login_ok_button = function ($modal) {
-	if (!validate_login_form()) {return;}
+CIMonitor.login.login_ok_button = function ($modal) {
+	if (!CIMonitor.login.validate_login_form()) {return;}
 	
 	var txtfields = ['username', 'password1'];
 	var data = {};
 	$.each(txtfields,function(index,id){
 		data[id] = $("#"+id+"").val();
 	});
-	do_ajax('post', get_url('login'), data,function(data){login_success(data,$modal);});
+	CIMonitor.utils.do_ajax('post', CIMonitor.data.get_url('login'), data,function(data){CIMonitor.login.login_success(data,$modal);});
 }
 
-var load_login_form = function() {
+CIMonitor.login.load_login_form = function() {
 	id = 'login_modal';
 	var $modal;
 	
@@ -82,12 +86,12 @@ var load_login_form = function() {
         modal : true
     }
     
-    $modal = modal_factory(get_url('modal','?template=login'),id, opts);
+    $modal = CIMonitor.modal_factory(CIMonitor.data.get_url('modal','?template=login'),id, opts);
 	
 	
 }
 
-var logout_success = function() {
+CIMonitor.login.logout_success = function() {
 	
 	$("#logout").css('display','none');
 	$("#login").css('display','block');
@@ -114,11 +118,11 @@ var logout_success = function() {
 		buttons: buttons
 	}
 	
-	remove_old_widgets();
+	CIMonitor.utils.remove_old_widgets();
 	
-	$modal = modal_factory(get_url('modal','?template=logout_success'),id, opts);	
+	$modal = CIMonitor.modal_factory(CIMonitor.data.get_url('modal','?template=logout_success'),id, opts);	
 }
 
-var do_logout = function() {
-	do_ajax('post', get_url('logout'), {},function(data){logout_success();});	
+CIMonitor.login.do_logout = function() {
+	CIMonitor.utils.do_ajax('post', CIMonitor.data.get_url('logout'), {},function(data){CIMonitor.login.logout_success();});	
 }

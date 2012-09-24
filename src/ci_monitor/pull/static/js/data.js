@@ -28,7 +28,12 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **/
-var urls = {
+
+var CIMonitor = CIMonitor || {};
+
+CIMonitor.data = {};
+
+CIMonitor.data.urls = {
 	hostname         : '/pull/validate_hostname/',
 	jobname          : '/pull/validate_job/',
 	retrieve_job     : '/pull/retrieve_job/',
@@ -41,7 +46,7 @@ var urls = {
 	remove           : '/pull/remove_job/'
 }
 
-function get_txtfield_map() {
+CIMonitor.data.get_txtfield_map = function() {
 	return {
     	hostname    : {value : 'PLEASE ENTER JENKINS HOSTNAME'},
     	jobname     : {value : 'PLEASE ENTER JOB NAME'},
@@ -52,11 +57,10 @@ function get_txtfield_map() {
 	
 }
 
-function get_url(key,querystring) {
-	url = urls[key];
+CIMonitor.data.get_url = function(key,querystring) {
+	url = CIMonitor.data.urls[key];
 	if (typeof(querystring) != 'undefined') {
 		url = url + querystring;
 	}
 	return url;
 }
- 

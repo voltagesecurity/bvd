@@ -28,7 +28,11 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **/
-var do_ajax = function (type, url, data, success, error) {
+
+var CIMonitor = CIMonitor || {};
+CIMonitor.utils = {};
+
+CIMonitor.utils.do_ajax = function (type, url, data, success, error) {
     return $.ajax({
             url: url,
 	        type: type,
@@ -41,16 +45,16 @@ var do_ajax = function (type, url, data, success, error) {
 	    });
 }
 
-function validate_email(email) { 
+CIMonitor.utils.validate_email = function(email) { 
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
 } 
 
-function save_widgets() {
+CIMonitor.utils.save_widgets = function() {
 	var widgets = {};
 	var list = [];
-	for (hostname in widget_map) {
-		$widgets = widget_map[hostname];
+	for (hostname in CIMonitor.widget_map) {
+		var $widgets = CIMonitor.widget_map[hostname];
 		for (i=0; i < $widgets.length; i++) {
 			$widget = $widgets[i];
 			data = $widget.getWidgetDimensions();
@@ -62,40 +66,40 @@ function save_widgets() {
 		}
 	}
 	widgets['widgets'] = JSON.stringify(list);
-	do_ajax('post','/pull/save_jobs/',widgets);
+	CIMonitor.utils.do_ajax('post','/pull/save_jobs/',widgets);
 }
 
-var remove_old_widgets = function() {
+CIMonitor.utils.remove_old_widgets = function() {
 	$.each($("#widgets").children(),function(){
     	$(this).remove();
     });
 }
 
-function create_new_widget(json) {
+CIMonitor.utils.create_new_widget = function(json) {
     var count = $("#widgets").children().length + 3;
     var $widget = new Widget(json.hostname, json.jobname, json.displayname, json.status,json.pk, count);
     
-    if (typeof(widget_map[json.hostname]) != 'undefined') {
-        widget_map[json.hostname].push($widget);
+    if (typeof(CIMonitor.widget_map[json.hostname]) != 'undefined') {
+        CIMonitor.widget_map[json.hostname].push($widget);
     } else {
         $widgets = [$widget];
-        widget_map[json.hostname] = $widgets;
+        CIMonitor.widget_map[json.hostname] = $widgets;
     }
     
-    set_size_of_widgets(count);
-    save_widgets();
+    CIMonitor.utils.set_size_of_widgets(count);
+    CIMonitor.utils.save_widgets();
    
 }
 
 
-function set_size_of_widgets(count) {
+CIMonitor.utils.set_size_of_widgets = function(count) {
     
     var $prev_widget = $("<div></div>");
     var counter = 0;
     var db_map = {};
     var db_list = [];
-    for (hostname in widget_map) {
-		$widgets = widget_map[hostname];
+    for (hostname in CIMonitor.widget_map) {
+		$widgets = CIMonitor.widget_map[hostname];
 		for (i=0; i < $widgets.length; i++) {
 		    if (counter == 0) {dimensions = {left : '0px', top: '0px'}}
 		    else {dimensions = $prev_widget.getWidgetDimensions();}
@@ -117,7 +121,7 @@ function set_size_of_widgets(count) {
 }
 
 
-function redraw_widgets(data) {
+CIMonitor.utils.redraw_widgets = function(data) {
 	widget_map = {};
 	$.each(data[0].jobs, function(){
 		var count = $("#widgets").children().length;
@@ -125,10 +129,10 @@ function redraw_widgets(data) {
 		$widget.draw(this.width,this.height,this.left,this.top);
 			
 		if (typeof(widget_map[this.hostname]) != 'undefined') {
-			widget_map[this.hostname].push($widget);
+			CIMonitor.widget_map[this.hostname].push($widget);
 		} else {
 			$widgets = [$widget];
-			widget_map[this.hostname] = $widgets; 
+			CIMonitor.widget_map[this.hostname] = $widgets; 
 		}
 	});
 }

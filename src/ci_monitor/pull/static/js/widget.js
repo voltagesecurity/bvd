@@ -28,7 +28,9 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **/
-var widget_map = {};
+
+var CIMonitor = CIMonitor || {};
+CIMonitor.widget_map = {};
 
 /**
 	Class to create and return a widget object, inherited from JQuery's $("<div></div>").  
@@ -172,9 +174,9 @@ var Widget = function(hostname, jobname, displayname, status, id, counter){
 		$li.click(function(){
 			data = {};
 			data['pk'] = self.pk;
-			do_ajax('post',get_url('remove'),data,function(data){
+			CIMonitor.utils.do_ajax('post',CIMonitor.data.get_url('remove'),data,function(data){
 				//remove the element from the widget map
-				var $widgets = widget_map[self.hostname];
+				var $widgets = CIMonitor.widget_map[self.hostname];
 				var index = 0;
 				var $widget;
 				for (i =0; i < $widgets.length; i++) {
@@ -186,7 +188,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter){
 				}
 				$widgets.splice(index,1);
 				$widget.remove();
-				widget_map[self.hostname] = $widgets;
+				CIMonitor.widget_map[self.hostname] = $widgets;
 				set_size_of_widgets($("#widgets").children().length+3);
 				save_widgets();
 				var poll = new Poll('/pull/pull_jobs/');

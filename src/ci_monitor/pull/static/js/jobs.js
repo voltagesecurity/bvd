@@ -28,12 +28,17 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **/
-var add_job_success = function(data,$modal) {
+
+var CIMonitor = CIMonitor || {};
+CIMonitor.jobs = {};
+
+
+CIMonitor.jobs.add_job_success = function(data,$modal) {
 	data = eval(data);
 	if (data[0].status != 100 && data[0].status != 500 && data[0].status != 401){
 		$("#hostname_err").css('display','none');
 			$("#hostname_err").html('Invalid URL');
-			create_new_widget(data[0]);
+			CIMonitor.utils.create_new_widget(data[0]);
 			$modal.remove();
                                                     
 	} else if (data[0].status == 100) {
@@ -48,23 +53,23 @@ var add_job_success = function(data,$modal) {
 	}
 }
 
-var add_job_ok_click = function($modal,txt_map) {
+CIMonitor.jobs.add_job_ok_click = function($modal,txt_map) {
 	if ($("#displayname").val().toUpperCase() == txt_map['displayname']['value'].toUpperCase() || $("#displayname").val() == '') {
 			$("#displayname").val($("#jobname").val());
 	}
 	var data = {};
 	for (id in txt_map) {data[id] = $("#" + id + "").val();}                            
-    do_ajax('post', get_url('retrieve_job'), data,function(data){add_job_success(data,$modal);});
+    CIMonitor.utils.do_ajax('post', CIMonitor.data.get_url('retrieve_job'), data,function(data){CIMonitor.jobs.add_job_success(data,$modal);});
 }
 
-function add_job(txt_map) {
+CIMonitor.jobs.add_job = function(txt_map) {
 	id = 'add_job_modal';
     var $modal;
     
     var buttons = [
     	{
         	text: "Ok",
-            click: function(){add_job_ok_click($modal,txt_map);}
+            click: function(){CIMonitor.jobs.add_job_ok_click($modal,txt_map);}
 		},
 		{
 			text: "Cancel",
@@ -83,17 +88,17 @@ function add_job(txt_map) {
 	}
     
     
-    $modal = modal_factory(get_url('modal','?template=add_job'),id, opts);
+    $modal = CIMonitor.modal_factory(CIMonitor.data.get_url('modal','?template=add_job'),id, opts);
 }
 
-var hostname_autocomplete = function () {
+CIMonitor.jobs.hostname_autocomplete = function () {
 	$(document).on('keyup','#hostname', function() {
         $(this).autocomplete({
             minLength : 2,
             source : function(request,response) {
                 var data = {};
                 data['txt'] = request.term;
-                var result = do_ajax('post',get_url('ac_hostname'),data,function(data) {response(eval(data))});
+                var result = CIMonitor.utils.do_ajax('post',CIMonitor.data.get_url('ac_hostname'),data,function(data) {response(eval(data))});
             }
         });
     });

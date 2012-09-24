@@ -28,7 +28,10 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **/
-function modal_factory (url, id, opts) {
+
+var CIMonitor = CIMonitor || {};
+
+CIMonitor.modal_factory = function(url, id, opts) {
     var $modal = $('<div id=\"'+id+'\"></div>').load(url).dialog(opts);
     return $modal;
 }
@@ -36,7 +39,7 @@ function modal_factory (url, id, opts) {
 
 $(function(){
 
-	var txtfield_map = get_txtfield_map();
+	var txtfield_map = CIMonitor.data.get_txtfield_map();
 	
     $("#add_job").button();
     
@@ -44,30 +47,30 @@ $(function(){
     $("#logout").button();
     
     $("#login").on("click",function(){
-    	load_login_form();
+    	CIMonitor.login.load_login_form();
     });
     
     $("#logout").on("click",function(){
-    	do_logout();
+    	CIMonitor.login.do_logout();
     });
 
     $("#add_job").on("click",function () {
-    	add_job(txtfield_map);
+    	CIMonitor.jobs.add_job(txtfield_map);
     });
     
     $(document).on('focus', 'input[type=text]', function(){
-    	clear_fields(txtfield_map,$(this))
+    	CIMonitor.validate.clear_fields(txtfield_map,$(this))
     });
     
     $(document).on('blur', 'input[type=text]', function () {
-        txtfield_blur(txtfield_map,$(this));
+        CIMonitor.validate.txtfield_blur(txtfield_map,$(this));
     });
     
     $(document).on('blur', 'input[type=password]', function () {
-        passfield_blur($(this));
+        CIMonitor.validate.passfield_blur($(this));
     });
     
-    hostname_autocomplete();
+    CIMonitor.jobs.hostname_autocomplete();
     
     
 });

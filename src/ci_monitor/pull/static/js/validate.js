@@ -28,10 +28,14 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 **/
+
+var CIMonitor = CIMonitor || {};
+CIMonitor.validate = {};
+
 var password_txt = ['txt_password1','txt_password2'];
 var call_ajax = ['hostname','jobname','username'];
 
-var blur_success = function(data,$this) {
+CIMonitor.validate.blur_success = function(data,$this) {
 	data = eval(data);
 	
 	if (data[0].status == 200){
@@ -41,7 +45,7 @@ var blur_success = function(data,$this) {
 	}
 }
 
-var txtfield_blur = function(txt_map, $this) {
+CIMonitor.validate.txtfield_blur = function(txt_map, $this) {
 	if ($this.val() == '') {
 		$this.val(txt_map[$this.attr('id')]['value']);
 		return;
@@ -51,11 +55,11 @@ var txtfield_blur = function(txt_map, $this) {
 	for (id in txt_map) {data[id] = $("#" + id + "").val();}
 	   
 	if ($.inArray($this.attr('id'), call_ajax) > -1) {
-		do_ajax('post', get_url($this.attr('id')), data, function(data){blur_success(data,$this)});
+		CIMonitor.utils.do_ajax('post', CIMonitor.data.get_url($this.attr('id')), data, function(data){CIMonitor.validate.blur_success(data,$this)});
 	}
 }
 
-var passfield_blur = function($this) {
+CIMonitor.validate.passfield_blur = function($this) {
 	if ($this.val() == '') {
 		id = 'txt_' + $this.attr('id');
 		$this.css('display','none');
@@ -64,15 +68,16 @@ var passfield_blur = function($this) {
 	}
 }
 
-var replace_txt_with_password = function(id) {
+CIMonitor.validate.replace_txt_with_password = function(id) {
 	var id1 = id.replace('txt_','');
 	$("#" + id1+ "").css('display','block');
 	$("#" + id + "").css('display','none');
 	$("#" + id1+ "").focus();		
 }
-var clear_fields = function (txt_map, $this) {
+
+CIMonitor.validate.clear_fields = function (txt_map, $this) {
 	if ($.inArray($this.attr('id'),password_txt) > -1) {
-		replace_txt_with_password($this.attr('id'));
+		CIMonitor.validate.replace_txt_with_password($this.attr('id'));
 		return;
 	}
 	

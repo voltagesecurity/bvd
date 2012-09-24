@@ -31,7 +31,7 @@
 {%extends "base.html"%}
 {%block header_tag%}
 <script src="{{STATIC_URL}}js/qunit.js"></script>
-<script src="{{STATIC_URL}}js/tests/test_ci_monitor.js"></script>
+<script src="{{STATIC_URL}}js/tests/test_widgets.js"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}/css/qunit.css">
 <style>
 body {
@@ -42,5 +42,6 @@ body {
 {%block content%}
 	<div id="qunit"></div>
 	<div id="qunit-fixture">
+	<div id="widgets"></div>
 
 {%endblock%}

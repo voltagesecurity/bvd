@@ -42,7 +42,7 @@
     	{
     		text: 'Login',
     		click: function() {
-    			login_ok_button($modal);
+    			CIMonitor.login.login_ok_button($modal);
     		}
     	},
     	{
@@ -57,13 +57,13 @@
         	width : 500,
     		height : 300,
         	autoOpen: true,
-        title: 'Login',
-        resizable : false,
-        modal : true,
-        buttons: buttons
-    }
+            title: 'Login',
+            resizable : false,
+            modal : true,
+            buttons: buttons
+        }
     
-    $modal = modal_factory(get_url('modal','?template=login_ad'),id, opts);
+    $modal = CIMonitor.modal_factory(CIMonitor.data.get_url('modal','?template=login_ad'),id, opts);
 	});
 	
 	$("#gmail_login").button();
