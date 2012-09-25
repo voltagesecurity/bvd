@@ -29,57 +29,17 @@
 
 **/
 
-var CIMonitor = CIMonitor || {};
+test("test get url ",function() {
+	
+	url = CIMonitor.data.get_url('hostname');
+	equal(url,'/pull/validate_hostname/');
 
-var Poll = function(url) {
-	
-	this.ajax = function() {
-		CIMonitor.utils.do_ajax('get',url,{}, function(data) {
-    	    data = eval(data);
-    	    CIMonitor.utils.remove_old_widgets();
-    	    CIMonitor.utils.redraw_widgets(data);
-    	});
-	}
-}
+});
 
-$(function(){
 
-	var poll = new Poll('/pull/pull_jobs/');
-   
-    var jenkins = function() {
-    	if ($("#add_job_modal").length == 0) {
-        	poll.ajax();
-        }
-    }
+test("test get url with query string",function() {
 	
-	setInterval(jenkins,'60000');
-	
-	var resize = function(data) {
-	    
-	    var curr_width = $(this).width();
-	    var curr_height = $(this).height();
-	    var max_width = $("#widgets").children(0).css('width');
-	    var max_height =  $("#widgets").children(0).css('height');
-	    
-	    var ratio = curr_height / curr_width;
-	    
-	    if ((curr_width/5) >= max_width && ratio <= 1) {
-	        curr_width = max_width ;
-	        curr_height = max_width * ratio;
-        } else {
-            curr_height = (curr_width/5) * ratio;
-            curr_width = curr_height;
-        }
-	    
-	    for (hostname in CIMonitor.widget_map) {
-    		$widgets = CIMonitor.widget_map[hostname];
-    		for (i=0; i < $widgets.length; i++) {
-    			$widgets[i].resize(curr_width,curr_height);
-    		}
-    	}
-	}
-	
-	$(window).resize(resize);
-	
-    
+	url = CIMonitor.data.get_url('hostname','?id=value');
+	equal(url,'/pull/validate_hostname/?id=value');
+
 });
