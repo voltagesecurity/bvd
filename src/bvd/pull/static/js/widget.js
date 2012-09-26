@@ -191,8 +191,10 @@ var Widget = function(hostname, jobname, displayname, status, id, counter){
 				BVD.widget_map[self.hostname] = $widgets;
 				BVD.utils.set_size_of_widgets($("#widgets").children().length + 3);
 				BVD.utils.save_widgets();
-				var poll = new Poll('/pull/pull_jobs/');
-				poll.ajax();
+				setTimeout(500,function(){
+					var poll = new Poll('/pull/pull_jobs/');
+					poll.ajax();
+				});
 			});
 		});
 		
