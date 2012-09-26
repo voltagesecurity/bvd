@@ -48,11 +48,11 @@ BVD.data.urls = {
 
 BVD.data.get_txtfield_map = function() {
 	return {
-    	hostname    : {value : 'PLEASE ENTER JENKINS HOSTNAME'},
-    	jobname     : {value : 'PLEASE ENTER JOB NAME'},
-    	displayname : {value: 'PLEASE ENTER DESIRED DISPLAY NAME'},
-    	username    : {value: 'USERNAME'},
-    	email       : {value: 'Email'}
+    	hostname    : {value : 'Please Enter Jenkins Hostname'},
+    	jobname     : {value : 'Please Enter Job Name'},
+    	displayname : {value: 'Please Enter Desired Display Name'},
+    	username    : {value: 'Username'},
+    	password1   : {value: 'password'}
 	}
 	
 }

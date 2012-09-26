@@ -40,7 +40,19 @@ BVD.validate.blur_success = function(data,$this) {
 	
 	if (data[0].status == 200){
 		$("#" + $this.attr('id') + "_err").css('display','none');
+	} 
+	else if (data[0].status == 403) {
+		//make the username and password fields visible
+		$("#div_username").css('display','block');
+		$("#div_password").css('display','block');
+		$("#add_job_modal").dialog( "option", "height", 500);
+		$("#username").focus();
+	}
+	else if (data[0].status == 401) {
+		$("#hostname_err").css('display','block');
+		$("#hostname_err").html('Invalid Login!');
 	} else {
+		$("#hostname_err").html('Invalid URL!');
 		$("#" + $this.attr('id') + "_err").css('display','block');
 	}
 }

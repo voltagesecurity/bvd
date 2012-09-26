@@ -189,8 +189,8 @@ var Widget = function(hostname, jobname, displayname, status, id, counter){
 				$widgets.splice(index,1);
 				$widget.remove();
 				BVD.widget_map[self.hostname] = $widgets;
-				set_size_of_widgets($("#widgets").children().length+3);
-				save_widgets();
+				BVD.utils.set_size_of_widgets($("#widgets").children().length + 3);
+				BVD.utils.save_widgets();
 				var poll = new Poll('/pull/pull_jobs/');
 				poll.ajax();
 			});

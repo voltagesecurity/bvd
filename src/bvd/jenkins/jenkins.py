@@ -39,12 +39,12 @@ class RetrieveJob(object):
         self.hostname = hostname
         self.jobname = jobname
         
-    def lookup_hostname(self):
+    def lookup_hostname(self, use_auth=False, username=None, password=None):
         try:
-            if self.hostname.find('cloudbees') > -1:
+            if use_auth:
                 req = urllib2.Request(self.hostname)
                 import base64
-                base64string = base64.encodestring('%s:%s' % ('sam.mohamed@voltage.com', 'voltage321'))[:-1]
+                base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
                 authheader =  "Basic %s" % base64string
                 req.add_header("Authorization", authheader)
                 conn = urllib2.urlopen(req,timeout=5)
@@ -54,15 +54,24 @@ class RetrieveJob(object):
             return True
         except ValueError:
             return ValueError
+        except urllib2.HTTPError, e:
+            print '>>>>>>>>>>>>>', e.code
+            #check the status code
+            if e.code == 403: #requires authentication
+                return 403
+            elif e.code == 401: #invalid credentials
+                return 401
+            return urllib2.URLError
         except urllib2.URLError:
             return urllib2.URLError
+        
             
-    def lookup_job(self):
+    def lookup_job(self, use_auth=False, username=None, password=None):
         try:
-            if self.hostname.find('cloudbees') > -1:
+            if use_auth:
                 req = urllib2.Request('%s/job/%s/lastBuild/api/json' % (self.hostname,self.jobname))
                 import base64
-                base64string = base64.encodestring('%s:%s' % ('sam.mohamed@voltage.com', 'voltage321'))[:-1]
+                base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
                 authheader =  "Basic %s" % base64string
                 req.add_header("Authorization", authheader)
                 conn = urllib2.urlopen(req,timeout=5)
@@ -79,9 +88,14 @@ class RetrieveJob(object):
                 
         except ValueError:
             return ValueError
+        except urllib2.HTTPError, e:
+            #check the status code
+            if e.code == 403: #requires authentication
+                return urllib2.HTTPError
+            return urllib2.URLError
         except urllib2.URLError:
             return urllib2.URLError
-            
+        
         conn.close()
         return dict(
             jobname = jobname,

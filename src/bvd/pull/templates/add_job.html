@@ -29,6 +29,11 @@
 
 -->
 <div class="modal">
+	<div id="div_username" style="display:none;">
+		<div style="height:50px;width:100%" style=""><label class="error_label" style="display:block;width:100%;">Autherization Required</label></div>
+		<div><input type="text" id="username" value="Username"></div><div><label class="error_label" id="loginerror">Invalid Login!</label></div>
+	</div>
+	<div id="div_password" style="display:none;"><div><input type="text" id="txt_password1" value="Password" ><input type="password" id="password1" style="display:none;" ></div></div>
 	<div><div><input type="text" id="hostname" value="Please Enter Jenkins Hostname"></div><div><label class="error_label" id="hostname_err">Invalid URL</label></div></div>
 	<div><div><input type="text" id="jobname" value="Please Enter Job Name"></div><div><label class="error_label" id="jobname_err">Invalid Job  Name</label></div></div>
 	<div><div><input type="text" id="displayname" value="Please Enter Desired Display Name"></div></div>

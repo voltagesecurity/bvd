@@ -153,12 +153,17 @@ def validate_username(request):
 @secure_required
 def validate_hostname(request):
     job = RetrieveJob(append_http(request.POST.get('hostname',None)),None)
-    test = job.lookup_hostname()
+    print request.POST.get('username') == 'Username'
+    test = job.lookup_hostname(request.POST.get('username') != 'Username', request.POST.get('username'), request.POST.get('password1'))
     
     if test == urllib2.URLError:
         result = dict(status = 500)
     elif test == ValueError:
         result = dict(status = 404)
+    elif test == 403: #autherization required
+        result = dict(status = 403)
+    elif test == 401: #invalid cerendtials
+        result = dict(status = 401)
     else:
         result = dict(status = 200)
     
@@ -174,13 +179,18 @@ def validate_job(request):
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
         
     job = RetrieveJob(hostname,jobname)
-    result = job.lookup_job()
+    result = job.lookup_job(request.POST.get('username') != 'Username', request.POST.get('username'), request.POST.get('password1'))
     
     if result == urllib2.URLError:
         result = dict(status = 500)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     elif result == ValueError:
         result = dict(status = 404)
+        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
+    elif result == 403: #autherization required
+        result = dict(status = 403)
+    elif result == 401: #invalid cerendtials
+        result = dict(status = 401)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     else:
         result.update(dict(hostname = hostname))
