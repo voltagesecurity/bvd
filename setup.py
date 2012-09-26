@@ -1,5 +1,5 @@
 """
-CI-Monitor v1.0 A Continous Integration Monitoring Tool
+BVD v1.0
 
 Copyright (c) 2012 Voltage Security
 All rights reserved.
@@ -38,7 +38,7 @@ def get_requirements(filename='requirements.txt'):
 def autosetup():
 	from setuptools import setup, find_packages
 	return setup(
-			name                    = "ci-monitor",
+			name                    = "bvd",
 			version                 = "1.0",
 			include_package_data    = True,
 			zip_safe                = False,

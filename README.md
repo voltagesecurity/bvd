@@ -1,22 +1,22 @@
-ci-monitor
+BVD
 ==========
 
-CI-Monitor is a tool for monitoring and presenting the status of CI Builds running on multiple Jenkins installation for Voltage Security.  The software has been made open source under the BSD license.
+BVD is a tool for monitoring and presenting the status of CI Builds running on multiple Jenkins installation for Voltage Security.  The software has been made open source under the BSD license.
 
-CI-Monitor is exensible in that it does not rely on any particular CI System, and can be used with any CI system of your choosing, by plugging in a module which connects to your desired CI System, and returns the following JSON for each desired CI build to be monitored:
+BVD is exensible in that it does not rely on any particular CI System, and can be used with any CI system of your choosing, by plugging in a module which connects to your desired CI System, and returns the following JSON for each desired CI build to be monitored:
 
     return dict(
             jobname = jobname,
             status   = status,
         )
 
-The CI-Montior GUI allows you to monitor CI builds by entering the following parameters:
+The BVD GUI allows you to monitor CI builds by entering the following parameters:
 
     1) Hostname of CI Server
     2) Name of Build
     3) Display name (Optional).  This is the name that will be displayed on the widget
 
-CI-Monitor reports on the various statuses of CI builds via colored widgets with icons representing each state, ex:
+BVD reports on the various statuses of CI builds via colored widgets with icons representing each state, ex:
 
     1) A successful last build: Green Widget with Check Mark icon
     2) A failed last build    : Red Widget with X icon

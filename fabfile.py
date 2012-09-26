@@ -1,5 +1,5 @@
 """
-CI-Monitor v1.0 A Continous Integration Monitoring Tool
+BVD v1.0
 
 Copyright (c) 2012 Voltage Security
 All rights reserved.
@@ -33,7 +33,7 @@ from fabric import api
 
 """Globals"""
 
-app_name = 'ci_monitor'
+app_name = 'bvd'
 wrapper = '. /usr/local/bin/virtualenvwrapper.sh;'
 
 def install_requirements(*args,**kwargs):
