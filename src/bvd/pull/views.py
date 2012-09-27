@@ -148,7 +148,7 @@ def login(request):
     user = authenticate(username=username,password=password)
     if user and user.is_active:
         django_login(request,user)
-        list = get_jobs_for_user(request.user,readyonly)
+        list = get_jobs_for_user(request.user,readonly)
         return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list, readonly = readonly)]), content_type = 'application/javascript; charset=utf8')
     
     return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
