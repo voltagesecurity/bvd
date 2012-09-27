@@ -60,14 +60,14 @@ def install_requirements(*args,**kwargs):
 		out, err = subprocess.Popen(cmd,shell=True).communicate()
 		
 def start_django_dev_server(*args,**kwargs):
-	cmd = 'cd ./src/ci_monitor && python manage.py runserver 0.0.0.0:8000'
+	cmd = 'cd ./src/bvd && python manage.py runserver 0.0.0.0:8000'
 	
 	subprocess.call(cmd, shell=True)
 	
 	print 'CI Monitor is running under http://localhost:8000'
 
 def sync_db(*args,**kwargs):
-	cmd = 'cd ./src/ci_monitor && python manage.py syncdb --noinput'
+	cmd = 'cd ./src/bvd && python manage.py syncdb --noinput'
 	subprocess.call(cmd,shell=True)
 	
 def local(*args,**kwargs):
