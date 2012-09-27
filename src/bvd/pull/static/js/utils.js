@@ -122,7 +122,6 @@ BVD.utils.set_size_of_widgets = function(count) {
 
 
 BVD.utils.redraw_widgets = function(data) {
-	BVD.widget_map = {};
 	$.each(data[0].jobs, function(){
 		var count = $("#widgets").children().length;
 		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,data[0].readonly);
