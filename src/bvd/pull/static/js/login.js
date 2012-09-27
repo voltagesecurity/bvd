@@ -66,10 +66,9 @@ BVD.login.login_success = function(data,$modal) {
 		$("#logout").css('display','inline');
 
 		if (data[0].readonly) {
-			$("#add_job").prop('disabled',true);
+			$("#add_job").css('display','block');
 		} else {
-			$("#add_job").prop("disabled",false);
-			$("#add_job").prop('aria-disabled',false);
+			$("#add_job").css('display','none');
 		}
 		BVD.utils.redraw_widgets(data);
 	}

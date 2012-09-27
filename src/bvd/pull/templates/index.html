@@ -50,11 +50,10 @@ div.button {
 		<script>
 			{%if readonly%}
 				readonly = true;
-				$("#add_job").prop('disabled',true);
+				$("#add_job").css('display','block');
 			{%else%}
 				readonly = false;
-				$("#add_job").prop('disabled',false);
-				$("#add_job").prop('aria-disabled',false);
+				$("#add_job").css('display','none');
 			{%endif%}
 		</script>
 	{%for job in jobs%}
