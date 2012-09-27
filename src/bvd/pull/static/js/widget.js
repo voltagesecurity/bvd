@@ -136,7 +136,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         return { top: ele.style.top, left: ele.style.left, height: ele.style.height, width: ele.style.width };
     }
 
-    this.make_icon = function () {
+    this.make_icon = function (self) {
     	$icon = $('<div>&nbsp;</div>');
 		$icon.attr('class','icon');
 		this.append($icon);
@@ -226,8 +226,11 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.attr('id','wdg'+id);
         this.id = this.attr('id');
 
-        if (!readyonly) {
-        	this.make_icon();
+        if (!readonly) {
+        	this.make_icon(self);
+        } else {
+        	$marquee = $('<div></div>');
+			$marquee.html(this.displayname);	
         }
         
         

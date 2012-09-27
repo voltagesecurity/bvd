@@ -110,8 +110,14 @@ def redirect_to_home(request):
 
 @secure_required
 def home(request,template='index.html'):
-    import os
-    print request.META['HTTP_HOST'], request.META['REMOTE_HOST']
+    if settings.USE_SSL:
+        import socket
+        if socket.gethostbyname(request.META['SERVER_NAME']) == request.META['REMOTE_ADDR']:
+            readonly = False
+        else:
+            readonly = True
+    else:
+        readonly = False
     if not request.user.is_authenticated():
         jobs = []
         pass
@@ -119,7 +125,7 @@ def home(request,template='index.html'):
         jobs = models.UserCiJob.objects.filter(entity_active=True,user__username=request.user.username)
     #jobs = models.CiJob.objects.filter(entity_active=True)
     return render_to_response(template,
-                              dict(title='Welcome to BVD',jobs = jobs),
+                              dict(title='Welcome to BVD',jobs = jobs, readonly = readonly),
                               context_instance=RequestContext(request))
 
 @secure_required

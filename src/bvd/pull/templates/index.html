@@ -47,10 +47,18 @@ div.button {
 	</div>
 </div>
 <div id="widgets">
+		<script>
+			{%if readonly%}
+				readonly = true;
+			{%else%}
+				readonly = false;
+			{%endif%}
+		</script>
 	{%for job in jobs%}
 		<script>
 			var count = $("#widgets").children().length;
-			$widget = new Widget('{{job.ci_job.ci_server.hostname}}','{{job.ci_job.jobname}}','{{job.displayname}}','{{job.ci_job.status}}','{{job.pk}}',count);
+
+			$widget = new Widget('{{job.ci_job.ci_server.hostname}}', '{{job.ci_job.jobname}}', '{{job.displayname}}', '{{job.ci_job.status}}', '{{job.pk}}', count, readonly);
 			$widget.draw('{{job.width}}','{{job.height}}','{{job.left}}','{{job.top}}');
 			
 			if (typeof(BVD.widget_map['{{job.ci_job.ci_server.hostname}}']) != 'undefined') {
