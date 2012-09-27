@@ -69,6 +69,7 @@ BVD.login.login_success = function(data,$modal) {
 			$("#add_job").prop('disabled',true);
 		} else {
 			$("#add_job").prop("disabled",false);
+			$("#add_job").prop('aria-disabled',false);
 		}
 		BVD.utils.redraw_widgets(data);
 	}
