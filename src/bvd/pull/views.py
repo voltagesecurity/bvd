@@ -51,10 +51,12 @@ def append_http(hostname):
     else:
         return 'http://%s' % hostname
     
-def get_jobs_for_user(user):
+def get_jobs_for_user(user,readonly=False):
     jobs =  models.UserCiJob.objects.filter(entity_active=True,user__username=user.username)
     list = []
     for job in jobs:
+        job.readonly = readonly
+        job.save()
         d = dict(
             pk      = job.pk,
             hostname = job.ci_job.ci_server.hostname,
@@ -65,6 +67,7 @@ def get_jobs_for_user(user):
             width = job.width,
             height = job.height,
             status = job.ci_job.status,
+            readonly = job.readonly,
                 
         )
         list.append(d)
@@ -113,19 +116,19 @@ def home(request,template='index.html'):
     if settings.USE_SSL:
         import socket
         if socket.gethostbyname(request.META['SERVER_NAME']) == request.META['REMOTE_ADDR']:
-            request.user.readonly = False
             readonly = False
         else:
-            request.user.readonly = True
             readonly = True
     else:
-        request.user.readonly = False
         readonly = False
     if not request.user.is_authenticated():
         jobs = []
         pass
     else:
         jobs = models.UserCiJob.objects.filter(entity_active=True,user__username=request.user.username)
+        for job in jobs:
+            job.readonly = readonly
+            job.save()
     #jobs = models.CiJob.objects.filter(entity_active=True)
     return render_to_response(template,
                               dict(title='Welcome to BVD',jobs = jobs, readonly = readonly),
@@ -143,11 +146,9 @@ def login(request):
         password = request.POST.get('password1')
     
     user = authenticate(username=username,password=password)
-    user.readonly = readonly
     if user and user.is_active:
         django_login(request,user)
-        list = get_jobs_for_user(request.user)
-        
+        list = get_jobs_for_user(request.user,readyonly)
         return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list, readonly = readonly)]), content_type = 'application/javascript; charset=utf8')
     
     return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
@@ -339,5 +340,6 @@ def pull_jobs(request, *args, **kwargs):
                 job['status'] = "DOWN"
             else:
                 job['status'] = result['status'] 
+
             
-        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list, readonly = request.user.readonly)]), content_type = 'application/javascript; charset=utf8')
+        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list)]), content_type = 'application/javascript; charset=utf8')
