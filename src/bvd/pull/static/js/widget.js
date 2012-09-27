@@ -226,7 +226,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.attr('id','wdg'+id);
         this.id = this.attr('id');
 
-        if (!readonly) {
+        if (!eval(readonly)) {
         	this.make_icon(self);
         } else {
         	$marquee = $('<div></div>');
