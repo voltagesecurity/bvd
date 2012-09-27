@@ -224,7 +224,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.displayname = displayname;
 
         this.on('click',function(){
-        	window.location.href = this.hostname + '/job/' + this.jobname;
+        	window.location.href = self.hostname + '/job/' + self.jobname;
         });
         
         this.attr('id','wdg'+id);
