@@ -51,12 +51,13 @@ def append_http(hostname):
     else:
         return 'http://%s' % hostname
     
-def get_jobs_for_user(user,readonly=False):
+def get_jobs_for_user(user, *args):
     jobs =  models.UserCiJob.objects.filter(entity_active=True,user__username=user.username)
     list = []
     for job in jobs:
-        job.readonly = readonly
-        job.save()
+        if len(args) > 0:
+            job.readonly = args[0]
+            job.save()
         d = dict(
             pk      = job.pk,
             hostname = job.ci_job.ci_server.hostname,
