@@ -197,7 +197,7 @@ CI_INSTALLATIONS = (
 
 AUTHENTICATION_BACKENDS = (
     'django_openid_auth.auth.OpenIDBackend',
-    'django_auth_ldap.backend.LDAPBackend',
+#    'django_auth_ldap.backend.LDAPBackend',
     'django.contrib.auth.backends.ModelBackend',
 )
 
@@ -210,7 +210,7 @@ OPENID_UPDATE_DETAILS_FROM_SREG = True
 OPENID_SSO_SERVER_URL = 'https://www.google.com/accounts/o8/id'
 
 
-from ldapsettings import *
+#from ldapsettings import *
 
 import os
 PROJECT_ROOT = os.getcwd()
