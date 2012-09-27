@@ -53,7 +53,7 @@ class UserCiJob(models.Model):
     top = models.CharField(max_length=10,null=True,blank=True)
     width = models.CharField(max_length=10,null=True,blank=True)
     height = models.CharField(max_length=10,null=True,blank=True)
-    readonly = models.BooleanField(null=True,blank=True)
+    readonly = models.NullBooleanField(null=True,blank=True)
     entity_active = models.BooleanField()
     
     def __unicode__(self):
