@@ -50,10 +50,10 @@ div.button {
 		<script>
 			{%if readonly%}
 				readonly = true;
-				$("#add_job").attr('disabled',true);
+				$("#add_job").attr("disabled", "disabled");
 			{%else%}
 				readonly = false;
-				$("#add_job").attr('disabled',false);
+				$("#add_job").removeAttr("disabled", "disabled");
 			{%endif%}
 		</script>
 	{%for job in jobs%}
