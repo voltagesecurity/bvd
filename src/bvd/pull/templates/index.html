@@ -53,7 +53,7 @@ div.button {
 				$("#add_job").attr("disabled", "disabled");
 			{%else%}
 				readonly = false;
-				$("#add_job").removeAttr("disabled", "disabled");
+				$("#add_job").removeAttr("disabled");
 			{%endif%}
 		</script>
 	{%for job in jobs%}
