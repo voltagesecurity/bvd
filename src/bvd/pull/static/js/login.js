@@ -70,6 +70,7 @@ BVD.login.login_success = function(data,$modal) {
 		} else {
 			$("#add_job").css('display','block');
 		}
+		BVD.utils.remove_old_widgets();
 		BVD.utils.redraw_widgets(data);
 	}
 }
