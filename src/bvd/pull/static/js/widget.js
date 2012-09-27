@@ -222,6 +222,8 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.jobname = jobname;
         this.status = status;
         this.displayname = displayname;
+
+        this.attr('href',this.hostname + '/job/' + this.jobname);
         
         this.attr('id','wdg'+id);
         this.id = this.attr('id');
