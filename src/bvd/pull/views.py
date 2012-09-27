@@ -113,10 +113,13 @@ def home(request,template='index.html'):
     if settings.USE_SSL:
         import socket
         if socket.gethostbyname(request.META['SERVER_NAME']) == request.META['REMOTE_ADDR']:
+            request.user.readonly = False
             readonly = False
         else:
+            request.user.readonly = True
             readonly = True
     else:
+        request.user.readonly = False
         readonly = False
     if not request.user.is_authenticated():
         jobs = []
@@ -140,6 +143,7 @@ def login(request):
         password = request.POST.get('password1')
     
     user = authenticate(username=username,password=password)
+    user.readonly = readonly
     if user and user.is_active:
         django_login(request,user)
         list = get_jobs_for_user(request.user)
@@ -336,4 +340,4 @@ def pull_jobs(request, *args, **kwargs):
             else:
                 job['status'] = result['status'] 
             
-        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list)]), content_type = 'application/javascript; charset=utf8')
+        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list, readonly = request.user.readonly)]), content_type = 'application/javascript; charset=utf8')
