@@ -66,9 +66,9 @@ BVD.login.login_success = function(data,$modal) {
 		$("#logout").css('display','inline');
 
 		if (data[0].readonly) {
-			$("#add_job").attr('disabled',"disabled");
+			$("#add_job").prop('disabled',true);
 		} else {
-			$("#add_job").removeAttr("disabled");
+			$("#add_job").prop("disabled",false);
 		}
 		BVD.utils.redraw_widgets(data);
 	}
