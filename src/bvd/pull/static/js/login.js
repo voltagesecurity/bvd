@@ -32,6 +32,12 @@
 var BVD = BVD || {};
 BVD.login = {};
 
+BVD.login.login_apple_tv = function() {
+	data = {};
+	data['view_tv'] = 1
+	BVD.utils.do_ajax('post', BVD.data.get_url('login'), data, function(data){BVD.login.login_success(data);});
+}
+
 BVD.login.validate_login_form = function() {
 	if ($("#username").val().toUpperCase() == 'username'.toUpperCase()) {
 		$("#loginerror").css('display','block');
@@ -54,10 +60,10 @@ BVD.login.login_success = function(data,$modal) {
 		$("#loginerror").css('display','block');
 		$("#loginerror").html('Invalid login!');
 	} else {
-		$modal.remove();
+		if (typeof($modal) != 'undefined') {$modal.remove();}
 		$("#login_modal").remove();
 		$("#login").css('display','none');
-		$("#logout").css('display','block');
+		$("#logout").css('display','inline');
 		BVD.utils.redraw_widgets(data);
 	}
 }
@@ -94,7 +100,7 @@ BVD.login.load_login_form = function() {
 BVD.login.logout_success = function() {
 	
 	$("#logout").css('display','none');
-	$("#login").css('display','block');
+	$("#login").css('display','inline');
 	
 	id = 'logout_modal';
 	

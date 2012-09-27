@@ -45,6 +45,7 @@ $(function(){
     
     $("#login").button();
     $("#logout").button();
+    $("#view_tv").button();
     
     $("#login").on("click",function(){
     	BVD.login.load_login_form();
@@ -52,6 +53,10 @@ $(function(){
     
     $("#logout").on("click",function(){
     	BVD.login.do_logout();
+    });
+
+    $("#view_tv").on("click",function(){
+        BVD.login.login_apple_tv(); 
     });
 
     $("#add_job").on("click",function () {

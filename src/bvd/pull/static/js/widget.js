@@ -43,7 +43,7 @@ BVD.widget_map = {};
 	
 	@param job_name String 
 */
-var Widget = function(hostname, jobname, displayname, status, id, counter){
+var Widget = function(hostname, jobname, displayname, status, id, counter, readonly){
 
 	this.make_success = function() {
 		this.addClass('success');
@@ -135,23 +135,9 @@ var Widget = function(hostname, jobname, displayname, status, id, counter){
         
         return { top: ele.style.top, left: ele.style.left, height: ele.style.height, width: ele.style.width };
     }
-	
-	this.init = function() {
-	    
-	    $.extend(this,$("<div></div>"));
-	    
-	    var self = this;
-	    
-	    this.pk = id;
-	    this.hostname = hostname;
-        this.jobname = jobname;
-        this.status = status;
-        this.displayname = displayname;
-        
-        this.attr('id','wdg'+id);
-        this.id = this.attr('id');
-        
-        $icon = $('<div>&nbsp;</div>');
+
+    this.make_icon = function () {
+    	$icon = $('<div>&nbsp;</div>');
 		$icon.attr('class','icon');
 		this.append($icon);
 		
@@ -223,6 +209,28 @@ var Widget = function(hostname, jobname, displayname, status, id, counter){
 		
 		$marquee = $('<div></div>');
 		$marquee.html(this.displayname);
+    }
+	
+	this.init = function() {
+	    
+	    $.extend(this,$("<div></div>"));
+	    
+	    var self = this;
+	    
+	    this.pk = id;
+	    this.hostname = hostname;
+        this.jobname = jobname;
+        this.status = status;
+        this.displayname = displayname;
+        
+        this.attr('id','wdg'+id);
+        this.id = this.attr('id');
+
+        if (!readyonly) {
+        	this.make_icon();
+        }
+        
+        
 		this.attr('class','widget');
 		this.css('position','absolute')
 		this.append($marquee);

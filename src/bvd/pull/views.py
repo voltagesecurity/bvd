@@ -110,6 +110,8 @@ def redirect_to_home(request):
 
 @secure_required
 def home(request,template='index.html'):
+    import os
+    print request.META['HTTP_HOST'], request.META['REMOTE_HOST']
     if not request.user.is_authenticated():
         jobs = []
         pass
@@ -122,15 +124,21 @@ def home(request,template='index.html'):
 
 @secure_required
 def login(request):
-    username = request.POST.get('username')
-    password = request.POST.get('password1')
+    if 'view_tv' in request.POST:
+        username = settings.ENGUSER
+        password = settings.ENGPASS
+        readonly = True
+    else:    
+        readonly = False
+        username = request.POST.get('username')
+        password = request.POST.get('password1')
     
     user = authenticate(username=username,password=password)
     if user and user.is_active:
         django_login(request,user)
         list = get_jobs_for_user(request.user)
         
-        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list)]), content_type = 'application/javascript; charset=utf8')
+        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list, readonly = readonly)]), content_type = 'application/javascript; charset=utf8')
     
     return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
 

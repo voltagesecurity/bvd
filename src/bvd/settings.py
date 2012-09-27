@@ -215,5 +215,7 @@ from ldapsettings import *
 import os
 PROJECT_ROOT = os.getcwd()
 
+
+
 #import dj_database_url
 #DATABASES = {'default': dj_database_url.config(default='postgres://localhost')}
