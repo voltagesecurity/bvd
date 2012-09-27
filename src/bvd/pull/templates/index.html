@@ -50,10 +50,10 @@ div.button {
 		<script>
 			{%if readonly%}
 				readonly = true;
-				$("#add_job").css('display','block');
+				$("#add_job").css('display','none');
 			{%else%}
 				readonly = false;
-				$("#add_job").css('display','none');
+				$("#add_job").css('display','block');
 			{%endif%}
 		</script>
 	{%for job in jobs%}
