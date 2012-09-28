@@ -224,6 +224,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.displayname = displayname;
 
         this.on('click',function(){
+        	alert(this.prop('class'))
         	window.location.href = self.hostname + '/job/' + self.jobname;
         });
         
