@@ -158,6 +158,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		$li1.html('View Job');
 		
 		$li.click(function(){
+			self.off('click');
 			data = {};
 			data['pk'] = self.pk;
 			BVD.utils.do_ajax('post',BVD.data.get_url('remove'),data,function(data){
@@ -203,8 +204,15 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		
 		$icon.hover(function(){
 			$(this).children(0).toggle();
+			self.on('click',function(){
+				return;
+			});
 		},function(){
 			$(this).children(0).toggle();
+			self.on('click',function(){
+
+        		window.location.href = self.hostname + '/job/' + self.jobname;
+        	});
 		});
 		
 		$marquee = $('<div></div>');
@@ -224,6 +232,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.displayname = displayname;
 
         this.on('click',function(){
+
         	window.location.href = self.hostname + '/job/' + self.jobname;
         });
         
