@@ -1,0 +1,6 @@
+<form method="post" name="add_icon" enctype="multipart/form-data">{%csrf_token%}
+	<input type="hidden" name="widget_id" value="{{widget_id}}"/>
+	<div class="upload">Upload Icon (png, jpg, gif) <br/><br/><input type="file" name="icon"/></div>
+	<br/>
+	<input type="submit" value="Save"/>
+</form>

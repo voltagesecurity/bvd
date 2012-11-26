@@ -99,13 +99,15 @@ def save_user_ci_job(**widget):
     
     try:
         user_ci_job = models.UserCiJob.objects.get(user__pk=widget['user'], ci_job__jobname=ci_job.jobname)
-        form = forms.UserCiJobForm(data=widget,instance=user_ci_job)
+        form = forms.UserCiJobForm(data=widget, instance=user_ci_job)
         if form.is_valid():
             user_ci_job = form.save()
     except models.UserCiJob.DoesNotExist:
         form = forms.UserCiJobForm(data=widget)
         if form.is_valid():
             user_ci_job = form.save()
+        else:
+            print form.errors
     return user_ci_job 
     
 def redirect_to_home(request):
@@ -114,6 +116,14 @@ def redirect_to_home(request):
 
 @secure_required
 def home(request,template='index.html'):
+    if request.method == 'POST':
+        if 'icon' in request.FILES:
+            try:
+                user_ci_job = models.UserCiJob.objects.get(id=request.POST.get('widget_id'))
+                user_ci_job.icon = request.POST.get('icon')
+                user_ci_job.save()
+            except:
+                pass
     if settings.USE_SSL:
         import socket
         if socket.gethostbyname(request.META['SERVER_NAME']) == request.META['REMOTE_ADDR']:
@@ -243,7 +253,7 @@ def retrieve_job(request):
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
     
     #check to see if the user has already added the job
-    user_ci_job = models.UserCiJob.objects.filter(entity_active=True,ci_job__jobname=jobname,user__username=request.user.username)
+    user_ci_job = models.UserCiJob.objects.filter(entity_active=True, ci_job__jobname=jobname, user__username=request.user.username)
     if len(user_ci_job) > 0:
         result = dict(status = 100)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
@@ -303,8 +313,9 @@ def get_modal(request):
        
     template = '%s.html' % template
     
+
     return render_to_response(template,
-                  dict(),
+                  request.GET,
                   context_instance=RequestContext(request))
     
 def signup(request):

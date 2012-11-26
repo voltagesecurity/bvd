@@ -27,9 +27,11 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 from django import forms
+from django.conf import settings
 from django.contrib.auth.models import User
 
 from bvd.pull import models
+
 
 class SignupForm(forms.ModelForm):
     class Meta:

@@ -39,7 +39,6 @@ body {
 
 .icon div {
 	background: url(../images/black_linen_v2.png);
-	height: 55px;
 	width:120px;
 	-moz-border-radius: 25px 10px / 10px 25px;
 	border-radius: 25px 10px / 10px 25px;
@@ -60,7 +59,7 @@ body {
 	margin-right: 2em;
 }
 
-.icon .remove-job {
+.icon .menu-item {
 	border: solid white;
 	border-top: 0;
 	border-left: 0;
@@ -140,7 +139,8 @@ body {
     color: white;
     text-shadow: 1px 1px 1px black;
 	background-color: #6BC231;
-	background-image: url(../images/checkmark.png);
+	
+	background-size: 128px 128px;
 	background-repeat:no-repeat;
     background-position:center;
 }
@@ -215,4 +215,13 @@ body {
         to {
                 -webkit-box-shadow:0 -1px 10px rgba(175,100,90, 0.5), 0 -1px 20px rgba(175,100,90, 1);
         }
+}
+
+.upload {
+	font-weight: bold;
+	font-size: 10pt;
+	font-family: Georgia, Arial, Helvetica, Serif;
+	text-transform: uppercase;
+	margin-top: 50px;
+
 }

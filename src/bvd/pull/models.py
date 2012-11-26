@@ -49,6 +49,7 @@ class UserCiJob(models.Model):
     user = models.ForeignKey(User)
     ci_job = models.ForeignKey('CiJob')
     displayname = models.CharField(max_length=100)
+    icon = models.CharField(max_length=100, null=True, blank=True)
     left = models.CharField(max_length=10,null=True,blank=True)
     top = models.CharField(max_length=10,null=True,blank=True)
     width = models.CharField(max_length=10,null=True,blank=True)

@@ -160,6 +160,7 @@ INSTALLED_APPS = (
     'django.contrib.admin',
 	'pull',
 	'jenkins',
+    'south',
     #'django_auth_ldap',
 	
 )

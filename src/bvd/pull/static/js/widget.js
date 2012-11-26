@@ -43,7 +43,7 @@ BVD.widget_map = {};
 	
 	@param job_name String 
 */
-var Widget = function(hostname, jobname, displayname, status, id, counter, readonly){
+var Widget = function(hostname, jobname, displayname, status, id, counter, readonly, background_img){
 
 	this.make_success = function() {
 		this.addClass('success');
@@ -101,6 +101,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 	    switch (status) {
     		case 'SUCCESS':
     			this.make_success();
+    			this.css('background-image', this.background_img);
     			break;
     		case 'FAILURE':
     			this.make_failure();
@@ -146,7 +147,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		
 		$li = $('<li></li>');
 		$li.html('Remove Job');
-		$li.attr('class','remove-job');
+		$li.attr('class','menu-item');
 		
 		$li.hover(function(){
 			$(this).addClass('menu-on');
@@ -156,6 +157,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		
 		$li1 = $('<li></li>');
 		$li1.html('View Job');
+		$li1.attr('class','menu-item');
 		
 		$li.click(function(){
 			self.off('click');
@@ -194,9 +196,37 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		$li1.click(function(){
 			window.location.href = self.hostname + '/job/' + self.jobname;
 		});
+
+		$li2 = $('<li></li>');
+		$li2.html('Edit Image');
+
+
+		$li2.hover(function(){
+			$(this).addClass('menu-on');
+		},function(){
+			$(this).removeClass('menu-on');
+		});
+
+		$li2.click(function(){
+			id = 'edit_image';
+			var $modal;
+	
+			var opts =      {
+        		width : 500,
+    			height : 300,
+        		autoOpen: true,
+        		title: 'Edit Image',
+        		resizable : false,
+        		modal : true
+    		}
+    
+    		$modal = BVD.modal_factory(BVD.data.get_url('modal','?template=edit_image&widget_id='+self.pk), id, opts);
+    		return false;
+		});
 		
 		$ul.append($li);
 		$ul.append($li1);
+		$ul.append($li2);
 		
 		$menu.append($ul);
 		
@@ -230,6 +260,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.jobname = jobname;
         this.status = status;
         this.displayname = displayname;
+        this.background_img = 'url(/static/images/'+background_img+')';
 
         this.on('click',function(){
 
@@ -248,6 +279,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         
         
 		this.attr('class','widget');
+		
 		this.css('position','absolute')
 		this.append($marquee);
 		this.set_status(this.status);
