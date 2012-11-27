@@ -26,7 +26,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-import urllib2, types
+import urllib2, types, os
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -69,6 +69,7 @@ def get_jobs_for_user(user, *args):
             height = job.height,
             status = job.ci_job.status,
             readonly = job.readonly,
+            icon = job.icon,
                 
         )
         list.append(d)
@@ -116,14 +117,7 @@ def redirect_to_home(request):
 
 @secure_required
 def home(request,template='index.html'):
-    if request.method == 'POST':
-        if 'icon' in request.FILES:
-            try:
-                user_ci_job = models.UserCiJob.objects.get(id=request.POST.get('widget_id'))
-                user_ci_job.icon = request.POST.get('icon')
-                user_ci_job.save()
-            except:
-                pass
+   
     if settings.USE_SSL:
         import socket
         if socket.gethostbyname(request.META['SERVER_NAME']) == request.META['REMOTE_ADDR']:
@@ -222,6 +216,8 @@ def validate_job(request):
     elif result == 401: #invalid cerendtials
         result = dict(status = 401)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
+    elif not result['status']:
+            result['status'] = 'SUCCESS'
     else:
         result.update(dict(hostname = hostname))
         
@@ -264,10 +260,12 @@ def retrieve_job(request):
          displayname = displayname,
          status = result['status'],
          user = request.user.pk,
+         icon = 'checkmark.png',
+         readonly = False,
          entity_active = True,
      )
     user_ci_job = save_user_ci_job(**widget)
-    result.update(dict(displayname = displayname, jobname = jobname, pk = user_ci_job.pk))
+    result.update(dict(displayname = displayname, jobname = jobname, pk = user_ci_job.pk, icon = 'checkmark.png'))
         
     return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
 
@@ -350,8 +348,30 @@ def pull_jobs(request, *args, **kwargs):
             elif result == ValueError:
                 #TODO: add an additional state other than down
                 job['status'] = "DOWN"
+            elif not result['status']:
+                job['status'] = 'SUCCESS'
             else:
                 job['status'] = result['status'] 
 
             
         return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list)]), content_type = 'application/javascript; charset=utf8')
+
+def edit_widget(request):
+    if request.method == 'POST':
+        try:
+            user_ci_job = models.UserCiJob.objects.get(id=request.POST.get('widget_id'))
+            user_ci_job.icon = request.FILES.get('icon').name
+            user_ci_job.save()
+
+            if settings.DEBUG:
+                path = '%s/pull/static/images/' % (settings.PROJECT_ROOT,)
+            else:
+                path = '%s/images/' % (settings.STATIC_ROOT,)
+
+            file = open('%s%s' % (path, request.FILES.get('icon').name,), 'wb')
+            file.write(request.FILES.get('icon').read())
+            file.close()
+        except Exception, e:
+            print e.message
+            pass
+    return pull_jobs(request)

@@ -33,6 +33,8 @@ var BVD = BVD || {};
 BVD.utils = {};
 
 BVD.utils.do_ajax = function (type, url, data, success, error) {
+	
+
     return $.ajax({
             url: url,
 	        type: type,
@@ -62,6 +64,7 @@ BVD.utils.save_widgets = function() {
     		data['displayname'] = $widget.displayname;
     		data['jobname'] = $widget.jobname;
     		data['status'] = $widget.status;
+    		data['icon'] = $widget.icon;
     		list.push(data);
 		}
 	}
@@ -76,8 +79,8 @@ BVD.utils.remove_old_widgets = function() {
 }
 
 BVD.utils.create_new_widget = function(json) {
-    var count = $("#widgets").children().length + 3;
-    var $widget = new Widget(json.hostname, json.jobname, json.displayname, json.status,json.pk, count);
+    var count = $(".widget").length + 3;
+    var $widget = new Widget(json.hostname, json.jobname, json.displayname, json.status, json.pk, count, false, json.icon);
     
     if (typeof(BVD.widget_map[json.hostname]) != 'undefined') {
         BVD.widget_map[json.hostname].push($widget);
@@ -124,8 +127,8 @@ BVD.utils.set_size_of_widgets = function(count) {
 BVD.utils.redraw_widgets = function(data) {
 	BVD.widget_map = {};
 	$.each(data[0].jobs, function(){
-		var count = $("#widgets").children().length;
-		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.background_img);
+		var count = $(".widget").length;
+		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon);
 		$widget.draw(this.width,this.height,this.left,this.top);
 			
 		if (typeof(BVD.widget_map[this.hostname]) != 'undefined') {

@@ -1,6 +1,16 @@
-<form method="post" name="add_icon" enctype="multipart/form-data">{%csrf_token%}
+<script src="{{STATIC_URL}}js/edit_icon.js"></script>
+<form id="fileupload" method="post" name="add_icon" enctype="multipart/form-data">{%csrf_token%}
 	<input type="hidden" name="widget_id" value="{{widget_id}}"/>
-	<div class="upload">Upload Icon (png, jpg, gif) <br/><br/><input type="file" name="icon"/></div>
-	<br/>
-	<input type="submit" value="Save"/>
+	<div class="row fileupload-buttonbar">
+		<div class="span7">
+            <!-- The fileinput-button span is used to style the file input field as button -->
+            <span class="btn btn-success fileinput-button">
+                <i class="icon-plus icon-white"></i>
+                 <span>Select file...</span>
+                <input type="file" name="icon" >
+            </span>
+        </div>
+
+    </div>
 </form>
+<div id="div_msg" style="display:none;">Uploading File: <label id="file_name">checkmark.png</label>&nbsp;&nbsp;<div id="progressbar" style="width:0%;"></div></div>

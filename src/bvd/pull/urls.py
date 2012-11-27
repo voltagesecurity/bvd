@@ -45,5 +45,6 @@ urlpatterns = patterns('bvd.pull.views',
 	url(r'^get_modal/$','get_modal',name='get_modal'),
     url(r'^login/$','login',name='login'),
     url(r'^logout/$','logout',name='logout'),
+    url(r'^edit_widget/$','edit_widget',name='edit_widget'),
 	
 )

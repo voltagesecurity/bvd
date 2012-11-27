@@ -42,21 +42,24 @@ body {
 	width:120px;
 	-moz-border-radius: 25px 10px / 10px 25px;
 	border-radius: 25px 10px / 10px 25px;
-	margin-top:-1.2em;
+	margin-top:-.3em !important;
 	display: none;
+	padding-top: 2px;
+	padding-bottom: 5px;
 	
 }
 .icon div ul li {
 	
 	font-size: 7pt;
 	height: 15px;
-	font-family: Georgia, Arial, Helvetica, Serif;
+	font-family: Georgia, Arial, Helvetica, Serif !important;
 	text-transform: uppercase;
 	text-align: left;
 	list-style-type: none;
-	padding: 10px 10px 0px 10px;
-	margin-left: -3em;
+	padding: 10px 10px 10px 10px !important;
+	margin-left: -1.5em;
 	margin-right: 2em;
+
 }
 
 .icon .menu-item {

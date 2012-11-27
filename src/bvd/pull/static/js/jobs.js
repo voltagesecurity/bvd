@@ -79,7 +79,7 @@ BVD.jobs.add_job = function(txt_map) {
                     
 	var opts =      {
 		width : 600,
-		height : 300,
+		height : 350,
 		autoOpen: true,
 		title: 'Adding a Jenkins Job',
 		resizable : false,

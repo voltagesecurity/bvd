@@ -84,11 +84,13 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		
 		if (count <= 15) {mod = 5;}
 		else if (count >= 50) {mod = 7;}
-		
-		var left = prev_left + size + 50; 		
-		left = (counter % mod == 0 && left < $(window).width()) ? 0 : left;
 
-		var top = (counter % mod == 0 && left < $(window).width()) ? (counter == 0) ? 0 : prev_top + size + 50  : prev_top
+		var left = prev_left + size + 50;;
+		
+		left = (counter % mod == 0 && left > ($(window).width() - 300)) ? 0 : (counter == 0) ? 0 : left;
+
+
+		var top = (counter % mod == 0) ? (counter == 0) ? 0 : prev_top + size + 50  : prev_top
 		
 		this.css('height',size+'px');
 		this.css('width',size+'px');
@@ -178,7 +180,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 				$widgets.splice(index,1);
 				$widget.remove();
 				BVD.widget_map[self.hostname] = $widgets;
-				BVD.utils.set_size_of_widgets($("#widgets").children().length + 3);
+				BVD.utils.set_size_of_widgets($(".widget").length + 3);
 				BVD.utils.save_widgets();
 				setTimeout(500,function(){
 					var poll = new Poll('/pull/pull_jobs/');
@@ -212,8 +214,8 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 			var $modal;
 	
 			var opts =      {
-        		width : 500,
-    			height : 300,
+        		width : 400,
+    			height : 225,
         		autoOpen: true,
         		title: 'Edit Image',
         		resizable : false,
@@ -260,6 +262,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.jobname = jobname;
         this.status = status;
         this.displayname = displayname;
+        this.icon = background_img;
         this.background_img = 'url(/static/images/'+background_img+')';
 
         this.on('click',function(){
