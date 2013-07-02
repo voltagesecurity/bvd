@@ -26,7 +26,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-from mock import Mock
+from mock import Mock, patch
 from StringIO import StringIO
 import urllib2
 
@@ -66,9 +66,9 @@ class ViewTests(unittest.TestCase):
         
         
 
+    @patch('bvd.jenkins.jenkins.RetrieveJob.lookup_hostname', Mock(return_value=ValueError))
     def test_validate_hostname_returns_404(self):
 		request = self.factory.post('/pull/validate_hostname', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-		views.RetrieveJob.lookup_hostname = Mock(return_value=ValueError)
 		
 		expected = [dict(status = 404)]
 		actual = views.validate_hostname(request)
@@ -77,9 +77,9 @@ class ViewTests(unittest.TestCase):
 		self.assertEqual(actual.status_code,200)
     
         
+    @patch('bvd.jenkins.jenkins.RetrieveJob.lookup_hostname', Mock(return_value=urllib2.URLError))
     def test_validate_hostname_returns_500(self):
 		request = self.factory.post('/pull/validate_hostname', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-		views.RetrieveJob.lookup_hostname = Mock(return_value=urllib2.URLError)
 		expected = [dict(status = 500)]
 		
 		actual = views.validate_hostname(request)
@@ -118,9 +118,9 @@ class ViewTests(unittest.TestCase):
     	
     
     
+    @patch('bvd.jenkins.jenkins.RetrieveJob.lookup_hostname', Mock(return_value=StringIO()))
     def test_validate_hostname_returns_True(self):
         request = self.factory.post('/pull/validate_hostname', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        views.RetrieveJob.lookup_hostname = Mock(return_value=StringIO())
         expected = [dict(status = 200)]
         actual = views.validate_hostname(request)
         self.assertEqual(actual.content,simplejson.dumps(expected))
