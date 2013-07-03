@@ -36,6 +36,8 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
+LOGIN_URL = '/openid/login/'
+
 MANAGERS = ADMINS
 
 # DATABASES = {
