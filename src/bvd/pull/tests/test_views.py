@@ -88,13 +88,12 @@ class ViewTests(unittest.TestCase):
         
     
 		
+    @patch('bvd.jenkins.jenkins.RetrieveJob.lookup_job', Mock(return_value=ValueError))
     def test_validate_job_returns_404(self):
         hostname = 'http://localhost:8080'
     	post_data = {'hostname' : hostname, 'jobname' : 'Test1'}
     	request = self.factory.post('/pull/validate_job',data=post_data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     	
-    	views.RetrieveJob.lookup_job = Mock(return_value=ValueError)
-
     	expected = [dict(status = 404)]
     	actual = views.validate_job(request)
 
@@ -102,10 +101,10 @@ class ViewTests(unittest.TestCase):
     	self.assertEqual(actual.status_code,200)
 
     
+    @patch('bvd.jenkins.jenkins.RetrieveJob.lookup_job', Mock(return_value=urllib2.URLError))
     def test_validate_job_returns_500(self):
         
         expected = [dict(status = 500)]
-    	views.RetrieveJob.lookup_job = Mock(return_value=urllib2.URLError)
     	hostname = 'http://localhost:8080'
     	post_data = {'hostname' : hostname, 'jobname' : 'Test1'}
     	request = self.factory.post('/pull/validate_job',data=post_data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
@@ -128,10 +127,9 @@ class ViewTests(unittest.TestCase):
         
     
     
+    @patch('bvd.jenkins.jenkins.RetrieveJob.lookup_job', \
+            Mock(return_value=dict(jobname = 'Test1', status = 'SUCCESS')))
     def test_validate_job_returns_200(self):
-
-    	d = dict(jobname = 'Test1', status = 'SUCCESS')
-    	views.RetrieveJob.lookup_job = Mock(return_value=d)
     	hostname = 'http://localhost:8080'
     	
     	expected = [dict(status = 200)]
@@ -147,11 +145,11 @@ class ViewTests(unittest.TestCase):
     	self.assertEqual(actual.status_code,200)
     	
     
-    
+   
+    @patch('bvd.jenkins.jenkins.RetrieveJob.lookup_job', Mock(return_value=urllib2.URLError))
     def test_validate_job_returns_500_when_invalid_request_data(self):
         
     	expected = [dict(status = 500)]
-    	views.RetrieveJob.lookup_job = Mock(return_value=urllib2.URLError)
     	hostname = 'http://localhost:8080'
     	post_data = {'jobname' : 'Test1'}
     	request = self.factory.post('/pull/validate_job',data=post_data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
