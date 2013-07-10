@@ -159,6 +159,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 				}
 				$widgets.splice(index,1);
 				$widget.remove();
+				Widget.render.refresh_grid();
 				BVD.widget_map[self.hostname] = $widgets;
 				BVD.utils.set_size_of_widgets($(".widget").length + 3);
 				BVD.utils.save_widgets();

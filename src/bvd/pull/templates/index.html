@@ -55,22 +55,12 @@ div.button {
 				readonly = false;
 				$("#add_job").css('display','block');
 			{%endif%}
+			new Poll('/pull/pull_jobs').ajax();
+			$("#widgets").freetile();
+			$(window).resize(function() {
+				new Poll('/pull/pull_jobs').ajax();
+			});
 		</script>
-	{%for job in jobs%}
-		<script>
-			var count = $("#widgets").children().length;
-
-			$widget = new Widget('{{job.ci_job.ci_server.hostname}}', '{{job.ci_job.jobname}}', '{{job.displayname}}', '{{job.ci_job.status}}', '{{job.pk}}', count, readonly, '{{job.icon}}');
-			Widget.render.draw($widget,'{{job.width}}','{{job.height}}','{{job.left}}','{{job.top}}');
-			
-			if (typeof(BVD.widget_map['{{job.ci_job.ci_server.hostname}}']) != 'undefined') {
-				BVD.widget_map['{{job.ci_job.ci_server.hostname}}'].push($widget);
-			} else {
-				$widgets = [$widget];
-				BVD.widget_map['{{job.ci_job.ci_server.hostname}}'] = $widgets; 
-			}
-		</script>
-	{%endfor%}
 </div>
 <div>{%if request.user %}<input id="userid" value="{{request.user.id}}"/>{%endif%}</div>
 {%csrf_token%}

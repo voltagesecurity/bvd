@@ -34,12 +34,17 @@ Widget.render = {};
 
 Widget.render.add_widget = function(widget) {
 	$('#widgets').append(widget);
-	// $marquee.marquee();
-	widget.draggable({
-	    stop : function(event,ui) {
-	        //alert($(this).css('left'));
-	    }
-	})
+	Widget.render.refresh_grid();
+}
+
+Widget.render.refresh_grid = function(animate) {
+	if(animate) {
+		$("#widgets").freetile({
+			animate: true,
+		})
+	} else {
+		$("#widgets").freetile();
+	}
 }
 
 Widget.render.remove_widget = function(widget) {
@@ -52,7 +57,7 @@ Widget.render.resize = function(widget, width, height) {
 }
 	
 Widget.render.draw = function (widget, width, height, left, top) {
-    widget.css({'top' : top, 'width' : width, 'height' : height, 'left' : left});
+    widget.css({ 'width' : width, 'height' : height });
 }
 
 Widget.render.refresh = function(widget) {

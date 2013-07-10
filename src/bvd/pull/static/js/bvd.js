@@ -38,6 +38,7 @@ var Poll = function(url) {
     	    data = eval(data);
     	    BVD.utils.remove_old_widgets();
     	    BVD.utils.redraw_widgets(data);
+    	    Widget.render.refresh_grid();
     	});
 	}
 }
