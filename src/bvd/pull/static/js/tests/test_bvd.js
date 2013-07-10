@@ -81,8 +81,8 @@ test("widget has correct data and attributes when initialized", function() {
 test("widget has only displayname when readonly", function() {
 	var widget = create_test_widget(true);
 
-	equal($($(widgetReadonly.toArray()[0]).children()).length, 1, "readonly widget has only displayname marquee")
-	equal($($(widgetReadonly.toArray()[0]).children()[0]).html(), widget_data['displayname'], "readonly marquee has correct displayname");
+	equal($($(widget.toArray()[0]).children()).length, 1, "readonly widget has only displayname marquee")
+	equal($($(widget.toArray()[0]).children()[0]).html(), widget_data['displayname'], "readonly marquee has correct displayname");
 });
 
 test("widget has div.icon subtree when not readonly", function() {
