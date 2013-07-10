@@ -29,57 +29,41 @@
 
 **/
 
-var BVD = BVD || {};
+var Widget = Widget || {};
+Widget.render = {};
 
-var Poll = function(url) {
-	
-	this.ajax = function() {
-		BVD.utils.do_ajax('get',url,{}, function(data) {
-    	    data = eval(data);
-    	    BVD.utils.remove_old_widgets();
-    	    BVD.utils.redraw_widgets(data);
-    	});
-	}
+Widget.render.add_widget = function(widget) {
+	$('#widgets').append(widget);
+	// $marquee.marquee();
+	widget.draggable({
+	    stop : function(event,ui) {
+	        //alert($(this).css('left'));
+	    }
+	})
 }
 
-$(function(){
+Widget.render.remove_widget = function(widget) {
+	widget.remove();
+}
 
-	var poll = new Poll('/pull/pull_jobs/');
-   
-    var jenkins = function() {
-    	if ($("#add_job_modal").length == 0) {
-        	poll.ajax();
-        }
-    }
+Widget.render.resize = function(widget, width, height) {
+    widget.css('height',height+'px');
+    widget.css('width',width+'px');
+}
 	
-	setInterval(jenkins,'60000');
-	
-	var resize = function(data) {
-	    
-	    var curr_width = $(this).width();
-	    var curr_height = $(this).height();
-	    var max_width = $("#widgets").children(0).css('width');
-	    var max_height =  $("#widgets").children(0).css('height');
-	    
-	    var ratio = curr_height / curr_width;
-	    
-	    if ((curr_width/5) >= max_width && ratio <= 1) {
-	        curr_width = max_width ;
-	        curr_height = max_width * ratio;
-        } else {
-            curr_height = (curr_width/5) * ratio;
-            curr_width = curr_height;
-        }
-	    
-	    for (hostname in BVD.widget_map) {
-    		$widgets = BVD.widget_map[hostname];
-    		for (i=0; i < $widgets.length; i++) {
-    			Widget.render.resize($widgets[i],curr_width,curr_height);
-    		}
-    	}
-	}
-	
-	$(window).resize(resize);
-	
-    
-});
+Widget.render.draw = function (widget, width, height, left, top) {
+    widget.css({'top' : top, 'width' : width, 'height' : height, 'left' : left});
+}
+
+Widget.render.refresh = function(widget) {
+    var dimensions = this.getWidgetDimensions();
+    widget.css(dimensions);
+}
+
+Widget.render.getWidgetDimensions = function(widget) {
+	var ele = document.getElementById(widget.id);
+
+    return { top: ele.style.top, left: ele.style.left, height: ele.style.height, width: ele.style.width };
+}
+
+

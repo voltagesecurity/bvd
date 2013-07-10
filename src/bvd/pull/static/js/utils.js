@@ -59,7 +59,7 @@ BVD.utils.save_widgets = function() {
 		var $widgets = BVD.widget_map[hostname];
 		for (i=0; i < $widgets.length; i++) {
 			$widget = $widgets[i];
-			data = $widget.getWidgetDimensions();
+			data = Widget.render.getWidgetDimensions($widget);
 			data['hostname'] = hostname;
     		data['displayname'] = $widget.displayname;
     		data['jobname'] = $widget.jobname;
@@ -105,7 +105,7 @@ BVD.utils.set_size_of_widgets = function(count) {
 		$widgets = BVD.widget_map[hostname];
 		for (i=0; i < $widgets.length; i++) {
 		    if (counter == 0) {dimensions = {left : '0px', top: '0px'}}
-		    else {dimensions = $prev_widget.getWidgetDimensions();}
+		    else {dimensions = Widget.render.getWidgetDimensions($prev_widget);}
 			var $current_widget = $widgets[i];
 			
 			$current_widget.set_size(count,
@@ -129,7 +129,7 @@ BVD.utils.redraw_widgets = function(data) {
 	$.each(data[0].jobs, function(){
 		var count = $(".widget").length;
 		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon);
-		$widget.draw(this.width,this.height,this.left,this.top);
+		Widget.render.draw($widget,this.width,this.height,this.left,this.top);
 			
 		if (typeof(BVD.widget_map[this.hostname]) != 'undefined') {
 			BVD.widget_map[this.hostname].push($widget);

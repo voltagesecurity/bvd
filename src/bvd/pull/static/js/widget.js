@@ -118,26 +118,6 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
     			this.make_success();
     	}
 	}
-	
-	this.resize = function(width,height) {
-	    this.css('height',height+'px');
-	    this.css('width',width+'px');
-	}
-	
-	this.draw = function (width, height, left, top) {
-	    this.css({'top' : top, 'width' : width, 'height' : height, 'left' : left});
-	}
-	
-	this.refresh = function() {
-	    var dimensions = this.getWidgetDimensions();
-	    this.css(dimensions);
-	}
-	
-	this.getWidgetDimensions = function() {
-        var ele = document.getElementById(this.id);
-        
-        return { top: ele.style.top, left: ele.style.left, height: ele.style.height, width: ele.style.width };
-    }
 
     this.make_icon = function (self) {
     	$icon = $('<div>&nbsp;</div>');
@@ -287,15 +267,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		this.append($marquee);
 		this.set_status(this.status);
 		
-		
-		
-		$('#widgets').append(this);
-		// $marquee.marquee();
-		this.draggable({
-		    stop : function(event,ui) {
-		        //alert($(this).css('left'));
-		    }
-		})
+		Widget.render.add_widget(this);
     }	
     
     this.init();
