@@ -62,6 +62,24 @@ div.button {
 			});
 		</script>
 </div>
+<div id="legend">
+	<div class="legend_success">
+		<div class="legend_square"></div>
+		<p>Success
+	</div>
+	<div class="legend_error">
+		<div class="legend_square"></div>
+		<p>Failure
+	</div>
+	<div class="legend_unstable">
+		<div class="legend_square"></div>
+		<p>Unstable Build
+	</div>
+	<div class="legend_down">
+		<div class="legend_square"></div>
+		<p>Aborted or Not Built
+	</div>
+</div>
 <div>{%if request.user %}<input id="userid" value="{{request.user.id}}"/>{%endif%}</div>
 {%csrf_token%}
 {%endblock%}

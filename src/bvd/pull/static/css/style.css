@@ -236,3 +236,46 @@ body {
 	margin-top: 50px;
 
 }
+
+#legend {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    padding: 10px;
+    background-color: rgba(0,0,0,0.5);
+    border-top: 2px solid black;
+    border-right: 2px solid black;
+}
+
+#legend div {
+    float: left;
+}
+
+#legend div p {
+    color: white;
+    float: left;
+    margin: 0 20px 0 8px;
+}
+
+.legend_square {
+    width: 20px;
+    height: 20px;
+}
+
+.legend_success .legend_square {
+    background-color: #6BC231;
+    margin-left: 15px;
+}
+
+.legend_error .legend_square {
+    background-color: #FF4234;
+}
+
+.legend_unstable .legend_square {
+    background-color: #ffd700;
+}
+
+.legend_down .legend_square {
+    background-color: #a9a9a9;
+    background-image: -webkit-linear-gradient(-45deg, rgba(255,255,255,0.2) 50%, transparent 10%);
+}
