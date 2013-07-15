@@ -350,6 +350,8 @@ def pull_jobs(request, *args, **kwargs):
                 job['status'] = "DOWN"
             elif not result['status']:
                 job['status'] = 'SUCCESS'
+            elif job['status'] == 'ABORTED' or job['status'] == 'NOT_BUILT':
+                job['status'] = "DOWN"
             else:
                 job['status'] = result['status'] 
 
