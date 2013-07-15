@@ -75,11 +75,12 @@ body {
     position: absolute;
     bottom: 0;
     text-align: center;
-    height: 40%;
+    min-height: 40%;
     width: inherit;
     background-color: rgba(0,0,0,0.6);
     padding: 3px 0 3px 0;
     margin-bottom: 10px;
+    overflow: hidden;
 }
 
 .modal div div input, .modal div div label {
