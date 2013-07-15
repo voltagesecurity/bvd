@@ -56,7 +56,7 @@ Widget.render.resize = function(widget, width, height) {
     widget.css('width',width+'px');
 }
 	
-Widget.render.draw = function (widget, width, height, left, top) {
+Widget.render.draw = function (widget, width, height) {
     widget.css({ 'width' : width, 'height' : height });
 }
 

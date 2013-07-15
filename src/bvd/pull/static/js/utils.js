@@ -129,7 +129,7 @@ BVD.utils.redraw_widgets = function(data) {
 	$.each(data[0].jobs, function(){
 		var count = $(".widget").length;
 		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon);
-		Widget.render.draw($widget,this.width,this.height,this.left,this.top);
+		Widget.render.draw($widget,this.width,this.height);
 			
 		if (typeof(BVD.widget_map[this.hostname]) != 'undefined') {
 			BVD.widget_map[this.hostname].push($widget);
