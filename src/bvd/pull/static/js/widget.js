@@ -263,8 +263,8 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         
         
 		this.attr('class','widget');
-		
-		this.css('position','absolute')
+
+        $marquee.attr('class','marquee');
 		this.append($marquee);
 		this.set_status(this.status);
 		

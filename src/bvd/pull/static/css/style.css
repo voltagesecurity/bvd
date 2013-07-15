@@ -71,6 +71,16 @@ body {
 	
 }
 
+.marquee {
+    position: absolute;
+    bottom: 0;
+    text-align: center;
+    height: 40%;
+    width: inherit;
+    background-color: rgba(0,0,0,0.6);
+    padding: 3px 0 3px 0;
+    margin-bottom: 10px;
+}
 
 .modal div div input, .modal div div label {
     margin-bottom: 15px;
@@ -121,10 +131,7 @@ body {
 	background: rgba(0, 0, 0, .5);
 	float: left;
 	width: 200px;
-	padding: 10px;
 	margin: 7px;
-	overflow: hidden;
-	margin-top: 1.8em;
     font-size: 25pt;
     font-weight: bold;
 	text-align:center;
@@ -157,6 +164,8 @@ body {
     height: 30px;
     position: absolute;
     cursor: pointer;
+    margin: 3px 0 0 3px;
+    z-index: 10;
 }
 
 .widget.error {
