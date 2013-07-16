@@ -35,8 +35,7 @@ from fabric import api
 
 app_name = 'bvd'
 wrapper = '. /usr/local/bin/virtualenvwrapper.sh;'
-# path_to_bvd = '/opt/bvd'
-path_to_bvd = '/Users/nathanielgraff/Dev/bvd'
+path_to_bvd = '/opt/bvd'
 
 def install_requirements(*args,**kwargs):
     #TODO: If need be, we can add a local pypi mirror for any additional packages
