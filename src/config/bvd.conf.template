@@ -1,0 +1,41 @@
+Listen 443
+NameVirtualHost *:443
+
+<VirtualHost *:443>
+        DocumentRoot {{path_to_bvd}}/src/bvd
+        Alias /media {{path_to_bvd}}/src/bvd/media
+        Alias /static {{path_to_bvd}}/src/bvd/static
+        WSGIScriptAlias / {{path_to_bvd}}/src/config/bvd.wsgi
+        SSLEngine on
+        SSLCertificateFile {{path_to_bvd}}/src/certs/engtvcorner.crt
+        SSLCertificateKeyFile {{path_to_bvd}}/src/certs/engtvcorner.key
+
+<Directory "{{path_to_bvd}}/src/config/">
+    Order allow,deny
+    Allow from all
+</Directory>
+
+<Directory "{{path_to_bvd}}/src/bvd/static">
+    Order allow,deny
+    Allow from all
+</Directory>
+
+</VirtualHost>
+
+<VirtualHost *:80>
+        DocumentRoot {{path_to_bvd}}/src/bvd
+        Alias /media {{path_to_bvd}}/src/bvd/media
+        Alias /static {{path_to_bvd}}/src/bvd/static
+        WSGIScriptAlias / {{path_to_bvd}}/src/config/bvd.wsgi
+
+<Directory "{{path_to_bvd}}/src/config/">
+    Order allow,deny
+    Allow from all
+</Directory>
+
+<Directory "{{path_to_bvd}}/src/bvd/static">
+    Order allow,deny
+    Allow from all
+</Directory>
+
+</VirtualHost>

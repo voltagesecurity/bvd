@@ -1,0 +1,25 @@
+<!-- 
+Mac OS X launchd configuration for loading BVD in Chrome at login
+
+TO MANUALLY INSTALL:
+  1 - Copy to ~/Library/LaunchAgents/com.user.loginscript.plist
+  2 - Replace {{ path_to_bvd }} with the path to the root of your installation of BVD
+        ex. /opt/bvd
+  3 - Configure launchd with:
+        launchctl load ~/Library/com.user.loginscript.plist
+  4 - Test that it works with:
+        launchctl start com.user.loginscript
+      Chrome should start and in 5 seconds go fullscreen.
+-->
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+   <key>Label</key>
+   <string>com.user.loginscript</string>
+   <key>Program</key>
+   <string>{{ path_to_bvd }}/src/config/kiosk.sh</string>
+   <key>RunAtLoad</key>
+   <true/>
+</dict>
+</plist>
