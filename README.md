@@ -56,6 +56,32 @@ Automated Installation
     
     http://localhost:8000
 
+Configuring Apache and Setting Up Production
+============================================
+
+1) Run
+
+    $ sudo fab configure_apache
+
+2) Add these lines to your httpd.conf:
+
+    LoadModule wsgi_module libexec/apache2/mod_wsgi.so
+    Include {{ path_to_bvd}}/src/config/bvd.conf
+    
+    where {{ path_to_bvd }} is the location of the installation of BVD
+
+3) Restart Apache
+
+    $ sudo apachectl -k restart
+
+4) To Automatically load BVD at login on OS X run
+
+    $ fab configure_automatic_start_on_login_osx
+
+5) [optional] Test that the login script works with
+
+    $ launchctl start com.user.loginscript
+
 Automated Installation Explanation
 ==================================
 
