@@ -71,6 +71,17 @@ def start_django_dev_server(*args,**kwargs):
 def sync_db(*args,**kwargs):
     cmd = 'cd ./src/bvd && python manage.py syncdb --noinput'
     subprocess.call(cmd,shell=True)
+
+def migrate_db(*args, **kwargs):
+    cmd = 'cd ./src/bvd && python manage.py migrate'
+    subprocess.call(cmd, shell=True)
+
+def git_pull(*args, **kwargs):
+    """
+    This function:
+        Updates the local repository by runnning `git pull`
+    """
+    subprocess.call('git pull', shell=True)
     
 def local(*args,**kwargs):
     """
@@ -141,4 +152,11 @@ def configure_automatic_start_on_login_osx(*args, **kwargs):
     print "test that the automatic launch script works by calling `launchctl start com.user.loginscript`"
 
 
-
+def update_bvd(*args, **kwargs):
+    """
+    This function:
+        1 - Updates the local repository
+        2 - Syncs the database
+    """
+    git_pull()
+    sync_db()
