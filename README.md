@@ -59,26 +59,30 @@ Automated Installation
 Configuring Apache and Setting Up Production
 ============================================
 
-1) Run
+1) Set your installation directory in the fabfile by editing path_to_bvd at the top of the file. EX:
+
+    path_to_bvd = '/is/actually/over/here'
+
+2) Run
 
     $ sudo fab configure_apache
 
-2) Add these lines to your httpd.conf:
+3) Add these lines to your httpd.conf:
 
     LoadModule wsgi_module libexec/apache2/mod_wsgi.so
     Include {{ path_to_bvd}}/src/config/bvd.conf
     
     where {{ path_to_bvd }} is the location of the installation of BVD
 
-3) Restart Apache
+4) Restart Apache
 
     $ sudo apachectl -k restart
 
-4) To Automatically load BVD at login on OS X run
+5) To Automatically load BVD at login on OS X run
 
     $ fab configure_automatic_start_on_login_osx
 
-5) [optional] Test that the login script works with
+6) [optional] Test that the login script works with
 
     $ launchctl start com.user.loginscript
 
