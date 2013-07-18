@@ -55,7 +55,12 @@ div.button {
 			{%else%}
 				readonly = false;
 				$("#add_job").css('display','block');
-			{%endif%}
+			{% endif %}
+			{% if appletv %}
+				$(function() {
+					BVD.login.login_apple_tv();
+				});
+			{% endif %}
 			{% if user.is_authenticated %}
 				new Poll().ajax('/pull/pull_jobs/');
 				$("#view_tv").css('display','none');

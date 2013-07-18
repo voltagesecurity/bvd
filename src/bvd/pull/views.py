@@ -137,7 +137,12 @@ def redirect_to_home(request):
 
 @secure_required
 def home(request,template='index.html'):
-   
+    appletv = request.GET.get('appletv')
+    if appletv == '1':
+        return render_to_response(template,
+                                  dict(title="Welcome to BVD", readonly=True, appletv=True),
+                                  context_instance=RequestContext(request))
+
     if settings.USE_SSL:
         import socket
         if socket.gethostbyname(request.META['SERVER_NAME']) == request.META['REMOTE_ADDR']:
@@ -146,17 +151,8 @@ def home(request,template='index.html'):
             readonly = True
     else:
         readonly = False
-    if not request.user.is_authenticated():
-        jobs = []
-        pass
-    else:
-        jobs = models.UserCiJob.objects.filter(entity_active=True,user__username=request.user.username)
-        for job in jobs:
-            job.readonly = readonly
-            job.save()
-    #jobs = models.CiJob.objects.filter(entity_active=True)
     return render_to_response(template,
-                              dict(title='Welcome to BVD',jobs = jobs, readonly = readonly),
+                              dict(title='Welcome to BVD', readonly = readonly),
                               context_instance=RequestContext(request))
 
 @secure_required
