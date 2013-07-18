@@ -31,9 +31,9 @@
 
 var BVD = BVD || {};
 
-var Poll = function(url) {
+var Poll = function() {
 	
-	this.ajax = function() {
+	this.ajax = function(url) {
 		BVD.utils.do_ajax('get',url,{}, function(data) {
     	    data = eval(data);
     	    BVD.utils.remove_old_widgets();
@@ -45,11 +45,15 @@ var Poll = function(url) {
 
 $(function(){
 
-	var poll = new Poll('/pull/pull_jobs/');
+	var poll = new Poll();
    
     var jenkins = function() {
     	if ($("#add_job_modal").length == 0) {
-        	poll.ajax();
+        	if(apple_tv != true) {
+                poll.ajax('/pull/pull_jobs/');
+            } else {
+                poll.ajax('/pull/pull_apple_tv_jobs/');
+            }
         }
     }
 	

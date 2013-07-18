@@ -32,9 +32,12 @@
 var BVD = BVD || {};
 BVD.login = {};
 
+apple_tv = false;
+
 BVD.login.login_apple_tv = function() {
 	data = {};
 	data['view_tv'] = 1
+	apple_tv = true;
 	BVD.utils.do_ajax('post', BVD.data.get_url('login'), data, function(data){BVD.login.login_success(data);});
 }
 
@@ -64,14 +67,20 @@ BVD.login.login_success = function(data,$modal) {
 		$("#login_modal").remove();
 		$("#login").css('display','none');
 		$("#logout").css('display','inline');
+		$("#view_tv").css('display','none');
+		$("#refresh").css('display','inline');
 
 		if (data[0].readonly) {
 			$("#add_job").css('display','none');
 		} else {
 			$("#add_job").css('display','block');
 		}
-		BVD.utils.remove_old_widgets();
-		BVD.utils.redraw_widgets(data);
+		poll = new Poll();
+		if(apple_tv != true) {
+			poll.ajax('/pull/pull_jobs/');
+		} else {
+			poll.ajax('/pull/pull_apple_tv_jobs/')
+		}
 	}
 }
 
@@ -108,6 +117,8 @@ BVD.login.logout_success = function() {
 	
 	$("#logout").css('display','none');
 	$("#login").css('display','inline');
+	$("#view_tv").css('display','inline');
+	$("#refresh").css('display','none');
 	
 	id = 'logout_modal';
 	
@@ -137,5 +148,6 @@ BVD.login.logout_success = function() {
 }
 
 BVD.login.do_logout = function() {
+	apple_tv = false;
 	BVD.utils.do_ajax('post', BVD.data.get_url('logout'), {},function(data){BVD.login.logout_success();});	
 }

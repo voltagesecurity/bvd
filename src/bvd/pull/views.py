@@ -50,7 +50,27 @@ def append_http(hostname):
         return hostname
     else:
         return 'http://%s' % hostname
-    
+   
+def get_jobs_for_readonly():
+    jobs = models.UserCiJob.objects.filter(entity_active=True)
+    joblist = []
+    for job in jobs:
+        d = dict(
+            pk      = job.pk,
+            hostname = job.ci_job.ci_server.hostname,
+            jobname = job.ci_job.jobname,
+            displayname = job.displayname,
+            left = job.left,
+            top = job.top,
+            width = job.width,
+            height = job.height,
+            status = job.ci_job.status,
+            readonly = True,
+            icon = job.icon,
+        )
+        joblist.append(d)
+    return joblist
+
 def get_jobs_for_user(user, *args):
     jobs =  models.UserCiJob.objects.filter(entity_active=True,user__username=user.username)
     list = []
@@ -142,19 +162,16 @@ def home(request,template='index.html'):
 @secure_required
 def login(request):
     if 'view_tv' in request.POST:
-        username = settings.ENGUSER
-        password = settings.ENGPASS
-        readonly = True
+        return HttpResponse(simplejson.dumps([dict(status = 200, readonly = True)]), content_type = 'application/javascript; charset=utf8')
     else:    
         readonly = False
         username = request.POST.get('username')
         password = request.POST.get('password1')
     
-    user = authenticate(username=username,password=password)
-    if user and user.is_active:
-        django_login(request,user)
-        list = get_jobs_for_user(request.user,readonly)
-        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list, readonly = readonly)]), content_type = 'application/javascript; charset=utf8')
+        user = authenticate(username=username,password=password)
+        if user and user.is_active:
+            django_login(request,user)
+            return HttpResponse(simplejson.dumps([dict(status = 200, readonly = readonly)]), content_type = 'application/javascript; charset=utf8')
     
     return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
 
@@ -357,6 +374,28 @@ def pull_jobs(request, *args, **kwargs):
 
             
         return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list)]), content_type = 'application/javascript; charset=utf8')
+
+def pull_apple_tv_jobs(request, *args, **kwargs):
+    joblist = get_jobs_for_readonly()
+    for job in joblist:
+        jenkins = RetrieveJob(job['hostname'],job['jobname'])
+        result = jenkins.lookup_job()
+            
+        if result == urllib2.URLError:
+           #TODO: add an additional state other than down 
+            job['status'] = "DOWN"
+        elif result == ValueError:
+            #TODO: add an additional state other than down
+            job['status'] = "DOWN"
+        elif not result['status']:
+            job['status'] = 'SUCCESS'
+        elif job['status'] == 'ABORTED' or job['status'] == 'NOT_BUILT':
+            job['status'] = "DOWN"
+        else:
+            job['status'] = result['status'] 
+            
+        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]), content_type = 'application/javascript; charset=utf8')
+
 
 def edit_widget(request):
     if request.method == 'POST':

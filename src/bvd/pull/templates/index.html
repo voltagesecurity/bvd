@@ -41,7 +41,8 @@ div.button {
 <div id="buttons" style="width:100%;height:50px;">
 	<div style="float: left;"><button id="add_job">+ Job</button></div>
 	<div style="float: right;">
-		<button id="view_tv" style="display:inline;">View TV</button>&nbsp;&nbsp;&nbsp;
+		<button id="view_tv" style="display:inline;">View TV</button>
+		<button id="refresh" style="display:none;">Refresh</button>&nbsp;&nbsp;&nbsp;
 		<button id="login" style="display:{%if user.is_authenticated %}none;{%else%}inline;{%endif%}">Login</button>
 		<button id="logout" style="display:{%if user.is_authenticated %}inline;{%else%}none;{%endif%}">Logout</button>
 	</div>
@@ -55,10 +56,18 @@ div.button {
 				readonly = false;
 				$("#add_job").css('display','block');
 			{%endif%}
-			new Poll('/pull/pull_jobs').ajax();
+			{% if user.is_authenticated %}
+				new Poll().ajax('/pull/pull_jobs/');
+				$("#view_tv").css('display','none');
+				$("#refresh").css('display','inline');
+			{% endif %}
 			$("#widgets").freetile();
 			$(window).resize(function() {
-				new Poll('/pull/pull_jobs').ajax();
+				if(apple_tv != true) {
+					new Poll().ajax('/pull/pull_jobs/');
+				} else {
+					new Poll().ajax('/pull/pull_apple_tv_jobs/');
+				}
 			});
 		</script>
 </div>

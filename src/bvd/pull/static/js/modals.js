@@ -46,6 +46,7 @@ $(function(){
     $("#login").button();
     $("#logout").button();
     $("#view_tv").button();
+    $("#refresh").button();
     
     $("#login").on("click",function(){
     	BVD.login.load_login_form();
@@ -57,6 +58,15 @@ $(function(){
 
     $("#view_tv").on("click",function(){
         BVD.login.login_apple_tv(); 
+    });
+
+    $("#refresh").on('click',function(){
+        poll = new Poll();
+        if(apple_tv != true) {
+            poll.ajax('/pull/pull_jobs/');
+        } else {
+            poll.ajax('/pull/pull_apple_tv_jobs/')
+        }
     });
 
     $("#add_job").on("click",function () {

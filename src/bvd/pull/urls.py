@@ -35,6 +35,7 @@ urlpatterns = patterns('bvd.pull.views',
     
     url(r'^$', 'home',name='home'),
     url(r'^pull_jobs/$','pull_jobs',name='pull_jobs'),
+    url(r'^pull_apple_tv_jobs/$', 'pull_apple_tv_jobs', name='pull_apple_tv_jobs'),
 	url(r'^validate_hostname/$','validate_hostname',name='validate_hostname'),
     url(r'^validate_username/$','validate_username',name='validate_username'),
 	url(r'^validate_job/$','validate_job',name='validate_job'),
