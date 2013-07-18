@@ -85,9 +85,6 @@ def git_pull(*args, **kwargs):
 def update_packages(*args, **kwargs):
     subprocess.call('pip install --upgrade -r requirements.txt', shell=True)
 
-def activate_venv(*args, **kwargs):
-    subprocess.call('. venv/bin/activate', shell=True)
-
 def collectstatic(*args, **kwargs):
     subprocess.call('cd ./src/bvd && python manage.py collectstatic --noinput', shell=True)
 
@@ -174,7 +171,6 @@ def update_bvd(*args, **kwargs):
         6 - Collects static files
         7 - Reloads wsgi by `touch`ing the wsgi config file
     """
-    activate_venv()
     git_pull()
     update_packages()
     sync_db()
