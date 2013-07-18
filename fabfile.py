@@ -81,6 +81,18 @@ def git_pull(*args, **kwargs):
         Updates the local repository by runnning `git pull`
     """
     subprocess.call('git pull', shell=True)
+
+def update_packages(*args, **kwargs):
+    subprocess.call('pip install --upgrade -r requirements.txt', shell=True)
+
+def activate_venv(*args, **kwargs):
+    subprocess.call('. venv/bin/activate', shell=True)
+
+def collectstatic(*args, **kwargs):
+    subprocess.call('cd ./src/bvd && python manage.py collectstatic --noinput', shell=True)
+
+def reload_wsgi(*args, **kwargs):
+    subprocess.call('touch src/config/bvd.wsgi', shell=True)
     
 def local(*args,**kwargs):
     """
@@ -154,8 +166,18 @@ def configure_automatic_start_on_login_osx(*args, **kwargs):
 def update_bvd(*args, **kwargs):
     """
     This function:
-        1 - Updates the local repository
-        2 - Syncs the database
+        1 - Activates virtualenv
+        2 - Updates the local git repository
+        3 - Updates package requirements
+        4 - Syncs the database
+        5 - Migrates the database with South
+        6 - Collects static files
+        7 - Reloads wsgi by `touch`ing the wsgi config file
     """
+    activate_venv()
     git_pull()
+    update_packages()
     sync_db()
+    migrate_db()
+    collectstatic()
+    reload_wsgi()

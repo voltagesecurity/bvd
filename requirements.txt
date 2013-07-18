@@ -6,3 +6,4 @@ python-openid
 django-openid-auth
 South
 PIL
+simplejson
