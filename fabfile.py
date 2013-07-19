@@ -90,6 +90,9 @@ def collectstatic(*args, **kwargs):
 
 def reload_wsgi(*args, **kwargs):
     subprocess.call('touch src/config/bvd.wsgi', shell=True)
+
+def refresh_kiosk(*args, **kwargs):
+    subprocess.call('./src/config/kiosk_refresh.sh', shell=True)
     
 def local(*args,**kwargs):
     """
@@ -163,13 +166,13 @@ def configure_automatic_start_on_login_osx(*args, **kwargs):
 def update_bvd(*args, **kwargs):
     """
     This function:
-        1 - Activates virtualenv
-        2 - Updates the local git repository
-        3 - Updates package requirements
-        4 - Syncs the database
-        5 - Migrates the database with South
-        6 - Collects static files
-        7 - Reloads wsgi by `touch`ing the wsgi config file
+        1 - Updates the local git repository
+        2 - Updates package requirements
+        3 - Syncs the database
+        4 - Migrates the database with South
+        5 - Collects static files
+        6 - Reloads wsgi by `touch`ing the wsgi config file
+        7 - Refreshes Chrome tab with a force reload of all page assets
     """
     git_pull()
     update_packages()
@@ -177,3 +180,4 @@ def update_bvd(*args, **kwargs):
     migrate_db()
     collectstatic()
     reload_wsgi()
+    refresh_kiosk()
