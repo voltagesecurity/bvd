@@ -30,5 +30,4 @@ from django.contrib import admin
 
 from bvd.pull import models
 admin.site.register(models.CiServer)
-admin.site.register(models.CiJob)
 admin.site.register(models.UserCiJob)

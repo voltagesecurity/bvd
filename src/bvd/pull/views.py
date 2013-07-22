@@ -26,7 +26,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-import urllib2, types, os
+import urllib2, types, os, pdb
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext
@@ -57,14 +57,12 @@ def get_jobs_for_readonly():
     for job in jobs:
         d = dict(
             pk      = job.pk,
-            hostname = job.ci_job.ci_server.hostname,
-            jobname = job.ci_job.jobname,
+            hostname = job.ci_server.hostname,
+            jobname = job.jobname,
             displayname = job.displayname,
-            left = job.left,
-            top = job.top,
             width = job.width,
             height = job.height,
-            status = job.ci_job.status,
+            status = job.status,
             readonly = True,
             icon = job.icon,
         )
@@ -80,17 +78,14 @@ def get_jobs_for_user(user, *args):
             job.save()
         d = dict(
             pk      = job.pk,
-            hostname = job.ci_job.ci_server.hostname,
-            jobname = job.ci_job.jobname,
+            hostname = job.ci_server.hostname,
+            jobname = job.jobname,
             displayname = job.displayname,
-            left = job.left,
-            top = job.top,
             width = job.width,
             height = job.height,
-            status = job.ci_job.status,
+            status = job.status,
             readonly = job.readonly,
-            icon = job.icon,
-                
+            icon = job.icon,   
         )
         list.append(d)
         
@@ -104,27 +99,18 @@ def save_ci_server(**widget):
     
     return ci_server
 
-def save_ci_job(**widget):
-    try:
-        ci_job =  models.CiJob.objects.get(ci_server__hostname=widget['ci_server'],jobname=widget['jobname'])
-    except models.CiJob.DoesNotExist:
-        ci_job = forms.CiJobForm(data=widget).save()
-        
-    return ci_job
     
 def save_user_ci_job(**widget):
     ci_server = save_ci_server(**widget)
     widget['ci_server'] = ci_server.pk
-    ci_job = save_ci_job(**widget)
-    widget['ci_job'] = ci_job.pk
-    
+
     try:
-        user_ci_job = models.UserCiJob.objects.get(user__pk=widget['user'], ci_job__jobname=ci_job.jobname)
+        user_ci_job = models.UserCiJob.objects.get(user__pk=widget['user'], jobname=widget['jobname'])
         form = forms.UserCiJobForm(data=widget, instance=user_ci_job)
         if form.is_valid():
             user_ci_job = form.save()
     except models.UserCiJob.DoesNotExist:
-        form = forms.UserCiJobForm(data=widget)
+        form = forms.UserCiJobForm(widget)
         if form.is_valid():
             user_ci_job = form.save()
         else:
@@ -133,7 +119,6 @@ def save_user_ci_job(**widget):
     
 def redirect_to_home(request):
     return HttpResponseRedirect('/')
-
 
 @secure_required
 def home(request,template='index.html'):
@@ -241,32 +226,32 @@ def validate_job(request):
     
 @secure_required
 def retrieve_job(request):
-    
+
     if not request.user.is_authenticated():
         result = [dict(status = 401)]
         return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
-    
+
     hostname = append_http(request.POST.get('hostname',''))
     jobname = request.POST.get('jobname',None)
     displayname = request.POST.get('displayname')
-    
+
     if hostname.strip() == 'http://' or not jobname:
         result = [dict(status = 500)]
         return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
-    
+
     key = str('%s/%s' % (hostname, jobname))
     result = request.session[key]
-    
+
     if not result:
         result = dict(status = 500)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
-    
+
     #check to see if the user has already added the job
-    user_ci_job = models.UserCiJob.objects.filter(entity_active=True, ci_job__jobname=jobname, user__username=request.user.username)
+    user_ci_job = models.UserCiJob.objects.filter(entity_active=True, jobname=jobname, user__username=request.user.username)
     if len(user_ci_job) > 0:
         result = dict(status = 100)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
-    
+
     widget = dict(
          hostname = hostname,
          jobname = jobname,
@@ -276,7 +261,7 @@ def retrieve_job(request):
          icon = 'checkmark.png',
          readonly = False,
          entity_active = True,
-     )
+    )
     user_ci_job = save_user_ci_job(**widget)
     result.update(dict(displayname = displayname, jobname = jobname, pk = user_ci_job.pk, icon = 'checkmark.png'))
         

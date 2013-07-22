@@ -36,22 +36,13 @@ class CiServer(models.Model):
     def __unicode__(self):
         return self.hostname
     
-class CiJob(models.Model):
-    
+class UserCiJob(models.Model):
+    user = models.ForeignKey(User)
     ci_server = models.ForeignKey('CiServer')
     jobname = models.CharField(max_length=100)
     status = models.CharField(max_length=10,null=True,blank=True)
-    
-    def __unicode__(self):
-        return self.jobname
-    
-class UserCiJob(models.Model):
-    user = models.ForeignKey(User)
-    ci_job = models.ForeignKey('CiJob')
     displayname = models.CharField(max_length=100)
     icon = models.CharField(max_length=100, null=True, blank=True)
-    left = models.CharField(max_length=10,null=True,blank=True)
-    top = models.CharField(max_length=10,null=True,blank=True)
     width = models.CharField(max_length=10,null=True,blank=True)
     height = models.CharField(max_length=10,null=True,blank=True)
     readonly = models.NullBooleanField(null=True,blank=True)

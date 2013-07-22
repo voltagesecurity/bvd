@@ -60,12 +60,9 @@ class CiServerForm(forms.ModelForm):
     class Meta:
         model = models.CiServer
         
-class CiJobForm(forms.ModelForm):
-    
-    class Meta:
-        model = models.CiJob
-        
 class UserCiJobForm(forms.ModelForm):
     
     class Meta:
         model = models.UserCiJob
+        fields = ('user', 'ci_server', 'jobname', 'status', 'displayname', 'icon', 'width',
+            'height', 'readonly', 'entity_active')
