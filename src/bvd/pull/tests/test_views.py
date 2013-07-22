@@ -37,33 +37,38 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import simplejson
 from django.conf import settings
 from django.contrib.auth.models import User
+from django.contrib.auth.models import User
 
 from bvd.pull import views
 from bvd.pull import models
 from bvd.tests.test_support import generate_xml_doc
 
 
-
 class ViewTests(unittest.TestCase):
     
+    @classmethod
+    def setUpClass(self):
+        self.user = User.objects.create_user('testuser', 'testuser@testuser.com', 'testpassword')
+        self.user.save()
+
+    @classmethod
+    def tearDownClass(self):
+        User.objects.all().delete()
+
     def setUp(self):
         self.factory = RequestFactory()
 
         d1 = dict(hostname= 'http://pydevs.org:9080')
         d3 = dict(jobname = 'Test1')
-        d2 = dict(displayname = 'Test1', left = '100px', top = '100px')
-        
+        d2 = dict(displayname = 'Test1', width = '100px', height = '100px', user = self.user)
         
         self.server1 = models.CiServer(**d1)
-        self.job1 = models.CiJob(**d3)
-        
-        
+        self.job1 = models.UserCiJob(**d2)
         
         self.server1.save()
         
         self.job1.ci_server = self.server1
         self.job1.save()
-        
         
 
     @patch('bvd.jenkins.jenkins.RetrieveJob.lookup_hostname', Mock(return_value=ValueError))
@@ -151,7 +156,7 @@ class ViewTests(unittest.TestCase):
         
     	expected = [dict(status = 500)]
     	hostname = 'http://localhost:8080'
-    	post_data = {'jobname' : 'Test1'}
+    	post_data = {'jobname' : 'Test1', 'user_id': 1}
     	request = self.factory.post('/pull/validate_job',data=post_data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     	
     	views.RetrieveJob.lookup_job = Mock(return_value=urllib2.URLError)

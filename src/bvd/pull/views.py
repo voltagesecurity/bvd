@@ -26,7 +26,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-import urllib2, types, os, pdb
+import urllib2, types, os
 
 from django.shortcuts import render_to_response
 from django.template import RequestContext

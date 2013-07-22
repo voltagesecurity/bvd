@@ -27,21 +27,31 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 from django.utils import unittest
+from django.contrib.auth.models import User
 
 from bvd.pull import views, models
 
 class FormsTests(unittest.TestCase):
+
+    @classmethod
+    def setUpClass(self):
+        self.user = User.objects.create_user('testuser', 'testuser@testuser.com', 'testpassword')
+        self.user.save()
+
+    @classmethod
+    def tearDownClass(self):
+        User.objects.all().delete()
     
     def setUp(self):
+
         self.POST = dict(
             hostname    = 'http://edge-master:8080',
             jobname     = 'bootstrap',
             displayname = 'bootstrap',
-            left        = '0px',
-            top         = '0px',
             width       = '340px',
             hieght      = '340px',     
-            status      = 'SUCCESS'
+            status      = 'SUCCESS',
+            user        = self.user.id,
         )
         
         self.ci_server = models.CiServer(hostname='http://secure.voltage.com')
@@ -50,9 +60,13 @@ class FormsTests(unittest.TestCase):
         self.ci_server1 = models.CiServer(hostname='http://jenkins.voltate.com')
         self.ci_server1.save()
         
-        self.ci_job = models.CiJob(jobname='euphoria', status='SUCCESS')
-        self.ci_job.ci_server = self.ci_server1
-        self.ci_job.save()
+        self.user_ci_job = models.UserCiJob(jobname='euphoria', status='SUCCESS', user_id = self.user.id)
+        self.user_ci_job.ci_server = self.ci_server1
+        self.user_ci_job.save()
+
+    def tearDown(self):
+        models.CiServer.objects.all().delete()
+        models.UserCiJob.objects.all().delete()
         
         
     def test_save_new_ci_server(self):
@@ -72,9 +86,9 @@ class FormsTests(unittest.TestCase):
         self.POST['hostname'] = 'http://secure.voltage.com'
         self.POST['ci_server'] = self.ci_server.pk
         
-        ci_job = views.save_ci_job(**self.POST)
-        self.assertEqual(ci_job.jobname, self.POST['jobname'])
-        self.assertEqual(ci_job.status, self.POST['status'])
+        user_ci_job = views.save_user_ci_job(**self.POST)
+        self.assertEqual(user_ci_job.jobname, self.POST['jobname'])
+        self.assertEqual(user_ci_job.status, self.POST['status'])
         self.POST.pop('ci_server')
         
     def test_save_ci_job_when_ci_job_exists(self):
@@ -82,8 +96,8 @@ class FormsTests(unittest.TestCase):
         self.POST['jobname'] = 'euphoria'
         self.POST['ci_server'] = self.ci_server1.pk
         
-        ci_job = views.save_ci_job(**self.POST)
-        self.assertEqual(ci_job.id,self.ci_job.id)
+        user_ci_job = views.save_user_ci_job(**self.POST)
+        self.assertEqual(user_ci_job.id,self.user_ci_job.id)
         
         self.POST.pop('ci_server')
         
