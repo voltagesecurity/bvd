@@ -35,6 +35,39 @@ BVD.validate = {};
 var password_txt = ['txt_password1','txt_password2'];
 var call_ajax = ['hostname','jobname','username'];
 
+BVD.validate.edit_job_update = function() {
+	/*
+		This function:
+			Validates CiServer and Job and sets color of text in those fields
+			to indicate the result.
+
+			If a hostname has not been entered into the new_ci_server input,
+			validates with ci_server in dropdown menu.
+	*/
+    var hostname = $("input[name=new_ci_server]").val();
+    if(hostname == "") {
+        hostname = $("select[name=ci_server]").val();
+    }
+    var jobname = $("input[name=jobname]").val();
+    BVD.utils.do_ajax('POST', BVD.data.get_url('jobname'),
+        {
+            hostname: hostname,
+            jobname: jobname,
+            username: "Username", // Don't use authentication
+        },
+        function(data) {
+            var returnval = eval(data)[0]['status'];
+            if(returnval == 200) {
+                $("input[name=new_ci_server]").css('color', 'limegreen');
+                $("input[name=jobname]").css('color', 'limegreen');
+            } else {
+                $("input[name=new_ci_server]").css('color', 'red');
+                $("input[name=jobname]").css('color', 'red');
+            }
+        }
+    );
+};
+
 BVD.validate.blur_success = function(data,$this) {
 	data = eval(data);
 	

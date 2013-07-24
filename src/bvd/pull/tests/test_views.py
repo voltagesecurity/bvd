@@ -31,7 +31,7 @@ from StringIO import StringIO
 import urllib2
 
 from django.utils import unittest
-from django.test.client import RequestFactory
+from django.test.client import RequestFactory, Client
 from django.core.urlresolvers import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import simplejson
@@ -51,6 +51,8 @@ class ViewTests(unittest.TestCase):
         self.user = User.objects.create_user('testuser', 'testuser@testuser.com', 'testpassword')
         self.user.save()
 
+        self.testclient = Client()
+
     @classmethod
     def tearDownClass(self):
         User.objects.all().delete()
@@ -60,7 +62,7 @@ class ViewTests(unittest.TestCase):
 
         d1 = dict(hostname= 'http://pydevs.org:9080')
         d3 = dict(jobname = 'Test1')
-        d2 = dict(displayname = 'Test1', width = '100px', height = '100px', user = self.user)
+        d2 = dict(displayname = 'Test1', jobname='Test1', width = '100px', height = '100px', user = self.user)
         
         self.server1 = models.CiServer(**d1)
         self.job1 = models.UserCiJob(**d2)
@@ -216,3 +218,105 @@ class ViewTests(unittest.TestCase):
 
     	self.assertEqual(actual.content,simplejson.dumps(expected))
     	self.assertEqual(actual.status_code,200)
+
+    def test_save_widget_redirects_when_user_is_authenticated(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+
+        response = views.save_widget(request)
+
+        self.assertEqual(response.status_code, 302)
+
+    def test_save_widget_returns_401_when_unauthorized(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=False)
+
+        request.POST['widget_id'] = False
+        response = views.save_widget(request)
+
+        self.assertEqual(response.status_code,401)
+
+    def test_save_widget_updates_fields_when_provided(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+
+        request.POST['displayname'] = "new-italiandisplay"
+        request.POST['jobname'] = "new-italianjob"
+        request.POST['entity_active'] = False
+        request.POST['widget_id'] = self.job1.pk
+
+        response = views.save_widget(request)
+
+        widget = models.UserCiJob.objects.get(pk=self.job1.pk)
+
+        self.assertEqual(widget.displayname, "new-italiandisplay")
+        self.assertEqual(widget.jobname, "new-italianjob")
+        self.assertEqual(widget.entity_active, False)
+
+    def test_save_widget_updates_ci_server_when_provided(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+
+        newhostname = "http://newciserver:8080"
+        server2 = models.CiServer(hostname=newhostname)
+        server2.save()
+
+        request.POST['ci_server'] = server2.hostname
+        request.POST['widget_id'] = self.job1.pk
+
+        response = views.save_widget(request)
+
+        widget = models.UserCiJob.objects.get(pk=self.job1.pk)
+
+        self.assertEqual(widget.ci_server.hostname, newhostname)
+
+    def test_save_widget_creates_and_updates_ci_server_when_new_server_provided(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+
+        newhostname = "http://reallynewciserver:8080"
+
+        request.POST['new_ci_server'] = newhostname
+        request.POST['widget_id'] = self.job1.pk
+
+        response = views.save_widget(request)
+
+        widget = models.UserCiJob.objects.get(pk=self.job1.pk)
+
+        self.assertEqual(widget.ci_server.hostname, newhostname)
+
+
+    def test_widget_to_dictionary_throws_when_not_usercijob_instance(self):
+        exception_raised = False
+        try:
+            views.widget_to_dictionary(1)
+        except TypeError:
+            exception_raised = True
+        self.assertTrue(exception_raised)
+
+    def test_widget_to_dictionary_returns_dictionary_when_usercijob_instance(self):
+        self.assertEqual(type(views.widget_to_dictionary(self.job1)), type(dict()))
+
+    def test_widget_to_dictionary_returns_complete_dictionary_when_usercijob_instance(self):
+        proper_data = dict(
+            pk = self.job1.pk,
+            ci_server = self.job1.ci_server.pk,
+            hostname = self.job1.ci_server.hostname,
+            jobname = self.job1.jobname,
+            displayname = self.job1.displayname,
+            width = self.job1.width,
+            height = self.job1.height,
+            status = self.job1.status,
+            readonly = self.job1.readonly,
+            icon = self.job1.icon,
+            user = self.job1.user.pk,
+            entity_active = self.job1.entity_active,
+        )
+        self.assertEqual(views.widget_to_dictionary(self.job1), proper_data)
+
+

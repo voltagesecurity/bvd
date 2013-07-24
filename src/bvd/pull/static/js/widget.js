@@ -180,17 +180,45 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 			window.location.href = self.hostname + '/job/' + self.jobname;
 		});
 
-		$li2 = $('<li></li>');
-		$li2.html('Edit Image');
+        $li2 = $('<li></li>');
+        $li2.html('Edit Widget');
+        $li2.attr('class', 'menu-item');
+
+        $li2.hover(function() {
+            $(this).addClass('menu-on');
+        }, function() {
+            $(this).removeClass('menu-on');
+        });
+
+        $li2.click(function() {
+            var id = 'edit_widget';
+            var $modal;
+            var opts = {
+                width: 400,
+                height: 385,
+                autoOpen: true,
+                title: "Edit Widget: '" + self.displayname + "'",
+                resizable: false,
+                modal: true,
+                beforeClose: function() {
+                    $("#edit_widget_dialog").remove();
+                },
+            }
+            $modal = BVD.modal_factory(BVD.data.get_url('modal', '?template=edit_widget&widget_id='+self.pk), id, opts);
+            return false;
+        });
+
+		$li3 = $('<li></li>');
+		$li3.html('Edit Image');
 
 
-		$li2.hover(function(){
+		$li3.hover(function(){
 			$(this).addClass('menu-on');
 		},function(){
 			$(this).removeClass('menu-on');
 		});
 
-		$li2.click(function(){
+		$li3.click(function(){
 			id = 'edit_image';
 			var $modal;
 	
@@ -209,7 +237,8 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		
 		$ul.append($li);
 		$ul.append($li1);
-		$ul.append($li2);
+        $ul.append($li2);
+		$ul.append($li3);
 		
 		$menu.append($ul);
 		
@@ -245,11 +274,6 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.displayname = displayname;
         this.icon = background_img;
         this.background_img = 'url(/static/images/'+background_img+')';
-
-        this.on('click',function(){
-
-        	window.location.href = self.hostname + '/job/' + self.jobname;
-        });
         
         this.attr('id','wdg'+id);
         this.id = this.attr('id');
@@ -261,10 +285,12 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 			$marquee.html(this.displayname);	
         }
         
-        
 		this.attr('class','widget');
 
         $marquee.attr('class','marquee');
+        $marquee.on('click', function() {
+            window.location.href = self.hostname + '/job/' + self.jobname;     
+        });
 		this.append($marquee);
 		this.set_status(this.status);
 		

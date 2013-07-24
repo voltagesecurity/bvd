@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 import urllib2, types, os
 
-from django.shortcuts import render_to_response
+from django.shortcuts import render_to_response, render
 from django.template import RequestContext
 from django.utils import simplejson
 from django.http import HttpResponse, HttpResponseRedirect
@@ -50,6 +50,25 @@ def append_http(hostname):
         return hostname
     else:
         return 'http://%s' % hostname
+
+def widget_to_dictionary(widget):
+    if isinstance(widget, models.UserCiJob):
+        return dict(
+            pk = widget.pk,
+            ci_server = widget.ci_server.pk,
+            hostname = widget.ci_server.hostname,
+            jobname = widget.jobname,
+            displayname = widget.displayname,
+            width = widget.width,
+            height = widget.height,
+            status = widget.status,
+            readonly = widget.readonly,
+            icon = widget.icon,
+            user = widget.user.pk,
+            entity_active = widget.entity_active,
+        )
+    else:
+        raise TypeError
    
 def get_jobs_for_readonly():
     jobs = models.UserCiJob.objects.filter(entity_active=True)
@@ -174,6 +193,7 @@ def validate_username(request):
  
 @secure_required
 def validate_hostname(request):
+    print request.POST.get('hostname')
     job = RetrieveJob(append_http(request.POST.get('hostname',None)),None)
     print request.POST.get('username') == 'Username'
     test = job.lookup_hostname(request.POST.get('username') != 'Username', request.POST.get('username'), request.POST.get('password1'))
@@ -195,14 +215,14 @@ def validate_hostname(request):
 def validate_job(request):
     hostname = append_http(request.POST.get('hostname',''))
     jobname = request.POST.get('jobname',None)
-    
+
     if hostname.strip() == 'http://' or not jobname:
         result = dict(status = 500)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
-        
+  
     job = RetrieveJob(hostname,jobname)
     result = job.lookup_job(request.POST.get('username') != 'Username', request.POST.get('username'), request.POST.get('password1'))
-    
+
     if result == urllib2.URLError:
         result = dict(status = 500)
         return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
@@ -306,6 +326,21 @@ def get_modal(request):
             return render_to_response(template,
                   dict(),
                   context_instance=RequestContext(request))
+    if template == 'edit_widget':
+        if not request.user.is_authenticated():
+            template = 'login_required.html'
+            return render_to_response(template,
+                dict(),
+                context_instance=RequestContext(request))
+        else:
+            widget_id = request.GET.get('widget_id')
+            try:
+                widget = models.UserCiJob.objects.get(pk=widget_id)
+                print widget.id
+            except models.UserCiJob.DoesNotExist:
+                pass
+            form = forms.UserCiJobForm(instance=widget)
+            return render(request, 'edit_widget.html', dict(form=form, widget_id=widget.id))
        
     template = '%s.html' % template
     
@@ -377,8 +412,49 @@ def pull_apple_tv_jobs(request, *args, **kwargs):
             
         return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]), content_type = 'application/javascript; charset=utf8')
 
+@secure_required
+def save_widget(request):
+    """
+        This Function:
+            Is POST-ed to by the edit_widget modal in order to save changes
+            to the widget.
+    """
+    if not request.user.is_authenticated():
+        return HttpResponse(status=401)
 
-def edit_widget(request):
+    if 'widget_id' in request.POST:
+        new_data = request.POST.copy()
+        widget = models.UserCiJob.objects.get(pk=request.POST['widget_id'])
+        old_data = widget_to_dictionary(widget)
+
+        # The form has to be populated by old data because the edit_widget
+        # modal form doesn't provide all attributes of the UserCiJob model.
+        # The widget's attributes are copied to a dictionary and then
+        # the values from the form data are used to update the dictionary.
+
+        for key in ['displayname', 'jobname', 'entity_active', 'ci_server']:
+            if key in new_data:
+                old_data[key] = new_data[key]
+
+        # If the form provides a new CiServer hostname a new model object is
+        # created and then the ci_server value is changed in the form data to match.
+
+        if 'new_ci_server' in new_data and not new_data['new_ci_server'] == '':
+            job = RetrieveJob(append_http(new_data['new_ci_server']),None)
+            if job.lookup_hostname(False):
+                newserver = models.CiServer(hostname = new_data['new_ci_server'])
+                newserver.save()
+                old_data['ci_server'] = newserver.hostname
+
+        form = forms.UserCiJobForm(old_data, instance=widget)
+        if form.is_valid():
+            form.save()
+        else:
+            print form.errors
+
+    return HttpResponseRedirect('/')
+
+def edit_widget_image(request):
     if request.method == 'POST':
         try:
             user_ci_job = models.UserCiJob.objects.get(id=request.POST.get('widget_id'))

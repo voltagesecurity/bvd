@@ -90,7 +90,7 @@ test("widget has div.icon subtree when not readonly", function() {
 
 	ok($(".widget div.icon"), "widget has div.icon");
 	ok($(".widget div.icon ul"), "widget has div.icon ul");
-	equal($(".widget div.icon ul li").length, 3, "widget icon has three list elements");
+	equal($(".widget div.icon ul li").length, 4, "widget icon has three list elements");
 });
 
 test("status set only to success when status is changed to success", function() {

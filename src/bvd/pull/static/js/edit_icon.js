@@ -2,7 +2,7 @@ $(function () {
     
     $("#fileupload").fileupload({
         
-        url: '/pull/edit_widget/',
+        url: '/pull/edit_widget_image/',
         submit: function(e, data) {
         	$("#div_msg").css('display', 'block');
         	$("#file_name").html(data.files[0].name);
