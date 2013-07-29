@@ -396,6 +396,8 @@ def pull_apple_tv_jobs(request, *args, **kwargs):
     for job in joblist:
         jenkins = RetrieveJob(job['hostname'],job['jobname'])
         result = jenkins.lookup_job()
+
+        print result
             
         if result == urllib2.URLError:
            #TODO: add an additional state other than down 
@@ -410,7 +412,7 @@ def pull_apple_tv_jobs(request, *args, **kwargs):
         else:
             job['status'] = result['status'] 
             
-        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]), content_type = 'application/javascript; charset=utf8')
+    return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]), content_type = 'application/javascript; charset=utf8')
 
 @secure_required
 def save_widget(request):
