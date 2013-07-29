@@ -341,6 +341,13 @@ def get_modal(request):
                 pass
             form = forms.UserCiJobForm(instance=widget)
             return render(request, 'edit_widget.html', dict(form=form, widget_id=widget.id))
+    if template == "inactive_widgets":
+        if not request.user.is_authenticated():
+            template = 'login_required.html'
+            return render_to_response(template,dict(),context_instance=RequestContext(request))
+        else:
+            widgets = models.UserCiJob.objects.filter(entity_active=False)
+            return render(request, 'inactive_widgets.html', dict(widgets=widgets))
        
     template = '%s.html' % template
     
@@ -362,8 +369,7 @@ def signup(request):
 @secure_required    
 def remove_job(request):
     user_ci_job = models.UserCiJob.objects.get(pk=int(request.POST.get('pk')))
-    user_ci_job.entity_active = False
-    user_ci_job.save()
+    user_ci_job.delete()
     return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
 
 @secure_required
@@ -434,9 +440,18 @@ def save_widget(request):
         # The widget's attributes are copied to a dictionary and then
         # the values from the form data are used to update the dictionary.
 
-        for key in ['displayname', 'jobname', 'entity_active', 'ci_server']:
+        for key in ['displayname', 'jobname', 'ci_server']:
             if key in new_data:
                 old_data[key] = new_data[key]
+
+        # If the 'entity_active' checkbox is unchecked the field is not returned
+        # from the form, therefore in order to update entity_active from the
+        # edit widget modal we check if it exists in the POST data at all.
+
+        if 'entity_active' in new_data:
+            old_data['entity_active'] = True
+        else:
+            old_data['entity_active'] = False
 
         # If the form provides a new CiServer hostname a new model object is
         # created and then the ci_server value is changed in the form data to match.

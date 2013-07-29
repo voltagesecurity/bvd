@@ -237,6 +237,27 @@ body {
 
 }
 
+#view_inactive_widgets {
+    position: fixed;
+    bottom: 10px;
+    right: 10px;
+    border: 0;
+}
+
+#view_inactive_widgets .ui-button-text {
+    background-color: black;
+    color: gray;
+}
+
+#view_inactive_widgets .ui-button-text:hover {
+    background-color: #151515;
+    color: lightgray;
+}
+
+.inactive_widget_label {
+    width: 160px;
+}
+
 #legend {
     position: fixed;
     bottom: 0;

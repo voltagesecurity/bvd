@@ -41,6 +41,7 @@ div.button {
 <div id="buttons" style="width:100%;height:50px;">
 	<div style="float: left;"><button id="add_job">+ Job</button></div>
 	<div style="float: right;">
+		<button id="view_inactive_widgets" style="display:none">Inactive Widgets</button>
 		<button id="view_tv" style="display:inline;">View TV</button>
 		<button id="refresh" style="display:none;">Refresh</button>&nbsp;&nbsp;&nbsp;
 		<button id="login" style="display:{%if user.is_authenticated %}none;{%else%}inline;{%endif%}">Login</button>
@@ -65,6 +66,7 @@ div.button {
 				new Poll().ajax('/pull/pull_jobs/');
 				$("#view_tv").css('display','none');
 				$("#refresh").css('display','inline');
+				$("#view_inactive_widgets").css('display','inline');
 			{% endif %}
 			$("#widgets").freetile();
 			$(window).resize(function() {

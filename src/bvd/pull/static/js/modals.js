@@ -47,6 +47,7 @@ $(function(){
     $("#logout").button();
     $("#view_tv").button();
     $("#refresh").button();
+    $("#view_inactive_widgets").button();
     
     $("#login").on("click",function(){
     	BVD.login.load_login_form();
@@ -67,6 +68,24 @@ $(function(){
         } else {
             poll.ajax('/pull/pull_apple_tv_jobs/')
         }
+    });
+
+    $("#view_inactive_widgets").on("click", function() {
+        var id = 'inactive_widgets';
+        var $modal;
+        var opts = {
+            width: 400,
+            height: 385,
+            autoOpen: true,
+            title: "Inactive Widgets",
+            resizable: false,
+            modal: true,
+            beforeClose: function() {
+                $("#inactive_widgets_dialog").remove();
+            },
+        }
+        $modal = BVD.modal_factory(BVD.data.get_url('modal', '?template=inactive_widgets'), id, opts);
+        return false;
     });
 
     $("#add_job").on("click",function () {

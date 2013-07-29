@@ -245,7 +245,6 @@ class ViewTests(unittest.TestCase):
 
         request.POST['displayname'] = "new-italiandisplay"
         request.POST['jobname'] = "new-italianjob"
-        request.POST['entity_active'] = False
         request.POST['widget_id'] = self.job1.pk
 
         response = views.save_widget(request)
@@ -254,7 +253,36 @@ class ViewTests(unittest.TestCase):
 
         self.assertEqual(widget.displayname, "new-italiandisplay")
         self.assertEqual(widget.jobname, "new-italianjob")
-        self.assertEqual(widget.entity_active, False)
+
+    def test_save_widget_makes_active_when_post_data_defined(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+
+        request.POST['widget_id'] = self.job1.pk
+        request.POST['entity_active'] = '1'
+
+        response = views.save_widget(request)
+
+        widget = models.UserCiJob.objects.get(pk=self.job1.pk)
+
+        self.assertTrue(widget.entity_active)
+
+    def test_save_widget_makes_inactive_when_post_data_undefined(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+
+        request.POST['widget_id'] = self.job1.pk
+        # request.POST['entity_active'] = '1'
+        # (commented out for verbosity)
+        # since 'entity_active' won't be in the POST dict, the widget will be set to inactive
+
+        response = views.save_widget(request)
+
+        widget = models.UserCiJob.objects.get(pk=self.job1.pk)
+
+        self.assertFalse(widget.entity_active)
 
     def test_save_widget_updates_ci_server_when_provided(self):
         request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')

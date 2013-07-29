@@ -295,6 +295,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		this.set_status(this.status);
 		
 		Widget.render.add_widget(this);
+
     }	
     
     this.init();

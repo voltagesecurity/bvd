@@ -1,0 +1,71 @@
+<div id="inactive_widgets_dialog">
+    <form>
+        {% for widget in widgets %}
+        <div class="inactive_widgets_field">
+            <span id="{{ widget.pk }}_label">{{ widget.displayname}}</span>
+            <div class="inactive_widgets_inputs">
+                <div class="activate_inactive_widget_button btn btn-primary" id="{{ widget.pk }}_active">
+                    Activate
+                </div>
+                <div class="delete_inactive_widget_button btn btn-danger" id="{{ widget.pk }}_delete">
+                    Delete
+                    <div style="display:none" value="{{ widget.hostname}}"></div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </form>
+    <script>
+        $(".activate_inactive_widget_button").on("click", function() {
+            var widgetbox = $(this).parents().eq(1);
+            widgetbox.animate({'color':'white','background-color':'#0066dd','opacity':.25},200).fadeOut(100,
+                function() {
+                    var widget_id = widgetbox.children().eq(0).attr('id').slice(0,-6);
+                    BVD.utils.do_ajax('POST', '/pull/save_widget/',
+                        {
+                            widget_id: widget_id,
+                            entity_active: 'True',
+                        },
+                        function() {
+                            var poll = new Poll();
+                            poll.ajax('/pull/pull_jobs');
+                            widgetbox.remove();
+                            if($(".inactive_widgets_field").length == 0) {
+                                $("#inactive_widgets_dialog").parent().dialog("close");
+                            }
+                        }
+                    );
+                }
+            );
+        });
+        $(".delete_inactive_widget_button").on("click", function() {
+            var widgetbox = $(this).parents().eq(1);
+            var widget_id = widgetbox.children().eq(0).attr('id').slice(0,-6);
+            widgetbox.animate({'color':'white','background-color':'red','opacity':.25},200).fadeOut(100,
+                function(){
+                    BVD.utils.do_ajax('post',BVD.data.get_url('remove'),{pk: widget_id},function() {
+                        widgetbox.remove();
+                        if($(".inactive_widgets_field").length == 0) {
+                            $("#inactive_widgets_dialog").parent().dialog("close");
+                        }
+                    });
+                    console.log(widget_id);
+                }
+            );
+        });
+    </script>
+    <style>
+    .inactive_widgets_field {
+        padding: 10px;
+        position: relative;
+        height: auto;
+        border-radius: 5px;
+    }
+    .inactive_widgets_inputs {
+        position: absolute;
+        right: 0px;
+        bottom: 0px;
+        margin: 0 5px 5px 0;
+    }
+    </style>
+</div>
