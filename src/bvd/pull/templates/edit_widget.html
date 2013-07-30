@@ -26,6 +26,11 @@
         <label for="entity_active">Entity Active</label>
         {{ form.entity_active }}
     </div>
+    <div class="fieldWrapper">
+        {{ form.appletv.errors }}
+        <label for="appletv">Display on TV</label>
+        {{ form.appletv }}
+    </div>
     <input style="display:none" type="text" name="widget_id" value="{{ widget_id }}" />
     <input id="submit_edit_widget" type="submit" value="Save Widget" />
     <div id="cancel_edit_widget">Cancel</div>
@@ -78,7 +83,7 @@
         position: relative;
         top: -2px;
     }
-    label[for=entity_active] {
+    label[for=entity_active], label[for=appletv] {
         display: inline-block;
     }
 </style>

@@ -1,0 +1,101 @@
+<div id="edit_readonly_display_dialog">
+    <div style="width:800px">
+        <div id="erd_your_widgets">
+            <h3>Your Widgets</h3>
+            {% for widget in widgets %}
+                <div class="erd_widget">
+                    <span id="{{ widget.pk }}_erdu_label">{{ widget.displayname}}</span>
+                    {% if not widget.appletv %}
+                        <div class="btn btn-primary erdu_primary_btn erdu_show">
+                            Show
+                            <div style="display:none;">{{ widget.pk }}</div>
+                        </div>
+                    {% else %}
+                        <div class="btn btn-danger erdu_primary_btn erdu_hide">
+                            Remove
+                            <div style="display:none;">{{ widget.pk }}</div>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+        <div id="erd_display_widgets">
+            <h3>Public TV</h3>
+        </div>
+    </div>
+    <script>
+    $(".erdu_primary_btn").on("click", function() {
+        var widget_id = $(this).children().eq(0).html();
+        console.log(widget_id);
+        if($(this).hasClass('erdu_show')) {
+            $(this).removeClass('erdu_show');
+            $(this).removeClass('btn-primary');
+            $(this).addClass('erdu_hide');
+            $(this).addClass('btn-danger');
+            $(this).html($(this).html().replace("Show","Remove"));
+            BVD.utils.do_ajax('post', '/pull/save_widget/',
+                {
+                    'widget_id': widget_id,
+                    'entity_active': 'True',
+                    'appletv': 'True',
+                    'appletv_active': 'True'
+                }, function() {
+                    update_erdd();
+                    new Poll().ajax('/pull/pull_jobs/');
+                });
+        } else {
+            $(this).removeClass('erdu_hide');
+            $(this).removeClass('btn-danger');
+            $(this).addClass('erdu_show');
+            $(this).addClass('btn-primary');
+            $(this).html($(this).html().replace("Remove", "Show"));
+            BVD.utils.do_ajax('post', '/pull/save_widget/',
+                {
+                    'widget_id': widget_id,
+                    'entity_active': 'True',
+                }, function() {
+                    update_erdd();
+                    new Poll().ajax('/pull/pull_jobs/');
+                });
+        }
+    });
+    $(function() {
+        update_erdd();
+    });
+    </script>
+    <style>
+        #erd_your_widgets, #erd_display_widgets {
+            margin: 0;
+            padding: 0;
+            width: 370px;
+            float: left;
+        }
+        #erd_your_widgets h3, #erd_display_widgets h3 {
+            border-bottom: 1px dashed gray;
+            padding-bottom: 10px;
+        }
+        #erd_your_widgets {
+            padding-right: 10px;
+        }
+        #erd_display_widgets {
+            border-left: 1px dashed gray;
+            padding-left: 10px;
+        }
+        .erd_widget {
+            width: 370px;
+            min-height: 35px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+        .erd_fade span {
+            opacity: 0.4;
+        }
+        .erd_display_notyours {
+            padding-left: 36px;
+            width: 334px;
+        }
+        .erdu_primary_btn, .erdd_primary_btn {
+            float: right;
+        }
+    </style>
+</div>

@@ -41,7 +41,10 @@ div.button {
 <div id="buttons" style="width:100%;height:50px;">
 	<div style="float: left;"><button id="add_job">+ Job</button></div>
 	<div style="float: right;">
-		<button id="view_inactive_widgets" style="display:none">Inactive Widgets</button>
+		<div id="bottom_right_buttons" style="display: none">
+			<button id="view_inactive_widgets">Inactive Widgets</button>
+			<button id="edit_readonly_display">Edit Public TV</button>
+		</div>
 		<button id="view_tv" style="display:inline;">View TV</button>
 		<button id="refresh" style="display:none;">Refresh</button>&nbsp;&nbsp;&nbsp;
 		<button id="login" style="display:{%if user.is_authenticated %}none;{%else%}inline;{%endif%}">Login</button>
@@ -60,13 +63,14 @@ div.button {
 			{% if appletv %}
 				$(function() {
 					BVD.login.login_apple_tv();
+					$("#bottom_right_buttons").css('display', 'none');
 				});
 			{% endif %}
 			{% if user.is_authenticated %}
 				new Poll().ajax('/pull/pull_jobs/');
 				$("#view_tv").css('display','none');
 				$("#refresh").css('display','inline');
-				$("#view_inactive_widgets").css('display','inline');
+				$("#bottom_right_buttons").css('display','inline');
 			{% endif %}
 			$("#widgets").freetile();
 			$(window).resize(function() {

@@ -237,19 +237,22 @@ body {
 
 }
 
-#view_inactive_widgets {
+#bottom_right_buttons {
     position: fixed;
     bottom: 10px;
     right: 10px;
+}
+
+#bottom_right_buttons button {
     border: 0;
 }
 
-#view_inactive_widgets .ui-button-text {
+#bottom_right_buttons button .ui-button-text {
     background-color: black;
     color: gray;
 }
 
-#view_inactive_widgets .ui-button-text:hover {
+#bottom_right_buttons button .ui-button-text:hover {
     background-color: #151515;
     color: lightgray;
 }

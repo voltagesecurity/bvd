@@ -344,6 +344,8 @@ class ViewTests(unittest.TestCase):
             icon = self.job1.icon,
             user = self.job1.user.pk,
             entity_active = self.job1.entity_active,
+            appletv = self.job1.appletv,
+            appletv_active = self.job1.appletv_active,
         )
         self.assertEqual(views.widget_to_dictionary(self.job1), proper_data)
 

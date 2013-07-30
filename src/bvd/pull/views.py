@@ -66,12 +66,17 @@ def widget_to_dictionary(widget):
             icon = widget.icon,
             user = widget.user.pk,
             entity_active = widget.entity_active,
+            appletv = widget.appletv,
+            appletv_active = widget.appletv_active,
         )
     else:
         raise TypeError
    
-def get_jobs_for_readonly():
-    jobs = models.UserCiJob.objects.filter(entity_active=True)
+def get_jobs_for_readonly(only_active=True):
+    if only_active:
+        jobs = models.UserCiJob.objects.filter(appletv=True, appletv_active=True)
+    else:
+        jobs = models.UserCiJob.objects.filter(appletv=True)
     joblist = []
     for job in jobs:
         d = dict(
@@ -84,6 +89,9 @@ def get_jobs_for_readonly():
             status = job.status,
             readonly = True,
             icon = job.icon,
+            entity_active = job.entity_active,
+            appletv = job.appletv,
+            appletv_active = job.appletv_active,
         )
         joblist.append(d)
     return joblist
@@ -125,6 +133,8 @@ def save_user_ci_job(**widget):
 
     try:
         user_ci_job = models.UserCiJob.objects.get(user__pk=widget['user'], jobname=widget['jobname'])
+        widget['appletv'] = user_ci_job.appletv
+        widget['appletv_active'] = user_ci_job.appletv_active
         form = forms.UserCiJobForm(data=widget, instance=user_ci_job)
         if form.is_valid():
             user_ci_job = form.save()
@@ -302,6 +312,7 @@ def save_jobs(request):
         return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
     
     for widget in widgets:
+        print widget
         widget['user'] = user.pk
         widget['entity_active'] = True
         save_user_ci_job(**widget)
@@ -346,8 +357,17 @@ def get_modal(request):
             template = 'login_required.html'
             return render_to_response(template,dict(),context_instance=RequestContext(request))
         else:
-            widgets = models.UserCiJob.objects.filter(entity_active=False)
+            widgets = models.UserCiJob.objects.filter(entity_active=False,user__username=request.user.username)
             return render(request, 'inactive_widgets.html', dict(widgets=widgets))
+
+    if template == "edit_readonly_display":
+        if not request.user.is_authenticated():
+            template = 'login_required.html'
+            return render_to_response(template,dict(),context_instance=RequestContext(request))
+        else:
+            widgets = models.UserCiJob.objects.filter(user__username=request.user.username)
+            print widgets
+            return render(request, 'edit_readonly_display.html', dict(widgets=widgets))
        
     template = '%s.html' % template
     
@@ -402,8 +422,29 @@ def pull_apple_tv_jobs(request, *args, **kwargs):
     for job in joblist:
         jenkins = RetrieveJob(job['hostname'],job['jobname'])
         result = jenkins.lookup_job()
+            
+        if result == urllib2.URLError:
+           #TODO: add an additional state other than down 
+            job['status'] = "DOWN"
+        elif result == ValueError:
+            #TODO: add an additional state other than down
+            job['status'] = "DOWN"
+        elif not result['status']:
+            job['status'] = 'SUCCESS'
+        elif job['status'] == 'ABORTED' or job['status'] == 'NOT_BUILT':
+            job['status'] = "DOWN"
+        else:
+            job['status'] = result['status'] 
+            
+    return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]), content_type = 'application/javascript; charset=utf8')
 
-        print result
+def pull_all_display_jobs(request, *args, **kwargs):
+    joblist = get_jobs_for_readonly(False)
+    print "Display jobs:"
+    for job in joblist:
+        print job['jobname']
+        jenkins = RetrieveJob(job['hostname'],job['jobname'])
+        result = jenkins.lookup_job()
             
         if result == urllib2.URLError:
            #TODO: add an additional state other than down 
@@ -444,14 +485,16 @@ def save_widget(request):
             if key in new_data:
                 old_data[key] = new_data[key]
 
-        # If the 'entity_active' checkbox is unchecked the field is not returned
-        # from the form, therefore in order to update entity_active from the
-        # edit widget modal we check if it exists in the POST data at all.
+        # If these checkboxes are unchecked, the field is not returned
+        # from the form, therefore in order to update them from the
+        # edit widget modal we check if they exist in the POST data at all.
 
-        if 'entity_active' in new_data:
-            old_data['entity_active'] = True
-        else:
-            old_data['entity_active'] = False
+        for key in ['entity_active', 'appletv', 'appletv_active']:
+            if key in new_data:
+                if new_data[key] != "current":
+                    old_data[key] = True
+            else:
+                old_data[key] = False
 
         # If the form provides a new CiServer hostname a new model object is
         # created and then the ci_server value is changed in the form data to match.

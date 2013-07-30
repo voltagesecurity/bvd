@@ -47,6 +47,8 @@ class UserCiJob(models.Model):
     height = models.CharField(max_length=10,null=True,blank=True)
     readonly = models.NullBooleanField(null=True,blank=True)
     entity_active = models.BooleanField()
+    appletv = models.BooleanField(default=False)
+    appletv_active = models.BooleanField(default=True)
     
     def __unicode__(self):
         return self.displayname

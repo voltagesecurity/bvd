@@ -48,6 +48,7 @@ $(function(){
     $("#view_tv").button();
     $("#refresh").button();
     $("#view_inactive_widgets").button();
+    $("#edit_readonly_display").button();
     
     $("#login").on("click",function(){
     	BVD.login.load_login_form();
@@ -85,6 +86,24 @@ $(function(){
             },
         }
         $modal = BVD.modal_factory(BVD.data.get_url('modal', '?template=inactive_widgets'), id, opts);
+        return false;
+    });
+
+    $("#edit_readonly_display").on("click", function() {
+        var id = 'readonly_display';
+        var $modal;
+        var opts = {
+            width: 800,
+            height: 500,
+            autoOpen: true,
+            title: "Edit Public TV",
+            resizable: false,
+            modal: true,
+            beforeClose: function() {
+                $("#edit_readonly_display_dialog").remove();
+            },
+        }
+        $modal = BVD.modal_factory(BVD.data.get_url('modal', '?template=edit_readonly_display'), id, opts);
         return false;
     });
 
