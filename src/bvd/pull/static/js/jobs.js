@@ -32,74 +32,21 @@
 var BVD = BVD || {};
 BVD.jobs = {};
 
-
-BVD.jobs.add_job_success = function(data,$modal) {
-	data = eval(data);
-	if (data[0].status != 100 && data[0].status != 500 && data[0].status != 401){
-		$("#hostname_err").css('display','none');
-			$("#hostname_err").html('Invalid URL');
-			BVD.utils.create_new_widget(data[0]);
-			$modal.remove();
-                                                    
-	} else if (data[0].status == 100) {
-		$("#hostname_err").css('display','block');
-		$("#hostname_err").html('Job Already Exists!');
-	} else if (data[0].status == 401) {
-		$("#hostname_err").css('display','block');
-		$("#hostname_err").html('Please login first!');
-	} else {
-		$("#hostname_err").css('display','block');
-		$("#hostname_err").html('Server Error!');
-	}
-}
-
-BVD.jobs.add_job_ok_click = function($modal,txt_map) {
-	if ($("#displayname").val().toUpperCase() == txt_map['displayname']['value'].toUpperCase() || $("#displayname").val() == '') {
-			$("#displayname").val($("#jobname").val());
-	}
-	var data = {};
-	for (id in txt_map) {data[id] = $("#" + id + "").val();}
-    BVD.utils.do_ajax('post', BVD.data.get_url('retrieve_job'), data,function(data){BVD.jobs.add_job_success(data,$modal);});
-}
-
 BVD.jobs.add_job = function(txt_map) {
 	id = 'add_job_modal';
     var $modal;
-    
-    var buttons = [
-    	{
-        	text: "Ok",
-            click: function(){BVD.jobs.add_job_ok_click($modal,txt_map);}
-		},
-		{
-			text: "Cancel",
-			click: function() { $modal.remove(); }
-		}
-	];
                     
 	var opts =      {
-		width : 600,
-		height : 350,
+		width : 380,
+		height : 360,
 		autoOpen: true,
 		title: 'Adding a Jenkins Job',
 		resizable : false,
 		modal : true,
-		buttons: buttons
+        beforeClose: function() {
+            $modal.remove();
+        },
 	}
     
-    
     $modal = BVD.modal_factory(BVD.data.get_url('modal','?template=add_job'),id, opts);
-}
-
-BVD.jobs.hostname_autocomplete = function () {
-	$(document).on('keyup','#hostname', function() {
-        $(this).autocomplete({
-            minLength : 2,
-            source : function(request,response) {
-                var data = {};
-                data['txt'] = request.term;
-                var result = BVD.utils.do_ajax('post',BVD.data.get_url('ac_hostname'),data,function(data) {response(eval(data))});
-            }
-        });
-    });
 }

@@ -36,7 +36,6 @@ BVD.data = {};
 BVD.data.urls = {
 	hostname         : '/pull/validate_hostname/',
 	jobname          : '/pull/validate_job/',
-	retrieve_job     : '/pull/retrieve_job/',
 	modal            : '/pull/get_modal',
 	ac_hostname      : '/pull/autocomplete_hostname/',
 	signup           : '/pull/signup/',

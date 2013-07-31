@@ -253,50 +253,6 @@ def validate_job(request):
     
     request.session[key] = result
     return HttpResponse(simplejson.dumps([dict(status = 200)]), content_type = 'application/javascript; charset=utf8')
-    
-@secure_required
-def retrieve_job(request):
-
-    if not request.user.is_authenticated():
-        result = [dict(status = 401)]
-        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
-
-    hostname = append_http(request.POST.get('hostname',''))
-    jobname = request.POST.get('jobname',None)
-    displayname = request.POST.get('displayname')
-
-    if hostname.strip() == 'http://' or not jobname:
-        result = [dict(status = 500)]
-        return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
-
-    key = str('%s/%s' % (hostname, jobname))
-    result = request.session[key]
-
-    if not result:
-        result = dict(status = 500)
-        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
-
-    #check to see if the user has already added the job
-    user_ci_job = models.UserCiJob.objects.filter(entity_active=True, jobname=jobname, user__username=request.user.username)
-    if len(user_ci_job) > 0:
-        result = dict(status = 100)
-        return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
-
-    widget = dict(
-         hostname = hostname,
-         jobname = jobname,
-         displayname = displayname,
-         status = result['status'],
-         user = request.user.pk,
-         icon = 'checkmark.png',
-         readonly = False,
-         entity_active = True,
-    )
-    user_ci_job = save_user_ci_job(**widget)
-    result.update(dict(displayname = displayname, jobname = jobname, pk = user_ci_job.pk, icon = 'checkmark.png'))
-        
-    return HttpResponse(simplejson.dumps([result]), content_type = 'application/javascript; charset=utf8')
-
 
 @secure_required
 def save_jobs(request):
@@ -312,7 +268,6 @@ def save_jobs(request):
         return HttpResponse(simplejson.dumps(result), content_type = 'application/javascript; charset=utf8')
     
     for widget in widgets:
-        print widget
         widget['user'] = user.pk
         widget['entity_active'] = True
         save_user_ci_job(**widget)
@@ -337,6 +292,9 @@ def get_modal(request):
             return render_to_response(template,
                   dict(),
                   context_instance=RequestContext(request))
+        else:
+            form = forms.UserCiJobForm()
+            return render(request, 'add_job.html', dict(form=form))
     if template == 'edit_widget':
         if not request.user.is_authenticated():
             template = 'login_required.html'
@@ -347,7 +305,6 @@ def get_modal(request):
             widget_id = request.GET.get('widget_id')
             try:
                 widget = models.UserCiJob.objects.get(pk=widget_id)
-                print widget.id
             except models.UserCiJob.DoesNotExist:
                 pass
             form = forms.UserCiJobForm(instance=widget)
@@ -366,7 +323,6 @@ def get_modal(request):
             return render_to_response(template,dict(),context_instance=RequestContext(request))
         else:
             widgets = models.UserCiJob.objects.filter(user__username=request.user.username)
-            print widgets
             return render(request, 'edit_readonly_display.html', dict(widgets=widgets))
        
     template = '%s.html' % template
@@ -386,6 +342,60 @@ def signup(request):
     else:
         return HttpResponse(simplejson.dumps([dict(status = 500)]), content_type = 'application/javascript; charset=utf8')
     
+@secure_required
+def add_job(request):
+    """
+        This Function is POSTed to by the Add Job modal to create a new widget. It:
+            - Checks if the user is authenticated
+            - Initializes widget data not provided by the add job modal
+            - If a displayname isn't provided, uses the jobname
+            - Creates a new Ci Server object if provided
+            - Checks if the user has a widget for that job on that server
+                Yes: Updates that widget with the form data
+                 No: Creates a new widget with the form data
+            - Saves the widget
+            - Redirects to '/'
+    """
+    if request.user.is_authenticated():
+        widget_data = request.POST.copy() # request.POST is immutable
+
+        widget_data['user'] = request.user.id
+        widget_data['icon'] = 'checkmark.png'
+        widget_data['readonly'] = False
+        widget_data['entity_active'] = True
+        widget_data['appletv'] = False
+        widget_data['appletv_active'] = True
+
+        if not 'displayname' in widget_data or widget_data['displayname'] == '':
+            widget_data['displayname'] = widget_data['jobname']
+
+        if 'new_ci_server' in widget_data and not widget_data['new_ci_server'] == '':
+            job = RetrieveJob(append_http(widget_data['new_ci_server']), None)
+            if job.lookup_hostname(False):
+                newserver = models.CiServer(hostname = widget_data['new_ci_server'])
+                newserver.save()
+                widget_data['ci_server'] = newserver.hostname
+
+        matches = models.UserCiJob.objects.filter(user__username = request.user.username,
+                    ci_server__hostname = widget_data['ci_server'],
+                    jobname = widget_data['jobname'])
+
+        if len(matches) > 0:
+            # Don't change the Public TV Display properties of the existing widget.
+            widget_data['appletv'] = matches[0].appletv
+            widget_data['appletv_active'] = matches[0].appletv_active
+
+            form = forms.UserCiJobForm(widget_data, instance=matches[0])
+        else:
+            form = forms.UserCiJobForm(widget_data)
+
+        if form.is_valid():
+            form.save()
+        else:
+            print form.errors
+
+    return HttpResponseRedirect('/')
+
 @secure_required    
 def remove_job(request):
     user_ci_job = models.UserCiJob.objects.get(pk=int(request.POST.get('pk')))
@@ -440,9 +450,7 @@ def pull_apple_tv_jobs(request, *args, **kwargs):
 
 def pull_all_display_jobs(request, *args, **kwargs):
     joblist = get_jobs_for_readonly(False)
-    print "Display jobs:"
     for job in joblist:
-        print job['jobname']
         jenkins = RetrieveJob(job['hostname'],job['jobname'])
         result = jenkins.lookup_job()
             

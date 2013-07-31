@@ -123,7 +123,5 @@ $(function(){
         BVD.validate.passfield_blur($(this));
     });
     
-    BVD.jobs.hostname_autocomplete();
-    
     
 });

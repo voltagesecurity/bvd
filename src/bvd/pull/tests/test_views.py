@@ -166,45 +166,6 @@ class ViewTests(unittest.TestCase):
     	
     	self.assertEqual(actual.content,simplejson.dumps(expected))
     	self.assertEqual(actual.status_code,200)
-        
-    
-    	
-    def test_retrieve_job_returns_500_when_invalid_request_data(self):
-        
-        expected = [dict(status = 500)]
-    	
-    	hostname = 'http://localhost:8080'
-    	post_data = {'jobname' : 'Test1'}
-    	request = self.factory.post('/pull/retrieve_job',data=post_data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        request.user = Mock(returnValue=User())
-        request.user.is_authenticated = Mock(returnValue=True)
-    	
-    	actual = views.retrieve_job(request)
-    	
-    	self.assertEqual(actual.content,simplejson.dumps(expected))
-    	self.assertEqual(actual.status_code,200)
-    	
-
-    	
-
-    def test_retrieve_job_returns_200_when_user_is_authenticated(self):
-        d = dict(jobname = 'Test2', status = 'SUCCESS')
-    	hostname = 'http://localhost:8080'
-    	post_data = {'hostname' : hostname, 'jobname' : 'Test2', 'displayname' : 'Test2'}
-    	d.update(dict(hostname = hostname, status = 200))
-    	request = self.factory.post('/pull/retrieve_job',data=post_data,HTTP_X_REQUESTED_WITH='XMLHttpRequest')
-        
-        request.session = {'http://localhost:8080/Test2' : d}
-        user = User(username='sammohamed')
-        user.save()
-        request.user = user 
-        request.user.is_authenticated = Mock(returnValue=True)
-        
-    	actual = views.retrieve_job(request)
-    	
-    	self.assertEqual(actual.content,simplejson.dumps([d]))
-    	self.assertEqual(actual.status_code,200)
-    	
     	
     def test_autocomplete_hostname_expected_result(self):
         
@@ -317,6 +278,77 @@ class ViewTests(unittest.TestCase):
         widget = models.UserCiJob.objects.get(pk=self.job1.pk)
 
         self.assertEqual(widget.ci_server.hostname, newhostname)
+
+    def test_add_job_error_when_unauthenticated(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=False)
+
+        response = views.save_widget(request)
+
+        self.assertEqual(response.status_code, 401)
+
+    def test_add_job_redirects_when_authenticated(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+
+        response = views.save_widget(request)
+
+        self.assertEqual(response.status_code, 302)
+
+    def test_add_job_creates_job_when_authenticated_and_data_provided(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+
+        request.POST['ci_server'] = self.server1.hostname
+        request.POST['jobname'] = "add_job_test"
+        request.POST['displayname'] = "add_job_test_displayname"
+
+        response = views.add_job(request)
+
+        widget = models.UserCiJob.objects.get(jobname=request.POST['jobname'])
+
+        self.assertEqual(widget.displayname, request.POST['displayname'])
+
+        widget.delete()
+
+    def test_add_job_uses_jobname_for_displayname_when_displayname_not_provided(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+
+        request.POST['ci_server'] = self.server1.hostname
+        request.POST['jobname'] = "add_job_test"
+
+        response = views.add_job(request)
+
+        widget = models.UserCiJob.objects.get(jobname=request.POST['jobname'])
+
+        self.assertEqual(widget.displayname, request.POST['jobname'])
+
+        widget.delete()
+
+    def test_add_job_updates_job_when_exists(self):
+        request = self.factory.post('/pull/save_widget', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+
+        request.POST['ci_server'] = self.server1.hostname
+        request.POST['jobname'] = "add_job_test"
+        request.POST['displayname'] = "before-update"
+
+        response = views.add_job(request)
+        
+        request.POST['displayname'] = "after-update"
+        response = views.add_job(request)
+
+        widget = models.UserCiJob.objects.get(jobname=request.POST['jobname'])
+
+        self.assertEqual(widget.displayname, "after-update")
+
+        widget.delete()
 
 
     def test_widget_to_dictionary_throws_when_not_usercijob_instance(self):

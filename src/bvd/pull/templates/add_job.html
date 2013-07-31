@@ -28,13 +28,69 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -->
-<div class="modal">
-	<div id="div_username" style="display:none;">
-		<div style="height:50px;width:100%" style=""><label class="error_label" style="display:block;width:100%;">Autherization Not supported in Version 1.0</label></div>
-		<div><input type="text" id="username" value="Username"></div><div><label class="error_label" id="loginerror">Invalid Login!</label></div>
-	</div>
-	<div id="div_password" style="display:none;"><div><input type="text" id="txt_password1" value="Password" ><input type="password" id="password1" style="display:none;" ></div></div>
-	<div><div><input type="text" id="hostname" value="Please Enter Jenkins Hostname"></div><div><label class="error_label" id="hostname_err">Invalid URL</label></div></div>
-	<div><div><input type="text" id="jobname" value="Please Enter Job Name"></div><div><label class="error_label" id="jobname_err">Invalid Job  Name</label></div></div>
-	<div><div><input type="text" id="displayname" value="Please Enter Desired Display Name"></div></div>
+<div id="add_job_modal">
+	<form action="/pull/add_job/" method="post">{%csrf_token%}
+        {{ form.non_field_errors }}
+        <div class="fieldWrapper">
+            {{ form.ci_server.errors }}
+            <label for="ci_server">Ci Server</label>
+            {{ form.ci_server }}
+            <div id="add_ci_server_button" class="btn btn-small btn-primary">+</div>
+            <div id="add_ci_server_input" style="display:none">
+                <span>New Ci Server:</span>
+                <input type="text" name="new_ci_server" maxlength="100" />
+            </div>
+        </div>
+        <div class="fieldWrapper" id="edit_widget_jobname">
+            {{ form.jobname.errors }}
+            <label for="jobname">Job Name</label>
+            {{ form.jobname }}
+        </div>
+        <div class="fieldWrapper">
+            {{ form.displayname.errors }}
+            <label for="displayname">Display Name</label>
+            {{ form.displayname }}
+        </div>
+        <input id="submit_add_job" type="submit" value="Save Widget" />
+        <input id="cancel_add_job" type="button" value="Cancel" />
+    </form>
+    <script>
+        $("input[id=submit_add_job]").button();
+        $("#add_ci_server_button").click(function(){
+            $("#add_ci_server_input").show(200);
+        });
+        $("input[id=cancel_add_job]").button().click(function(){
+            $("#add_job_modal").dialog("close");
+        });
+        $("select[name=ci_server]").change(function() {
+            BVD.validate.edit_job_update();
+        });
+        $("input[name=new_ci_server]").change(function() {
+            BVD.validate.edit_job_update();
+        });
+        $("input[name=jobname]").change(function() {
+            BVD.validate.edit_job_update();
+        });
+    </script>
+    <style>
+        #add_ci_server_button {
+            position: relative;
+            top: -5px;
+        }
+        #add_ci_server_input span {
+            font-size: 14px;
+            position: relative;
+            top: -5px;
+            background-color: #0066dd;
+            padding-top: 6px;
+            padding-bottom: 7px;
+            padding-right: 12px;
+            margin-right: -9px;
+            z-index: -1;
+            padding-left: 10px;
+            border-top-left-radius: 5px;
+            border-bottom-left-radius: 5px;
+            color: white;
+        }
+    </style>
 </div>

@@ -195,7 +195,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
             var $modal;
             var opts = {
                 width: 400,
-                height: 385,
+                height: 410,
                 autoOpen: true,
                 title: "Edit Widget: '" + self.displayname + "'",
                 resizable: false,

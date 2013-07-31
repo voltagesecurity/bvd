@@ -33,7 +33,7 @@
     </div>
     <input style="display:none" type="text" name="widget_id" value="{{ widget_id }}" />
     <input id="submit_edit_widget" type="submit" value="Save Widget" />
-    <div id="cancel_edit_widget">Cancel</div>
+    <input id="cancel_edit_widget" type="button" value="Cancel" />
 </form>
 <script>
     $(function() {
@@ -74,14 +74,6 @@
         border-top-left-radius: 5px;
         border-bottom-left-radius: 5px;
         color: white;
-    }
-    #cancel_edit_widget {
-        height: 33px;
-        top: 5px;
-    }
-    #cancel_edit_widget span.ui-button-text {
-        position: relative;
-        top: -2px;
     }
     label[for=entity_active], label[for=appletv] {
         display: inline-block;
