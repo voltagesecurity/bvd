@@ -74,28 +74,27 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 	    this.removeClass('down');
 	}
 	
-	this.set_size = function(count, prev_left, prev_top, counter) {
-		var size = String(0.5/Math.log(count));
-		size = size.substring(2,5);
-		size = (size.indexOf("0") == 0) ? size.substring(1,3) : size;	
-		size = parseInt(size);
-		
-		var mod = 6;
-		
-		if (count <= 15) {mod = 5;}
-		else if (count >= 50) {mod = 7;}
+	this.set_size = function(count) {
+		var window_height = window.innerHeight;
+        var window_width = window.innerWidth;
 
-		var left = prev_left + size + 50;;
-		
-		left = (counter % mod == 0 && left > ($(window).width() - 300)) ? 0 : (counter == 0) ? 0 : left;
+        var sizes = {};
+        var n = 0;
+        for(var s = 1000; s >= 100; s = s-10) {
+            n = Math.floor(window_height/s) * Math.floor(window_width/s);
+            sizes[n] = s;
+        }
 
-
-		var top = (counter % mod == 0) ? (counter == 0) ? 0 : prev_top + size + 50  : prev_top
+        var size = 200;
+        for(n = count; n >= 0; n--) {
+            if(sizes[n] != undefined) {
+                size = sizes[n] - (-0.5*n + 50);
+                break;
+            }
+        }
 		
 		this.css('height',size+'px');
 		this.css('width',size+'px');
-		this.css('left',left+'px');
-		this.css('top',top+'px');
 	}
 	
 	this.set_status = function(status) {
@@ -161,7 +160,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 				$widget.remove();
 				Widget.render.refresh_grid();
 				BVD.widget_map[self.hostname] = $widgets;
-				BVD.utils.set_size_of_widgets($(".widget").length + 3);
+				BVD.utils.set_size_of_widgets($(".widget").length);
 				BVD.utils.save_widgets();
 				setTimeout(500,function(){
 					var poll = new Poll('/pull/pull_jobs/');

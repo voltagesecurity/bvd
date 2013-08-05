@@ -79,7 +79,7 @@ BVD.utils.remove_old_widgets = function() {
 }
 
 BVD.utils.create_new_widget = function(json) {
-    var count = $(".widget").length + 3;
+    var count = $(".widget").length;
     var $widget = new Widget(json.hostname, json.jobname, json.displayname, json.status, json.pk, count, false, json.icon);
     
     if (typeof(BVD.widget_map[json.hostname]) != 'undefined') {
@@ -108,11 +108,7 @@ BVD.utils.set_size_of_widgets = function(count) {
 		    else {dimensions = Widget.render.getWidgetDimensions($prev_widget);}
 			var $current_widget = $widgets[i];
 			
-			$current_widget.set_size(count,
-			                                parseInt(dimensions['left'].replace('px','')),
-			                                parseInt(dimensions['top'].replace('px','')),
-			                                counter
-			                            );
+			$current_widget.set_size(count);
 			$prev_widget = $current_widget;
 		    counter++;
 		}
