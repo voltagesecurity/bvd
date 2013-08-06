@@ -228,7 +228,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
                 modal: true,
                 beforeClose: function() {
                     $("#edit_widget_dialog").remove();
-                },
+                }
             }
             $modal = BVD.modal_factory(BVD.data.get_url('modal', '?template=edit_widget&widget_id='+self.pk), id, opts);
             return false;

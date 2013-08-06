@@ -45,7 +45,7 @@ BVD.jobs.add_job = function(txt_map) {
 		modal : true,
         beforeClose: function() {
             $modal.remove();
-        },
+        }
 	}
     
     $modal = BVD.modal_factory(BVD.data.get_url('modal','?template=add_job'),id, opts);

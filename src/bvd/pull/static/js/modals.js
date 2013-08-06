@@ -83,7 +83,7 @@ $(function(){
             modal: true,
             beforeClose: function() {
                 $("#inactive_widgets_dialog").remove();
-            },
+            }
         }
         $modal = BVD.modal_factory(BVD.data.get_url('modal', '?template=inactive_widgets'), id, opts);
         return false;
@@ -101,7 +101,7 @@ $(function(){
             modal: true,
             beforeClose: function() {
                 $("#edit_readonly_display_dialog").remove();
-            },
+            }
         }
         $modal = BVD.modal_factory(BVD.data.get_url('modal', '?template=edit_readonly_display'), id, opts);
         return false;

@@ -39,7 +39,7 @@
                 {
                     'widget_id': pk,
                     'entity_active': 'current',
-                    'appletv': 'True',
+                    'appletv': 'True'
                 }, function() {
                     update_erdd();
                 });
