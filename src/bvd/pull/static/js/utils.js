@@ -40,7 +40,7 @@ BVD.utils.do_ajax = function (type, url, data, success, error) {
 	        type: type,
 	        data: data,
 	        headers: {
-	               "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val(),
+	               "X-CSRFToken": $("input[name='csrfmiddlewaretoken']").val()
 	        },
 	        success: success,
 	        error: error

@@ -41,7 +41,7 @@ Widget.render.refresh_grid = function(animate) {
     BVD.utils.set_size_of_widgets($(".widget").length);
 	if(animate) {
 		$("#widgets").freetile({
-			animate: true,
+			animate: true
 		})
 	} else {
 		$("#widgets").freetile();

@@ -54,7 +54,7 @@ BVD.validate.edit_job_update = function() {
             {
                 hostname: hostname,
                 jobname: jobname,
-                username: "Username", // Don't use authentication
+                username: "Username" // Don't use authentication
             },
             function(data) {
                 var returnval = eval(data)[0]['status'];
