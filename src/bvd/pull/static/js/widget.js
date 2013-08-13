@@ -153,17 +153,17 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		$menu = $('<div></div>');
 		$ul = $('<ul></ul>');
 		
-		$li = $('<li></li>');
-		$li.html('Remove Job');
-		$li.attr('class','menu-item');
+		$remove_job_li = $('<li></li>');
+		$remove_job_li.html('Remove Job');
+		$remove_job_li.attr('class','menu-item');
 		
-		$li.hover(function(){
+		$remove_job_li.hover(function(){
 			$(this).addClass('menu-on');
 		},function(){
 			$(this).removeClass('menu-on');
 		});
 
-        $li.click(function(){
+        $remove_job_li.click(function(){
             self.off('click');
             data = {};
             data['pk'] = self.pk;
@@ -192,17 +192,17 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
             });
         });
 
-        $li1 = $('<li></li>');
-        $li1.html("Hide Job")
-        $li1.attr('class','menu-item');
+        $hide_job_li = $('<li></li>');
+        $hide_job_li.html("Hide Job")
+        $hide_job_li.attr('class','menu-item');
 
-        $li1.hover(function(){
+        $hide_job_li.hover(function(){
             $(this).addClass('menu-on');
         },function(){
             $(this).removeClass('menu-on');
         });
 
-        $li1.click(function() {
+        $hide_job_li.click(function() {
             data = {};
             data['widget_id'] = self.pk;
             data['appletv'] = "current";
@@ -213,31 +213,31 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
             });
         });
 		
-		$li2 = $('<li></li>');
-		$li2.html('View Job');
-		$li2.attr('class','menu-item');
+		$view_job_li = $('<li></li>');
+		$view_job_li.html('View Job');
+		$view_job_li.attr('class','menu-item');
 		
-		$li2.hover(function(){
+		$view_job_li.hover(function(){
 			$(this).addClass('menu-on');
 		},function(){
 			$(this).removeClass('menu-on');
 		});
 		
-		$li2.click(function(){
+		$view_job_li.click(function(){
 			window.location.href = self.hostname + '/job/' + self.jobname;
 		});
 
-        $li3 = $('<li></li>');
-        $li3.html('Edit Widget');
-        $li3.attr('class', 'menu-item');
+        $edit_widget_li = $('<li></li>');
+        $edit_widget_li.html('Edit Widget');
+        $edit_widget_li.attr('class', 'menu-item');
 
-        $li3.hover(function() {
+        $edit_widget_li.hover(function() {
             $(this).addClass('menu-on');
         }, function() {
             $(this).removeClass('menu-on');
         });
 
-        $li3.click(function() {
+        $edit_widget_li.click(function() {
             var id = 'edit_widget';
             var $modal;
             var opts = {
@@ -255,17 +255,17 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
             return false;
         });
 
-		$li4 = $('<li></li>');
-		$li4.html('Edit Image');
+		$edit_image_li = $('<li></li>');
+		$edit_image_li.html('Edit Image');
 
 
-		$li4.hover(function(){
+		$edit_image_li.hover(function(){
 			$(this).addClass('menu-on');
 		},function(){
 			$(this).removeClass('menu-on');
 		});
 
-		$li4.click(function(){
+		$edit_image_li.click(function(){
 			id = 'edit_image';
 			var $modal;
 	
@@ -282,11 +282,11 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
     		return false;
 		});
 		
-		$ul.append($li);
-        $ul.append($li1);
-		$ul.append($li2);
-        $ul.append($li3);
-		$ul.append($li4);
+		$ul.append($remove_job_li);
+        $ul.append($hide_job_li);
+		$ul.append($view_job_li);
+        $ul.append($edit_widget_li);
+		$ul.append($edit_image_li);
 		
 		$menu.append($ul);
 		
