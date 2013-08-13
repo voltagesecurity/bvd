@@ -45,6 +45,24 @@ def mock_url_open_job_last_build():
             "url":"http://localhost:8080/job/test3/1/","builtOn":"","changeSet":{"items":[],"kind":null},"culprits":[]}
             """
     return StringIO(json_str)
+
+def mock_url_open_last_successful_build(*args):
+    # This function is to test RetrieveJob.lookup_last_successful_build()
+    # it returns the necessary data to test the first json request to find
+    # the number of the last successful build and the data for the second
+    # json request. Normally they would be in separate json strings
+    # provided by the Jenkins API but to simplify mocking urllib2.urlopen
+    # the data is concatenated here.
+    json_str = """
+        {
+            "lastSuccessfulBuild" : {
+                "number" : 20,
+                "url" : "http://localhost:8080/job/job1/20/"
+            },
+            "id" : "2013-08-08_14-00-50"
+        }
+        """
+    return StringIO(json_str)
     
 def generate_xml_doc_with_matrix():
     doc = et.fromstring("""

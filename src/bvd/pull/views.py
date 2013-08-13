@@ -411,6 +411,9 @@ def pull_jobs(request, *args, **kwargs):
             jenkins = RetrieveJob(job['hostname'],job['jobname'])
             result = jenkins.lookup_job()
             
+            lastSuccess = jenkins.lookup_last_successful_build()
+            job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
+            
             if result == urllib2.URLError:
                 #TODO: add an additional state other than down 
                 job['status'] = "DOWN"
@@ -432,6 +435,9 @@ def pull_apple_tv_jobs(request, *args, **kwargs):
     for job in joblist:
         jenkins = RetrieveJob(job['hostname'],job['jobname'])
         result = jenkins.lookup_job()
+
+        lastSuccess = jenkins.lookup_last_successful_build()
+        job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
             
         if result == urllib2.URLError:
            #TODO: add an additional state other than down 

@@ -28,17 +28,60 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 import urllib2, StringIO
 from urlparse import urlparse
-from dateutil import parser
+from dateutil import parser, relativedelta
+import datetime
 import types
 import xml.etree.ElementTree as et
 import simplejson
+import re
 
 class RetrieveJob(object):
     
     def __init__(self, hostname, jobname):
         self.hostname = hostname
         self.jobname = jobname
-        
+
+    def _parse_jenkins_timestamp(self, timestamp):
+        expression = re.compile(r'\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}')
+        if not timestamp or not expression.match(timestamp):
+            return None
+        date = parser.parse(timestamp[:10] + ' ' + timestamp[11:].replace('-',':'))
+        return date
+
+    def _get_time_diff(self, time):
+        if isinstance(time, datetime.datetime):
+            diff = relativedelta.relativedelta(datetime.datetime.now(),time)
+            if diff.years >=1:
+                if diff.years > 1:
+                    return str(diff.years) + " years ago"
+                else:
+                    return "1 year ago"
+            elif diff.months >= 1:
+                if diff.months > 1:
+                    return str(diff.months) + " months ago"
+                else:
+                    return "1 month ago"
+            elif diff.days >= 1:
+                if diff.days > 1:
+                    return str(diff.days) + " days ago"
+                else:
+                    return "1 day ago"
+            elif diff.hours >= 1:
+                if diff.hours > 1:
+                    return str(diff.hours) + " hours ago"
+                else:
+                    return "1 hour ago"
+            elif diff.minutes >= 1 :
+                if diff.minutes > 1:
+                     return str(diff.minutes) + " minutes ago"
+                else:
+                    return "1 minute ago"
+            else:
+                return "Less than one minute ago"
+
+        else:
+            return None
+
     def lookup_hostname(self, use_auth=False, username=None, password=None):
         try:
             if use_auth:
@@ -69,35 +112,124 @@ class RetrieveJob(object):
     def lookup_job(self, use_auth=False, username=None, password=None):
         try:
             if use_auth:
-                req = urllib2.Request('%s/job/%s/lastBuild/api/json' % (self.hostname,self.jobname))
+                # Create auth header for request
                 import base64
                 base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
                 authheader =  "Basic %s" % base64string
+
+                # Create request and add auth header
+                req = urllib2.Request('%s/job/%s/lastBuild/api/json' % (self.hostname,self.jobname))
                 req.add_header("Authorization", authheader)
                 conn = urllib2.urlopen(req,timeout=5)
             else:
+                # Request job without auth
                 conn = urllib2.urlopen('%s/job/%s/lastBuild/api/json' % (self.hostname,self.jobname),timeout=5)
             
             json = simplejson.load(conn)
-
-            if 'result' in json and 'fullDisplayName' in json:
-                jobname = self.jobname
-                status   = json.get('result')
-            else:
-                return None
+            conn.close()
                 
         except ValueError:
             return ValueError
+
         except urllib2.HTTPError, e:
             #check the status code
             if e.code == 403: #requires authentication
                 return urllib2.HTTPError
             return urllib2.URLError
+
         except urllib2.URLError:
             return urllib2.URLError
+
+        if 'result' in json and 'fullDisplayName' in json:
+            jobname = self.jobname
+            status   = json.get('result')
+        else:
+            return None
         
-        conn.close()
         return dict(
             jobname = jobname,
             status   = status,
         )
+
+    def lookup_last_successful_build(self, use_auth=False, username=None, password=None):
+        # Lookup lastSuccessfulBuild number
+        try:
+            if use_auth:
+                # Create auth header for request
+                import base64
+                base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
+                authheader =  "Basic %s" % base64string
+
+                # Create request for general job info
+                req_general = urllib2.Request('%s/job/%s/api/json' % (self.hostname,self.jobname))
+                req_general.add_header("Authorization", authheader)
+                conn_general = urllib2.urlopen(req_general,timeout=5)
+            else:
+                # Request general job info without auth
+                conn_general = urllib2.urlopen('%s/job/%s/api/json' % (self.hostname,self.jobname))
+
+        except ValueError:
+            return ValueError
+
+        except urllib2.HTTPError, e:
+            #check the status code
+            if e.code == 403: #requires authentication
+                return urllib2.HTTPError
+            return urllib2.URLError
+
+        except urllib2.URLError:
+            return urllib2.URLError
+
+        json_general = simplejson.load(conn_general)
+        conn_general.close()
+
+        if 'lastSuccessfulBuild' in json_general:
+            lastSuccessfulBuild = json_general.get('lastSuccessfulBuild').get('number')
+        else:
+            return None
+
+        # lookup timestamp of last successful build
+        try:
+            if use_auth:
+                # Create auth header for request
+                import base64
+                base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
+                authheader =  "Basic %s" % base64string
+
+                # Create request for general job info
+                req_specific = urllib2.Request('%s/job/%s/%d/api/json' % (self.hostname,self.jobname, lastSuccessfulBuild))
+                req_specific.add_header("Authorization", authheader)
+                conn_specific = urllib2.urlopen(req_specific,timeout=5)
+            else:
+                # Request general job info without auth
+                conn_specific = urllib2.urlopen('%s/job/%s/%d/api/json' % (self.hostname,self.jobname, lastSuccessfulBuild))
+
+        except ValueError:
+            return ValueError
+
+        except urllib2.HTTPError, e:
+            #check the status code
+            if e.code == 403: #requires authentication
+                return urllib2.HTTPError
+            return urllib2.URLError
+
+        except urllib2.URLError:
+            return urllib2.URLError
+
+        json_specific = simplejson.load(conn_specific)
+        conn_specific.close()
+
+        if 'id' in json_specific:
+            lastSuccessfulBuildTime = json_specific.get('id')
+        else:
+            return None
+
+        time = self._parse_jenkins_timestamp(lastSuccessfulBuildTime)
+        timesince = self._get_time_diff(time)
+
+        return dict(
+            lastSuccessfulBuild = lastSuccessfulBuild,
+            lastSuccessfulBuildTime = lastSuccessfulBuildTime,
+            timeSinceLastSuccess = timesince
+        )
+

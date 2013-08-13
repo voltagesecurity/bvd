@@ -80,7 +80,7 @@ BVD.utils.remove_old_widgets = function() {
 
 BVD.utils.create_new_widget = function(json) {
     var count = $(".widget").length;
-    var $widget = new Widget(json.hostname, json.jobname, json.displayname, json.status, json.pk, count, false, json.icon);
+    var $widget = new Widget(json.hostname, json.jobname, json.displayname, json.status, json.pk, count, false, json.icon, json.timeSinceLastSuccess);
     
     if (typeof(BVD.widget_map[json.hostname]) != 'undefined') {
         BVD.widget_map[json.hostname].push($widget);
@@ -124,7 +124,7 @@ BVD.utils.redraw_widgets = function(data) {
 	BVD.widget_map = {};
 	$.each(data[0].jobs, function(){
 		var count = $(".widget").length;
-		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon);
+		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon, this.timeSinceLastSuccess);
 		Widget.render.draw($widget,this.width,this.height);
 			
 		if (typeof(BVD.widget_map[this.hostname]) != 'undefined') {

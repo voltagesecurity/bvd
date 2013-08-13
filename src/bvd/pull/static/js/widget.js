@@ -43,7 +43,7 @@ BVD.widget_map = {};
 	
 	@param job_name String 
 */
-var Widget = function(hostname, jobname, displayname, status, id, counter, readonly, background_img){
+var Widget = function(hostname, jobname, displayname, status, id, counter, readonly, background_img, timeSinceLastSuccess){
 
 	this.make_success = function() {
 		this.addClass('success');
@@ -285,6 +285,12 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		
 		$marquee = $('<div></div>');
 		$marquee.html(this.displayname);
+
+        $lastSuccess = $('<div></div>');
+        $lastSuccess.addClass('lastSuccess');
+        $lastSuccess.html(this.timeSinceLastSuccess);
+
+        $marquee.append($lastSuccess);
     }
 	
 	this.init = function() {
@@ -300,6 +306,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.displayname = displayname;
         this.icon = background_img;
         this.background_img = 'url(/static/images/'+background_img+')';
+        this.timeSinceLastSuccess = "Last Success: " + timeSinceLastSuccess;
         
         this.attr('id','wdg'+id);
         this.id = this.attr('id');
@@ -308,7 +315,13 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         	this.make_icon(self);
         } else {
         	$marquee = $('<div></div>');
-			$marquee.html(this.displayname);	
+			$marquee.html(this.displayname);
+            
+            $lastSuccess = $('<div></div>');
+            $lastSuccess.addClass('lastSuccess');
+            $lastSuccess.html(this.timeSinceLastSuccess);
+
+            $marquee.append($lastSuccess);
         }
         
 		this.attr('class','widget');
