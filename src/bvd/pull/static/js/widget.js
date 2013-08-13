@@ -162,61 +162,82 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		},function(){
 			$(this).removeClass('menu-on');
 		});
+
+        $li.click(function(){
+            self.off('click');
+            data = {};
+            data['pk'] = self.pk;
+            BVD.utils.do_ajax('post',BVD.data.get_url('remove'),data,function(data){
+                //remove the element from the widget map
+                var $widgets = BVD.widget_map[self.hostname];
+                var index = 0;
+                var $widget;
+                for (i =0; i < $widgets.length; i++) {
+                    if ($widgets[i].pk == self.pk) {
+                        index = i;
+                        $widget = $widgets[i];
+                        break;
+                    }
+                }
+                $widgets.splice(index,1);
+                $widget.remove();
+                Widget.render.refresh_grid();
+                BVD.widget_map[self.hostname] = $widgets;
+                BVD.utils.set_size_of_widgets($(".widget").length);
+                BVD.utils.save_widgets();
+                setTimeout(500,function(){
+                    var poll = new Poll('/pull/pull_jobs/');
+                    poll.ajax();
+                });
+            });
+        });
+
+        $li1 = $('<li></li>');
+        $li1.html("Hide Job")
+        $li1.attr('class','menu-item');
+
+        $li1.hover(function(){
+            $(this).addClass('menu-on');
+        },function(){
+            $(this).removeClass('menu-on');
+        });
+
+        $li1.click(function() {
+            data = {};
+            data['widget_id'] = self.pk;
+            data['appletv'] = "current";
+            data['appletv_active'] = "current";
+            // data['entity_active'] left undefined to make inactive
+            BVD.utils.do_ajax('post','/pull/save_widget/',data, function(data) {
+                new Poll().ajax('/pull/pull_jobs/');
+            });
+        });
 		
-		$li1 = $('<li></li>');
-		$li1.html('View Job');
-		$li1.attr('class','menu-item');
+		$li2 = $('<li></li>');
+		$li2.html('View Job');
+		$li2.attr('class','menu-item');
 		
-		$li.click(function(){
-			self.off('click');
-			data = {};
-			data['pk'] = self.pk;
-			BVD.utils.do_ajax('post',BVD.data.get_url('remove'),data,function(data){
-				//remove the element from the widget map
-				var $widgets = BVD.widget_map[self.hostname];
-				var index = 0;
-				var $widget;
-				for (i =0; i < $widgets.length; i++) {
-					if ($widgets[i].pk == self.pk) {
-						index = i;
-						$widget = $widgets[i];
-						break;
-					}
-				}
-				$widgets.splice(index,1);
-				$widget.remove();
-				Widget.render.refresh_grid();
-				BVD.widget_map[self.hostname] = $widgets;
-				BVD.utils.set_size_of_widgets($(".widget").length);
-				BVD.utils.save_widgets();
-				setTimeout(500,function(){
-					var poll = new Poll('/pull/pull_jobs/');
-					poll.ajax();
-				});
-			});
-		});
-		
-		$li1.hover(function(){
+		$li2.hover(function(){
 			$(this).addClass('menu-on');
 		},function(){
 			$(this).removeClass('menu-on');
 		});
 		
-		$li1.click(function(){
+		$li2.click(function(){
 			window.location.href = self.hostname + '/job/' + self.jobname;
 		});
 
-        $li2 = $('<li></li>');
-        $li2.html('Edit Widget');
-        $li2.attr('class', 'menu-item');
+        $li3 = $('<li></li>');
+        $li3.html('Edit Widget');
+        $li3.attr('class', 'menu-item');
 
-        $li2.hover(function() {
+        $li3.hover(function() {
             $(this).addClass('menu-on');
         }, function() {
             $(this).removeClass('menu-on');
         });
 
-        $li2.click(function() {
+        $li3.click(function() {
             var id = 'edit_widget';
             var $modal;
             var opts = {
@@ -234,17 +255,17 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
             return false;
         });
 
-		$li3 = $('<li></li>');
-		$li3.html('Edit Image');
+		$li4 = $('<li></li>');
+		$li4.html('Edit Image');
 
 
-		$li3.hover(function(){
+		$li4.hover(function(){
 			$(this).addClass('menu-on');
 		},function(){
 			$(this).removeClass('menu-on');
 		});
 
-		$li3.click(function(){
+		$li4.click(function(){
 			id = 'edit_image';
 			var $modal;
 	
@@ -262,9 +283,10 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		});
 		
 		$ul.append($li);
-		$ul.append($li1);
-        $ul.append($li2);
-		$ul.append($li3);
+        $ul.append($li1);
+		$ul.append($li2);
+        $ul.append($li3);
+		$ul.append($li4);
 		
 		$menu.append($ul);
 		
