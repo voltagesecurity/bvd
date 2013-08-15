@@ -123,16 +123,18 @@ BVD.utils.set_size_of_widgets = function(count) {
 BVD.utils.redraw_widgets = function(data) {
 	BVD.widget_map = {};
 	$.each(data[0].jobs, function(){
-		var count = $(".widget").length;
-		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon, this.timeSinceLastSuccess);
-		Widget.render.draw($widget,this.width,this.height);
-			
-		if (typeof(BVD.widget_map[this.hostname]) != 'undefined') {
-			BVD.widget_map[this.hostname].push($widget);
-		} else {
-			$widgets = [$widget];
-			BVD.widget_map[this.hostname] = $widgets; 
-		}
+        $.each(this, function() {
+    		var count = $(".widget").length;
+    		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon, this.timeSinceLastSuccess);
+    		Widget.render.draw($widget,this.width,this.height);
+    			
+    		if (typeof(BVD.widget_map[this.hostname]) != 'undefined') {
+    			BVD.widget_map[this.hostname].push($widget);
+    		} else {
+    			$widgets = [$widget];
+    			BVD.widget_map[this.hostname] = $widgets; 
+    		}
+        });
 	});
 }
 

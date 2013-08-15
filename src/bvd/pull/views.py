@@ -37,11 +37,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.contrib.auth.models import User
 from django.core import serializers
-
+from collections import defaultdict
 
 from bvd.jenkins.jenkins import RetrieveJob
 from bvd.pull import models, forms
 from bvd.decorators.decorators import secure_required
+
+import pdb
 
 def append_http(hostname):
     if not hostname: return 'http://'
@@ -73,13 +75,37 @@ def widget_to_dictionary(widget):
         raise TypeError
    
 def get_jobs_for_readonly(only_active=True):
+    products = models.Product.objects.all()
+    joblist = defaultdict(list)
+    
+    for product in products:
+        if only_active:
+            jobs = product.jobs.filter(appletv=True, appletv_active=True)
+        else:
+            jobs = product.jobs.filter(appletv=True)
+        
+        for job in jobs:
+            joblist[product.productname].append(dict(
+                pk      = job.pk,
+                hostname = job.ci_server.hostname,
+                jobname = job.jobname,
+                displayname = job.displayname,
+                width = job.width,
+                height = job.height,
+                status = job.status,
+                readonly = True,
+                icon = job.icon,
+                entity_active = job.entity_active,
+                appletv = job.appletv,
+                appletv_active = job.appletv_active,
+            ))
     if only_active:
-        jobs = models.UserCiJob.objects.filter(appletv=True, appletv_active=True)
+        productless_jobs = models.UserCiJob.objects.filter(product__jobs__isnull=True, appletv=True, appletv_active=True)
     else:
-        jobs = models.UserCiJob.objects.filter(appletv=True)
-    joblist = []
-    for job in jobs:
-        d = dict(
+        productless_jobs = models.UserCiJob.objects.filter(product__jobs__isnull=True, appletv=True)
+    
+    for job in productless_jobs:
+        joblist["no_product"].append(dict(
             pk      = job.pk,
             hostname = job.ci_server.hostname,
             jobname = job.jobname,
@@ -92,18 +118,39 @@ def get_jobs_for_readonly(only_active=True):
             entity_active = job.entity_active,
             appletv = job.appletv,
             appletv_active = job.appletv_active,
-        )
-        joblist.append(d)
+        ))
+
     return joblist
 
+
 def get_jobs_for_user(user, *args):
-    jobs =  models.UserCiJob.objects.filter(entity_active=True,user__username=user.username)
-    list = []
-    for job in jobs:
-        if len(args) > 0:
-            job.readonly = args[0]
-            job.save()
-        d = dict(
+    products = models.Product.objects.all()
+    joblist = defaultdict(list)
+    
+    for product in products:
+        jobs = product.jobs.filter(entity_active=True, user__username=user.username)
+        
+        for job in jobs:
+            if len(args) > 0:
+                job.readonly = args[0]
+                job.save()
+            joblist[product.productname].append(dict(
+                pk      = job.pk,
+                hostname = job.ci_server.hostname,
+                jobname = job.jobname,
+                displayname = job.displayname,
+                width = job.width,
+                height = job.height,
+                status = job.status,
+                readonly = job.readonly,
+                icon = job.icon,
+                entity_active = job.entity_active,
+            ))
+
+    productless_jobs = models.UserCiJob.objects.filter(product__jobs__isnull=True, user__username=user.username, entity_active=True)
+    
+    for job in productless_jobs:
+        joblist["no_product"].append(dict(
             pk      = job.pk,
             hostname = job.ci_server.hostname,
             jobname = job.jobname,
@@ -112,11 +159,11 @@ def get_jobs_for_user(user, *args):
             height = job.height,
             status = job.status,
             readonly = job.readonly,
-            icon = job.icon,   
-        )
-        list.append(d)
-        
-    return list
+            icon = job.icon,
+            entity_active = job.entity_active,
+        ))
+
+    return joblist
 
 def save_ci_server(**widget):
     try:
@@ -323,6 +370,7 @@ def get_modal(request):
             return render_to_response(template,dict(),context_instance=RequestContext(request))
         else:
             widgets = models.UserCiJob.objects.filter(user__username=request.user.username)
+            print widgets
             return render(request, 'edit_readonly_display.html', dict(widgets=widgets))
        
     template = '%s.html' % template
@@ -406,16 +454,42 @@ def remove_job(request):
 def pull_jobs(request, *args, **kwargs):
     
     if request.user.is_authenticated():
-        list = get_jobs_for_user(request.user)
-        for job in list:
+        joblist = get_jobs_for_user(request.user)
+        for product, jobs in joblist.iteritems():
+            for job in jobs:
+                jenkins = RetrieveJob(job['hostname'],job['jobname'])
+                result = jenkins.lookup_job()
+
+                lastSuccess = jenkins.lookup_last_successful_build()
+                job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
+
+                if result == urllib2.URLError:
+                    #TODO: add an additional state other than down 
+                    job['status'] = "DOWN"
+                elif result == ValueError:
+                    #TODO: add an additional state other than down
+                    job['status'] = "DOWN"
+                elif not result['status']:
+                    job['status'] = 'SUCCESS'
+                elif job['status'] == 'ABORTED' or job['status'] == 'NOT_BUILT':
+                    job['status'] = "DOWN"
+                else:
+                    job['status'] = result['status'] 
+
+        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]))
+
+def pull_apple_tv_jobs(request, *args, **kwargs):
+    joblist = get_jobs_for_readonly()
+    for product, jobs in joblist.iteritems():
+        for job in jobs:
             jenkins = RetrieveJob(job['hostname'],job['jobname'])
             result = jenkins.lookup_job()
-            
+
             lastSuccess = jenkins.lookup_last_successful_build()
             job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
-            
+                
             if result == urllib2.URLError:
-                #TODO: add an additional state other than down 
+               #TODO: add an additional state other than down 
                 job['status'] = "DOWN"
             elif result == ValueError:
                 #TODO: add an additional state other than down
@@ -426,52 +500,11 @@ def pull_jobs(request, *args, **kwargs):
                 job['status'] = "DOWN"
             else:
                 job['status'] = result['status'] 
-
-            
-        return HttpResponse(simplejson.dumps([dict(status = 200, jobs = list)]))
-
-def pull_apple_tv_jobs(request, *args, **kwargs):
-    joblist = get_jobs_for_readonly()
-    for job in joblist:
-        jenkins = RetrieveJob(job['hostname'],job['jobname'])
-        result = jenkins.lookup_job()
-
-        lastSuccess = jenkins.lookup_last_successful_build()
-        job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
-            
-        if result == urllib2.URLError:
-           #TODO: add an additional state other than down 
-            job['status'] = "DOWN"
-        elif result == ValueError:
-            #TODO: add an additional state other than down
-            job['status'] = "DOWN"
-        elif not result['status']:
-            job['status'] = 'SUCCESS'
-        elif job['status'] == 'ABORTED' or job['status'] == 'NOT_BUILT':
-            job['status'] = "DOWN"
-        else:
-            job['status'] = result['status'] 
             
     return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]))
 
 def pull_all_display_jobs(request, *args, **kwargs):
     joblist = get_jobs_for_readonly(False)
-    for job in joblist:
-        jenkins = RetrieveJob(job['hostname'],job['jobname'])
-        result = jenkins.lookup_job()
-            
-        if result == urllib2.URLError:
-           #TODO: add an additional state other than down 
-            job['status'] = "DOWN"
-        elif result == ValueError:
-            #TODO: add an additional state other than down
-            job['status'] = "DOWN"
-        elif not result['status']:
-            job['status'] = 'SUCCESS'
-        elif job['status'] == 'ABORTED' or job['status'] == 'NOT_BUILT':
-            job['status'] = "DOWN"
-        else:
-            job['status'] = result['status'] 
             
     return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]))
 
