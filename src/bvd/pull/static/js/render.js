@@ -32,9 +32,37 @@
 var Widget = Widget || {};
 Widget.render = {};
 
-Widget.render.add_widget = function(widget) {
-	$('#widgets').append(widget);
+Widget.render.add_widget = function(widget, product) {
+    /*
+        This function:
+            - If the widget belongs to a product
+                - Creates the product div if it doesn't exist
+                - Adds the widget to the product
+            - If the widget doesn't belong to a product
+                - Adds the widget directly to div#widgets
+    */
+	if(product != undefined) {
+        if($('#product_' + product).length == 0) {
+            Widget.render.add_product(product);
+            $('#product_' + product).eq(0).append(widget);
+        } else {
+            $('#product_' + product).eq(0).append(widget);
+        }
+    } else {
+        $('#widgets').append(widget);
+    }
 	Widget.render.refresh_grid();
+}
+
+Widget.render.add_product = function(product_name) {
+    var product = $("<div></div>");
+    product.attr('class', 'product');
+    product.attr('id', 'product_' + product_name);
+
+    var title = $('<p>' + product_name + '</p>');
+    product.append(title);
+
+    $("#widgets").append(product);
 }
 
 Widget.render.refresh_grid = function(animate) {

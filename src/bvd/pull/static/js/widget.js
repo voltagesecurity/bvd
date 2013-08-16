@@ -42,7 +42,7 @@ var BVD = BVD || {};
 	
 	@param job_name String 
 */
-var Widget = function(hostname, jobname, displayname, status, id, counter, readonly, background_img, timeSinceLastSuccess){
+var Widget = function(hostname, jobname, displayname, status, id, counter, readonly, background_img, timeSinceLastSuccess, product){
 
 	this.make_success = function() {
 		this.addClass('success');
@@ -264,6 +264,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
         this.icon = background_img;
         this.background_img = 'url(/static/images/'+background_img+')';
         this.timeSinceLastSuccess = "Last Success: " + timeSinceLastSuccess;
+        this.product = product;
         
         this.attr('id','wdg'+id);
         this.id = this.attr('id');
@@ -290,7 +291,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		this.append($marquee);
 		this.set_status(this.status);
 		
-		Widget.render.add_widget(this);
+		Widget.render.add_widget(this, product);
 
     }	
     

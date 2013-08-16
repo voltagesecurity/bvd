@@ -207,6 +207,23 @@ body {
     background-position:center;
 }
 
+.product {
+    border: 2px dashed lightgray;
+    margin: 3px;
+}
+
+.product p {
+    z-index: 10;
+    color: white;
+    position: absolute;
+    padding: 10px;
+    left: 0px;
+    bottom: -10px;
+    background-color: rgba(0,0,0,0.5);
+    border-top: 2px dashed lightgray;
+    border-right: 2px dashed lightgray;
+}
+
 .login_required {
 	background-image: url(../images/login-required.jpg);
 	background-size:550px 171px;

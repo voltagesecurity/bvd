@@ -33,8 +33,6 @@ var BVD = BVD || {};
 BVD.utils = {};
 
 BVD.utils.do_ajax = function (type, url, data, success, error) {
-	
-
     return $.ajax({
             url: url,
 	        type: type,
@@ -119,11 +117,14 @@ BVD.utils.set_size_of_widgets = function(count) {
 }
 
 
-BVD.utils.redraw_widgets = function(data) {
-	$.each(data[0].jobs, function(){
-        $.each(this, function() {
+BVD.utils.draw_widgets = function(data) {
+	$.each(data[0].jobs, function(product, jobs){
+        if(product == 'no_product') {
+            product = undefined;
+        }
+        $.each(jobs, function() {
     		var count = $(".widget").length;
-    		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon, this.timeSinceLastSuccess);
+    		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon, this.timeSinceLastSuccess, product);
     		Widget.render.draw($widget,this.width,this.height);
         });
 	});
