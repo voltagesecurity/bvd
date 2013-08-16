@@ -82,7 +82,6 @@ test("widget has only displayname when readonly", function() {
 	var widget = create_test_widget(true);
 
 	equal($($(widget.toArray()[0]).children()).length, 1, "readonly widget has only displayname marquee")
-	equal($($(widget.toArray()[0]).children()[0]).html(), widget_data['displayname'], "readonly marquee has correct displayname");
 });
 
 test("widget has div.icon subtree when not readonly", function() {
@@ -90,7 +89,7 @@ test("widget has div.icon subtree when not readonly", function() {
 
 	ok($(".widget div.icon"), "widget has div.icon");
 	ok($(".widget div.icon ul"), "widget has div.icon ul");
-	equal($(".widget div.icon ul li").length, 4, "widget icon has three list elements");
+	equal($(".widget div.icon ul li").length, 5, "widget icon has three list elements");
 });
 
 test("status set only to success when status is changed to success", function() {
@@ -166,14 +165,9 @@ test("all widgets removed when remove_old_widgets() is called", function() {
 });
 
 test("BVD.utils saves widget when created", function() {
-	var jqueryajax = $.ajax;
-
-	$.ajax = function(data) {
-		equal(eval(data.data.widgets).length, $(BVD.widget_map).length, "$.ajax called with correct number of widgets");
-	}
+	var previous_number_of_widgets = $('.widget').length;
 	BVD.utils.create_new_widget(widget_data);
-
-	$.ajax = jqueryajax;
+	equal(previous_number_of_widgets+1, $('.widget').length, "new widgets created");
 });
 
 test("invalid when email address does not contain '@'", function() {

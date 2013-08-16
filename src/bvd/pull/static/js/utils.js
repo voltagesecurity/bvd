@@ -50,26 +50,6 @@ BVD.utils.do_ajax = function (type, url, data, success, error) {
 BVD.utils.validate_email = function(email) { 
     var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return re.test(email);
-} 
-
-BVD.utils.save_widgets = function() {
-	var widgets = {};
-	var list = [];
-	for (hostname in BVD.widget_map) {
-		var $widgets = BVD.widget_map[hostname];
-		for (i=0; i < $widgets.length; i++) {
-			$widget = $widgets[i];
-			data = Widget.render.getWidgetDimensions($widget);
-			data['hostname'] = hostname;
-    		data['displayname'] = $widget.displayname;
-    		data['jobname'] = $widget.jobname;
-    		data['status'] = $widget.status;
-    		data['icon'] = $widget.icon;
-    		list.push(data);
-		}
-	}
-	widgets['widgets'] = JSON.stringify(list);
-	BVD.utils.do_ajax('post','/pull/save_jobs/',widgets);
 }
 
 BVD.utils.remove_old_widgets = function() {
@@ -80,18 +60,8 @@ BVD.utils.remove_old_widgets = function() {
 
 BVD.utils.create_new_widget = function(json) {
     var count = $(".widget").length;
-    var $widget = new Widget(json.hostname, json.jobname, json.displayname, json.status, json.pk, count, false, json.icon, json.timeSinceLastSuccess);
-    
-    if (typeof(BVD.widget_map[json.hostname]) != 'undefined') {
-        BVD.widget_map[json.hostname].push($widget);
-    } else {
-        $widgets = [$widget];
-        BVD.widget_map[json.hostname] = $widgets;
-    }
-    
+    var $widget = new Widget(json.hostname, json.jobname, json.displayname, json.status, json.pk, count, false, json.icon, json.timeSinceLastSuccess);    
     BVD.utils.set_size_of_widgets(count);
-    BVD.utils.save_widgets();
-   
 }
 
 
@@ -150,19 +120,11 @@ BVD.utils.set_size_of_widgets = function(count) {
 
 
 BVD.utils.redraw_widgets = function(data) {
-	BVD.widget_map = {};
 	$.each(data[0].jobs, function(){
         $.each(this, function() {
     		var count = $(".widget").length;
     		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon, this.timeSinceLastSuccess);
     		Widget.render.draw($widget,this.width,this.height);
-    			
-    		if (typeof(BVD.widget_map[this.hostname]) != 'undefined') {
-    			BVD.widget_map[this.hostname].push($widget);
-    		} else {
-    			$widgets = [$widget];
-    			BVD.widget_map[this.hostname] = $widgets; 
-    		}
         });
 	});
 }

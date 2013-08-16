@@ -30,7 +30,6 @@
 **/
 
 var BVD = BVD || {};
-BVD.widget_map = {};
 
 /**
 	Class to create and return a widget object, inherited from JQuery's $("<div></div>").  
@@ -118,23 +117,9 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
             data = {};
             data['pk'] = self.pk;
             BVD.utils.do_ajax('post',BVD.data.get_url('remove'),data,function(data){
-                //remove the element from the widget map
-                var $widgets = BVD.widget_map[self.hostname];
-                var index = 0;
-                var $widget;
-                for (i =0; i < $widgets.length; i++) {
-                    if ($widgets[i].pk == self.pk) {
-                        index = i;
-                        $widget = $widgets[i];
-                        break;
-                    }
-                }
-                $widgets.splice(index,1);
-                $widget.remove();
+                Widget.render.remove_widget(self);
                 Widget.render.refresh_grid();
-                BVD.widget_map[self.hostname] = $widgets;
                 BVD.utils.set_size_of_widgets($(".widget").length);
-                BVD.utils.save_widgets();
                 setTimeout(500,function(){
                     var poll = new Poll('/pull/pull_jobs/');
                     poll.ajax();

@@ -59,7 +59,7 @@ $(function(){
 	
 	setInterval(jenkins,'60000');
 	
-	var resize = function(data) {
+	/*var resize = function(data) {
 	    
 	    var curr_width = $(this).width();
 	    var curr_height = $(this).height();
@@ -84,7 +84,7 @@ $(function(){
     	}
 	}
 	
-	$(window).resize(resize);
+	$(window).resize(resize);*/
 	
     
 });
