@@ -207,6 +207,10 @@ body {
     background-position:center;
 }
 
+.widget.noproduct {
+    margin: 12px;
+}
+
 .product {
     border: 2px dashed lightgray;
     margin: 3px;

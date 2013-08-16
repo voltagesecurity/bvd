@@ -49,9 +49,9 @@ Widget.render.add_widget = function(widget, product) {
             $('#product_' + product).eq(0).append(widget);
         }
     } else {
+        widget.addClass('noproduct')
         $('#widgets').append(widget);
     }
-	Widget.render.refresh_grid();
 }
 
 Widget.render.add_product = function(product_name) {
@@ -74,6 +74,16 @@ Widget.render.refresh_grid = function(animate) {
 	} else {
 		$("#widgets").freetile();
 	}
+    var size = $('.widget').eq(0).height();
+    console.log(size);
+    while(document.height > window.innerHeight) {
+        console.log("make widgets smaller")
+        size--;
+        console.log(size);
+        $.each($('.widget'), function() {
+            Widget.render.resize($(this), size, size);
+        });
+    }
 }
 
 Widget.render.remove_widget = function(widget) {

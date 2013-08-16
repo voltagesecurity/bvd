@@ -92,7 +92,7 @@ BVD.utils.set_size_of_widgets = function(count) {
         overflow past the screen and require scrolling.
     */
 
-    var window_height = window.innerHeight;
+    var window_height = window.innerHeight - 100;
     var window_width = window.innerWidth;
 
     var sizes = {};
