@@ -55,7 +55,7 @@ class UserCiJob(models.Model):
 
 class Product(models.Model):
     productname = models.CharField(max_length=100)
-    jobs = models.ManyToManyField(UserCiJob)
+    jobs = models.ManyToManyField(UserCiJob, blank=True)
 
     def __unicode__(self):
         return self.productname

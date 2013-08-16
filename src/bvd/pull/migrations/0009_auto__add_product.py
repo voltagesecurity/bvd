@@ -77,7 +77,7 @@ class Migration(SchemaMigration):
         'pull.product': {
             'Meta': {'object_name': 'Product'},
             'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'jobs': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['pull.UserCiJob']", 'symmetrical': 'False'}),
+            'jobs': ('django.db.models.fields.related.ManyToManyField', [], {'to': "orm['pull.UserCiJob']", 'symmetrical': 'False', 'blank': 'True'}),
             'productname': ('django.db.models.fields.CharField', [], {'max_length': '100'})
         },
         'pull.usercijob': {

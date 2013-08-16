@@ -74,56 +74,6 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 	    this.removeClass('down');
 	}
 	
-	this.set_size = function(count) {
-        /*
-            This function sets the size of the widget based on the current number of
-            widgets on the screen. It assumes that widgets will never be larger
-            than 1000 pixels square or smaller than 100 pixels square, the latter
-            of which is more than reasonable because past that size widgets are no
-            longer very readable, especially for large displaynames.
-
-            It does this by creating a dictionary of acceptable widget sizes based on
-            the current window dimensions. This dictionary is generated on each resize
-            because:
-                A) widget resizes are often triggered by window resizes
-                B) variable scope
-                C) it doesn't appear to be a performance problem
-
-            Essentially, the resulting dictionary is treated as a piecewise function
-            where the key is the bottom of a range of widget quantities that fit
-            in the window. The first for loop gerenates the dictionary by dividing
-            the window width and height by a series of different possible widget sizes
-            to determine what quantities of widgets need to be what size.
-
-            The second for loop chooses a size from that dictionary by finding the largest
-            value less than or equal to the number of widgets. As a final tweak to widget
-            sizing it also subtracts a certain amount from the size of the widget based on
-            a simple linear function of the number of widgets. This ensures that the large
-            widgets fill as much of the screen as possible while the small widgets don't
-            overflow past the screen and require scrolling.
-        */
-		var window_height = window.innerHeight;
-        var window_width = window.innerWidth;
-
-        var sizes = {};
-        var n = 0;
-        for(var s = 1000; s >= 100; s = s-10) {
-            n = Math.floor(window_height/s) * Math.floor(window_width/s);
-            sizes[n] = s;
-        }
-
-        var size = 200;
-        for(n = count; n >= 0; n--) {
-            if(sizes[n] != undefined) {
-                size = sizes[n] - (-0.5*n + 50);
-                break;
-            }
-        }
-		
-		this.css('height',size+'px');
-		this.css('width',size+'px');
-	}
-	
 	this.set_status = function(status) {
 	    this.status = status;
 	    switch (status) {
