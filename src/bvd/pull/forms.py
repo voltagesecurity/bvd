@@ -33,6 +33,8 @@ from django.contrib.auth.models import User
 from bvd.pull import models
 
 
+
+
 class SignupForm(forms.ModelForm):
     class Meta:
         model = User
@@ -66,3 +68,8 @@ class UserCiJobForm(forms.ModelForm):
         model = models.UserCiJob
         fields = ('user', 'ci_server', 'jobname', 'status', 'displayname', 'icon', 'width',
             'height', 'readonly', 'entity_active', 'appletv', 'appletv_active')
+
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = models.Product
+        widgets = {'jobs': forms.CheckboxSelectMultiple}

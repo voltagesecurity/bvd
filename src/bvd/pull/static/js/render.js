@@ -32,7 +32,7 @@
 var Widget = Widget || {};
 Widget.render = {};
 
-Widget.render.add_widget = function(widget, product) {
+Widget.render.add_widget = function(widget, product, readonly) {
     /*
         This function:
             - If the widget belongs to a product
@@ -43,7 +43,7 @@ Widget.render.add_widget = function(widget, product) {
     */
 	if(product != undefined) {
         if($('#product_' + product).length == 0) {
-            Widget.render.add_product(product);
+            Widget.render.add_product(product, readonly);
             $('#product_' + product).eq(0).append(widget);
         } else {
             $('#product_' + product).eq(0).append(widget);
@@ -54,13 +54,86 @@ Widget.render.add_widget = function(widget, product) {
     }
 }
 
-Widget.render.add_product = function(product_name) {
+Widget.render.add_product = function(product_name, readonly) {
     var product = $("<div></div>");
     product.attr('class', 'product');
     product.attr('id', 'product_' + product_name);
 
-    var title = $('<p>' + product_name + '</p>');
-    product.append(title);
+    var label = $('<div></div>');
+    label.addClass('product-label');
+
+    if(!eval(readonly)) {
+        var icon = $('<div></div>');
+        icon.addClass('product-icon');
+
+        var menu = $('<div></div>');
+        menu.addClass('product-menu');
+        icon.hover(function() {
+            $(this).children(0).toggle();
+        },
+        function(){
+            $(this).children(0).toggle();
+        });
+
+        var list = $('<ul></ul>');
+
+        var edit_product = $('<li></li>');
+        edit_product.addClass('menu-item');
+        edit_product.hover(function() {
+            edit_product.addClass('menu-on');
+        },
+        function() {
+            edit_product.removeClass('menu-on');
+        });
+        edit_product.html("Edit Product");
+        edit_product.click(function() {
+            var id = 'edit_product';
+            var $modal;
+            var opts = {
+                width: 300,
+                autoOpen: true,
+                title: "Edit Product",
+                resizable: false,
+                modal: true,
+                beforeClose: function() {
+                    $("#edit_product").remove();
+                }
+            }
+            $modal = BVD.modal_factory(BVD.data.get_url('modal', "?template=edit_product&productname="+product_name), id, opts);
+        });
+
+        var remove_product = $('<li></li>');
+        remove_product.hover(function() {
+            remove_product.addClass('menu-on');
+        },
+        function() {
+            remove_product.removeClass('menu-on');
+        });
+        remove_product.html("Remove Product");
+        remove_product.click(function() {
+            BVD.utils.do_ajax('POST', '/pull/remove_product/', {
+                productname: product_name
+            },function() {
+                new Poll().ajax('/pull/pull_jobs/');
+            });
+        });
+
+        list.append(edit_product);
+        list.append(remove_product);
+
+        menu.append(list);
+        icon.append(menu);
+        label.append(icon);
+    }
+
+    var title = $('<span>' + product_name + '</span>');
+    label.append(title);
+
+    if(readonly) {
+        title.addClass('readonly');
+    }
+
+    product.append(label);
 
     $("#widgets").append(product);
 }
@@ -75,7 +148,6 @@ Widget.render.refresh_grid = function(animate) {
 		$("#widgets").freetile();
 	}
     var size = $('.widget').eq(0).height();
-    console.log(size);
     while(document.height > window.innerHeight) {
         console.log("make widgets smaller")
         size--;
@@ -83,6 +155,9 @@ Widget.render.refresh_grid = function(animate) {
         $.each($('.widget'), function() {
             Widget.render.resize($(this), size, size);
         });
+        if(size <= 0) {
+            break;
+        }
     }
 }
 

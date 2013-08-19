@@ -48,6 +48,9 @@ urlpatterns = patterns('bvd.pull.views',
   url(r'^login/$','login',name='login'),
   url(r'^logout/$','logout',name='logout'),
   url(r'^save_widget/$', 'save_widget', name='save_widget'),
+  url(r'^add_product/$', 'add_product', name='add_product'),
+  url(r'^save_product/$', 'save_product', name='save_product'),
+  url(r'^remove_product/$', 'remove_product', name='remove_product'),
   url(r'^edit_widget_image/$','edit_widget_image',name='edit_widget_image'),
 	
 )

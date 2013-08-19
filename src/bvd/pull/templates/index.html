@@ -39,7 +39,10 @@ div.button {
 {%block content%}
 
 <div id="buttons" style="width:100%;height:50px;">
-	<div style="float: left;"><button id="add_job">+ Job</button></div>
+	<div style="float: left;">
+		<button id="add_job">+ Job</button>
+		<button id="add_product">+ Product</button>
+	</div>
 	<div style="float: right;">
 		<div id="bottom_right_buttons" style="display: none">
 			<button id="view_inactive_widgets">Inactive Widgets</button>
@@ -56,9 +59,11 @@ div.button {
 			{%if readonly%}
 				readonly = true;
 				$("#add_job").css('display','none');
+				$("#add_product").css('display', 'none');
 			{%else%}
 				readonly = false;
-				$("#add_job").css('display','block');
+				$("#add_job").css('display','inline');
+				$("#add_product").css('display','inline');
 			{% endif %}
 			{% if appletv %}
 				$(function() {

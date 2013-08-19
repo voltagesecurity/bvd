@@ -1,0 +1,40 @@
+<div id="add_product_modal">
+    <form action="/pull/add_product/" method="post">{%csrf_token%}
+        {{ form.non_field_errors }}
+        <div class="fieldWrapper">
+            {{ form.productname.errors }}
+            <label for="productname">Product Name</label>
+            {{ form.productname }}
+        </div>
+        <div class="fieldWrapper" id="add_product_jobs">
+            <label for="product_jobs" style="display:inline">Jobs</label>
+            <input id="filter_product_jobs" placeholder="Filter" />
+            <ul>
+                {% for job in jobs %}
+                    <li>
+                        <label for="id_jobs_{{ job.pk }}">
+                            <input type="checkbox" name="jobs" value="{{ job.pk }}" id="id_jobs_{{ job.pk }}" />
+                            {{ job.displayname }}
+                        </label>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+        <input id="submit_add_product" type="submit" value="Save" />
+        <input id="cancel_add_product" type="button" value="Cancel" />
+    </form>
+    <script>
+        $('input[id=submit_add_product]').button();
+        $('input[id=cancel_add_product]').button().on("click", function() {
+            $("#add_product_modal").parent().remove();
+        });
+        $('input[id=filter_product_jobs]').fastLiveFilter('#add_product_jobs li');
+    </script>
+    <style>
+        #add_product_jobs ul {
+            list-style-type: none;
+            max-height: 175px;
+            overflow-y: scroll;
+        }
+    </style>
+</div>

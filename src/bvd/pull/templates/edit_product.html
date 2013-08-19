@@ -1,0 +1,34 @@
+<div id="edit_product_modal">
+    <form action="/pull/save_product/" method="post">{%csrf_token%}
+        {{ form.non_field_errors }}
+        <div class="fieldWrapper">
+            {{ form.productname.errors }}
+            <label for="productname">Product Name</label>
+            {{ form.productname }}
+        </div>
+        <div class="fieldWrapper" id="edit_product_jobs">
+            {{ form.jobs.errors }}
+            <label for="product_jobs" style="display:inline">Jobs</label>
+            <input id="filter_product_jobs" placeholder="Filter" />
+            {{ form.jobs }}
+            </ul>
+        </div>
+        <input style="display:none" type="text" name="product_id" value="{{ product_id }}" />
+        <input id="submit_edit_product" type="submit" value="Save" />
+        <input id="cancel_edit_product" type="button" value="Cancel" />
+    </form>
+    <script>
+        $('input[id=submit_edit_product]').button();
+        $('input[id=cancel_edit_product]').button().on("click", function() {
+            $("#edit_product_modal").parent().remove();
+        });
+        $('input[id=filter_product_jobs]').fastLiveFilter('#edit_product_jobs li');
+    </script>
+    <style>
+        #edit_product_jobs ul {
+            list-style-type: none;
+            max-height: 175px;
+            overflow-y: scroll;
+        }
+    </style>
+</div>

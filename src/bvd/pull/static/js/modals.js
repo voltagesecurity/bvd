@@ -42,6 +42,7 @@ $(function(){
 	var txtfield_map = BVD.data.get_txtfield_map();
 	
     $("#add_job").button();
+    $("#add_product").button();
     
     $("#login").button();
     $("#logout").button();
@@ -109,6 +110,22 @@ $(function(){
 
     $("#add_job").on("click",function () {
     	BVD.jobs.add_job(txtfield_map);
+    });
+
+    $("#add_product").on("click", function() {
+        var id = 'new_product';
+        var $modal;
+        var opts = {
+            width: 300,
+            autoOpen: true,
+            title: "Add Product",
+            resizable: false,
+            modal: true,
+            beforeClose: function() {
+                $("#new_product").remove();
+            }
+        }
+        $modal = BVD.modal_factory(BVD.data.get_url('modal', '?template=new_product'), id, opts);
     });
     
     $(document).on('focus', 'input[type=text]', function(){

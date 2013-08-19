@@ -291,7 +291,7 @@ var Widget = function(hostname, jobname, displayname, status, id, counter, reado
 		this.append($marquee);
 		this.set_status(this.status);
 		
-		Widget.render.add_widget(this, product);
+		Widget.render.add_widget(this, product, readonly);
 
     }	
     

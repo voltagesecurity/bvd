@@ -62,7 +62,7 @@ body {
 
 }
 
-.icon .menu-item {
+.menu-item {
 	border: solid white;
 	border-top: 0;
 	border-left: 0;
@@ -216,16 +216,67 @@ body {
     margin: 3px;
 }
 
-.product p {
+.product-label {
     z-index: 10;
     color: white;
     position: absolute;
     padding: 10px;
-    left: 0px;
-    bottom: -10px;
+    left: 0;
+    bottom: 0;
     background-color: rgba(0,0,0,0.5);
     border-top: 2px dashed lightgray;
     border-right: 2px dashed lightgray;
+}
+
+.product-label span {
+    display: inline;
+    height: auto;
+    margin: 5px 0 0 10px;
+    padding: 0;
+    float: left;
+}
+
+.product-label span.readonly {
+    margin: 0;
+}
+
+.product-menu {
+    background: url(../images/black_linen_v2.png);
+    width: 140px;
+    -moz-border-radius: 25px 10px / 10px 25px;
+    border-radius: 25px 10px / 10px 25px;
+    margin-top: -.3em !important;
+    display: none;
+    padding-top: 2px;
+    padding-bottom: 5px;
+    position: absolute;
+    bottom: 40px;
+}
+
+.product.menu:hover {
+    display: block;
+}
+
+.product-menu ul li {
+    font-size: 7pt;
+    height: 15px;
+    font-family: Georgia, Arial, Helvetica, Serif !important;
+    text-transform: uppercase;
+    text-align: left;
+    list-style-type: none;
+    padding: 10px 10px 10px 10px !important;
+    margin-left: -1.5em;
+    margin-right: 2em;
+}
+
+.product-icon {
+    background-image: url(../images/gear-icon.png);
+    background-repeat: no-repeat;
+    background-position: center;
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    float: left;
 }
 
 .login_required {

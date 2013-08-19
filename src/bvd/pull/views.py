@@ -332,46 +332,45 @@ def autocomplete_hostname(request):
 
 @secure_required    
 def get_modal(request):
-    template = request.GET.get('template') 
+    if not request.user.is_authenticated():
+        template = 'login_required.html'
+        return render_to_response(template,
+              dict(),
+              context_instance=RequestContext(request))
+
+    template = request.GET.get('template')
+
     if template == 'add_job':
-        if not request.user.is_authenticated():
-            template = 'login_required.html'
-            return render_to_response(template,
-                  dict(),
-                  context_instance=RequestContext(request))
-        else:
-            form = forms.UserCiJobForm()
-            return render(request, 'add_job.html', dict(form=form))
+        form = forms.UserCiJobForm()
+        return render(request, 'add_job.html', dict(form=form))
+
     if template == 'edit_widget':
-        if not request.user.is_authenticated():
-            template = 'login_required.html'
-            return render_to_response(template,
-                dict(),
-                context_instance=RequestContext(request))
-        else:
-            widget_id = request.GET.get('widget_id')
-            try:
-                widget = models.UserCiJob.objects.get(pk=widget_id)
-            except models.UserCiJob.DoesNotExist:
-                pass
-            form = forms.UserCiJobForm(instance=widget)
-            return render(request, 'edit_widget.html', dict(form=form, widget_id=widget.id))
+        widget_id = request.GET.get('widget_id')
+        try:
+            widget = models.UserCiJob.objects.get(pk=widget_id)
+        except models.UserCiJob.DoesNotExist:
+            pass
+        form = forms.UserCiJobForm(instance=widget)
+        return render(request, 'edit_widget.html', dict(form=form, widget_id=widget.id))
+
+    if template == 'new_product':
+        form = forms.ProductForm()
+        jobs = models.UserCiJob.objects.filter(user__username=request.user.username).order_by('displayname')
+        return render(request, 'add_product.html', dict(form=form, jobs=jobs))
+
+    if template == 'edit_product':
+        product = models.Product.objects.get(productname=request.GET.get('productname'))
+        form = forms.ProductForm(instance=product)
+        return render(request, 'edit_product.html', dict(form=form, product_id=product.pk))
+
     if template == "inactive_widgets":
-        if not request.user.is_authenticated():
-            template = 'login_required.html'
-            return render_to_response(template,dict(),context_instance=RequestContext(request))
-        else:
-            widgets = models.UserCiJob.objects.filter(entity_active=False,user__username=request.user.username)
-            return render(request, 'inactive_widgets.html', dict(widgets=widgets))
+        widgets = models.UserCiJob.objects.filter(entity_active=False,user__username=request.user.username)
+        return render(request, 'inactive_widgets.html', dict(widgets=widgets))
 
     if template == "edit_readonly_display":
-        if not request.user.is_authenticated():
-            template = 'login_required.html'
-            return render_to_response(template,dict(),context_instance=RequestContext(request))
-        else:
-            widgets = models.UserCiJob.objects.filter(user__username=request.user.username)
-            print widgets
-            return render(request, 'edit_readonly_display.html', dict(widgets=widgets))
+        widgets = models.UserCiJob.objects.filter(user__username=request.user.username)
+        print widgets
+        return render(request, 'edit_readonly_display.html', dict(widgets=widgets))
        
     template = '%s.html' % template
     
@@ -558,6 +557,45 @@ def save_widget(request):
             form.save()
         else:
             print form.errors
+
+    return HttpResponseRedirect('/')
+
+@secure_required
+def add_product(request):
+    if not request.user.is_authenticated():
+        return HttpResponse(status=401)
+
+    form = forms.ProductForm(request.POST)
+    if form.is_valid():
+        form.save()
+    else:
+        print form.errors
+
+    return HttpResponseRedirect('/')
+
+@secure_required
+def save_product(request):
+    if not request.user.is_authenticated():
+        return HttpResponse(status=401)
+
+    productinstance = models.Product.objects.get(pk=request.POST.get('product_id'))
+    form = forms.ProductForm(request.POST, instance=productinstance)
+    if form.is_valid():
+        form.save()
+    else:
+        print form.errors
+
+    return HttpResponseRedirect('/')
+
+@secure_required
+def remove_product(request):
+    if not request.user.is_authenticated():
+        return HttpResponse(status=401)
+
+    product = models.Product.objects.get(productname=request.POST.get('productname'))
+
+    if product:
+        product.delete()
 
     return HttpResponseRedirect('/')
 
