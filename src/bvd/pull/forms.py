@@ -70,6 +70,13 @@ class UserCiJobForm(forms.ModelForm):
             'height', 'readonly', 'entity_active', 'appletv', 'appletv_active')
 
 class ProductForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        username = kwargs.pop('username', None)
+        super(ProductForm, self).__init__(*args, **kwargs)
+
+        if username:
+            self.fields['jobs'].queryset = models.UserCiJob.objects.filter(user__username=username)
+
     class Meta:
         model = models.Product
         widgets = {'jobs': forms.CheckboxSelectMultiple}

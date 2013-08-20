@@ -332,19 +332,26 @@ def autocomplete_hostname(request):
 
 @secure_required    
 def get_modal(request):
-    if not request.user.is_authenticated():
-        template = 'login_required.html'
-        return render_to_response(template,
-              dict(),
-              context_instance=RequestContext(request))
-
     template = request.GET.get('template')
 
+    if template == 'login':
+        return render_to_response('login.html', request.GET, context_instance=RequestContext(request))
+
     if template == 'add_job':
+        if not request.user.is_authenticated():
+            template = 'login_required.html'
+            return render_to_response(template,
+                  dict(),
+                  context_instance=RequestContext(request))
         form = forms.UserCiJobForm()
         return render(request, 'add_job.html', dict(form=form))
 
     if template == 'edit_widget':
+        if not request.user.is_authenticated():
+            template = 'login_required.html'
+            return render_to_response(template,
+                  dict(),
+                  context_instance=RequestContext(request))
         widget_id = request.GET.get('widget_id')
         try:
             widget = models.UserCiJob.objects.get(pk=widget_id)
@@ -354,20 +361,40 @@ def get_modal(request):
         return render(request, 'edit_widget.html', dict(form=form, widget_id=widget.id))
 
     if template == 'new_product':
+        if not request.user.is_authenticated():
+            template = 'login_required.html'
+            return render_to_response(template,
+                  dict(),
+                  context_instance=RequestContext(request))
         form = forms.ProductForm()
         jobs = models.UserCiJob.objects.filter(user__username=request.user.username).order_by('displayname')
         return render(request, 'add_product.html', dict(form=form, jobs=jobs))
 
     if template == 'edit_product':
+        if not request.user.is_authenticated():
+            template = 'login_required.html'
+            return render_to_response(template,
+                  dict(),
+                  context_instance=RequestContext(request))
         product = models.Product.objects.get(productname=request.GET.get('productname'))
-        form = forms.ProductForm(instance=product)
+        form = forms.ProductForm(instance=product, username=request.user.username)
         return render(request, 'edit_product.html', dict(form=form, product_id=product.pk))
 
     if template == "inactive_widgets":
+        if not request.user.is_authenticated():
+            template = 'login_required.html'
+            return render_to_response(template,
+                  dict(),
+                  context_instance=RequestContext(request))
         widgets = models.UserCiJob.objects.filter(entity_active=False,user__username=request.user.username)
         return render(request, 'inactive_widgets.html', dict(widgets=widgets))
 
     if template == "edit_readonly_display":
+        if not request.user.is_authenticated():
+            template = 'login_required.html'
+            return render_to_response(template,
+                  dict(),
+                  context_instance=RequestContext(request))
         widgets = models.UserCiJob.objects.filter(user__username=request.user.username)
         print widgets
         return render(request, 'edit_readonly_display.html', dict(widgets=widgets))
