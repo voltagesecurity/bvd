@@ -366,9 +366,8 @@ def get_modal(request):
             return render_to_response(template,
                   dict(),
                   context_instance=RequestContext(request))
-        form = forms.ProductForm()
-        jobs = models.UserCiJob.objects.filter(user__username=request.user.username).order_by('displayname')
-        return render(request, 'add_product.html', dict(form=form, jobs=jobs))
+        form = forms.ProductForm(username=request.user.username)
+        return render(request, 'add_product.html', dict(form=form))
 
     if template == 'edit_product':
         if not request.user.is_authenticated():

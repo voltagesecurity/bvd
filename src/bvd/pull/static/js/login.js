@@ -72,8 +72,10 @@ BVD.login.login_success = function(data,$modal) {
 
 		if (data[0].readonly) {
 			$("#add_job").css('display','none');
+			$("#add_product").css('display', 'none');
 		} else {
-			$("#add_job").css('display','block');
+			$("#add_job").css('display','inline');
+			$("#add_product").css('display', 'inline')
 		}
 		poll = new Poll();
 		if(apple_tv != true) {

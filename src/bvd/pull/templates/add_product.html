@@ -9,16 +9,7 @@
         <div class="fieldWrapper" id="add_product_jobs">
             <label for="product_jobs" style="display:inline">Jobs</label>
             <input id="filter_product_jobs" placeholder="Filter" />
-            <ul>
-                {% for job in jobs %}
-                    <li>
-                        <label for="id_jobs_{{ job.pk }}">
-                            <input type="checkbox" name="jobs" value="{{ job.pk }}" id="id_jobs_{{ job.pk }}" />
-                            {{ job.displayname }}
-                        </label>
-                    </li>
-                {% endfor %}
-            </ul>
+            {{ form.jobs }}
         </div>
         <input id="submit_add_product" type="submit" value="Save" />
         <input id="cancel_add_product" type="button" value="Cancel" />

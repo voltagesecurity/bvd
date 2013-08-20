@@ -75,7 +75,7 @@ class ProductForm(forms.ModelForm):
         super(ProductForm, self).__init__(*args, **kwargs)
 
         if username:
-            self.fields['jobs'].queryset = models.UserCiJob.objects.filter(user__username=username)
+            self.fields['jobs'].queryset = models.UserCiJob.objects.filter(user__username=username).order_by('displayname')
 
     class Meta:
         model = models.Product
