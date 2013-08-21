@@ -1,8 +1,31 @@
 <div id="inactive_widgets_dialog">
     <form>
-        {% for widget in widgets %}
+        {% for product in products %}
+            {% if product.jobs %}
+            <div class="inactive_product">
+                <span class="inactive_product_name">{{ product.productname }}
+                <ul class="inactive_product_widgets_list">
+                {% for widget in product.jobs %}
+                    <li class="inactive_widgets_field">
+                        <span class="inactive_widget_label" id="{{ widget.pk }}_label">{{ widget.displayname}}</span>
+                        <div class="inactive_widgets_inputs">
+                            <div class="activate_inactive_widget_button btn btn-primary" id="{{ widget.pk }}_active">
+                                Activate
+                            </div>
+                            <div class="delete_inactive_widget_button btn btn-danger" id="{{ widget.pk }}_delete">
+                                Delete
+                                <div style="display:none" value="{{ widget.hostname}}"></div>
+                            </div>
+                        </div>
+                    </li>
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+        {% endfor %}
+        {% for widget in productless_widgets %}
         <div class="inactive_widgets_field">
-            <span id="{{ widget.pk }}_label">{{ widget.displayname}}</span>
+            <span class="inactive_widget_label" id="{{ widget.pk }}_label">{{ widget.displayname}}</span>
             <div class="inactive_widgets_inputs">
                 <div class="activate_inactive_widget_button btn btn-primary" id="{{ widget.pk }}_active">
                     Activate
@@ -35,6 +58,11 @@
                             if($(".inactive_widgets_field").length == 0) {
                                 $("#inactive_widgets_dialog").parent().dialog("close");
                             }
+                            $.each($(".inactive_product_widgets_list"), function() {
+                                if($(this).children().length <= 0 ) {
+                                    $(this).parents().eq(1).hide();
+                                }
+                            })
                         }
                     );
                 }
@@ -63,11 +91,20 @@
         height: auto;
         border-radius: 5px;
     }
+    .inactive_widget_label {
+        display: inline;
+    }
     .inactive_widgets_inputs {
-        position: absolute;
-        right: 0px;
-        bottom: 0px;
+        display: inline-block;
+        padding: 5px;
         margin: 0 5px 5px 0;
+    }
+    .inactive_product {
+        padding: 5px 0 0 10px;
+        border-bottom: 2px dashed gray;
+    }
+    .inactive_product_widgets_list {
+        list-style-type: none;
     }
     </style>
 </div>
