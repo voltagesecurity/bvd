@@ -43,8 +43,6 @@ class UserCiJob(models.Model):
     status = models.CharField(max_length=10,null=True,blank=True)
     displayname = models.CharField(max_length=100)
     icon = models.CharField(max_length=100, null=True, blank=True)
-    width = models.CharField(max_length=10,null=True,blank=True)
-    height = models.CharField(max_length=10,null=True,blank=True)
     readonly = models.NullBooleanField(null=True,blank=True)
     entity_active = models.BooleanField()
     appletv = models.BooleanField(default=False)

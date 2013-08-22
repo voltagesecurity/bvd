@@ -125,7 +125,6 @@ BVD.utils.draw_widgets = function(data) {
         $.each(jobs, function() {
     		var count = $(".widget").length;
     		$widget = new Widget(this.hostname,this.jobname,this.displayname,this.status,this.pk,count,this.readonly, this.icon, this.timeSinceLastSuccess, product);
-    		Widget.render.draw($widget,this.width,this.height);
         });
 	});
 }

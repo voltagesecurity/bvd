@@ -48,8 +48,6 @@ class FormsTests(unittest.TestCase):
             hostname    = 'http://edge-master:8080',
             jobname     = 'bootstrap',
             displayname = 'bootstrap',
-            width       = '340px',
-            hieght      = '340px',     
             status      = 'SUCCESS',
             user        = self.user.id,
         )

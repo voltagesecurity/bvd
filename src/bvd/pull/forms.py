@@ -66,8 +66,8 @@ class UserCiJobForm(forms.ModelForm):
     
     class Meta:
         model = models.UserCiJob
-        fields = ('user', 'ci_server', 'jobname', 'status', 'displayname', 'icon', 'width',
-            'height', 'readonly', 'entity_active', 'appletv', 'appletv_active')
+        fields = ('user', 'ci_server', 'jobname', 'status', 'displayname', 'icon',
+            'readonly', 'entity_active', 'appletv', 'appletv_active')
 
 class ProductForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):

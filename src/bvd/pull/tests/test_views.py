@@ -62,7 +62,7 @@ class ViewTests(unittest.TestCase):
 
         d1 = dict(hostname= 'http://pydevs.org:9080')
         d3 = dict(jobname = 'Test1')
-        d2 = dict(displayname = 'Test1', jobname='Test1', width = '100px', height = '100px', user = self.user)
+        d2 = dict(displayname = 'Test1', jobname='Test1', user = self.user)
         
         self.server1 = models.CiServer(**d1)
         self.job1 = models.UserCiJob(**d2)
@@ -369,8 +369,6 @@ class ViewTests(unittest.TestCase):
             hostname = self.job1.ci_server.hostname,
             jobname = self.job1.jobname,
             displayname = self.job1.displayname,
-            width = self.job1.width,
-            height = self.job1.height,
             status = self.job1.status,
             readonly = self.job1.readonly,
             icon = self.job1.icon,
