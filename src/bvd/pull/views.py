@@ -388,13 +388,11 @@ def get_modal(request):
 
         product_widgets = []
         products = models.Product.objects.select_related().filter(jobs__user__username=request.user.username).distinct()
-        print products
         for product in products:
             product_widgets.append(dict(productname=product.productname, jobs=product.jobs.filter(entity_active=False).distinct()))
-        print product_widgets
 
         productless_widgets = models.UserCiJob.objects.filter(product__jobs__isnull=True,entity_active=False,user__username=request.user.username)
-        return render(request, 'inactive_widgets.html', dict(products=product_widgets, productless_widgets=productless_widgets))
+        return render(request, '%s.html' % template, dict(products=product_widgets, productless_widgets=productless_widgets))
 
     if template == "edit_readonly_display":
         if not request.user.is_authenticated():
@@ -402,9 +400,15 @@ def get_modal(request):
             return render_to_response(template,
                   dict(),
                   context_instance=RequestContext(request))
-        widgets = models.UserCiJob.objects.filter(user__username=request.user.username)
-        print widgets
-        return render(request, 'edit_readonly_display.html', dict(widgets=widgets))
+        
+
+        product_widgets = []
+        products = models.Product.objects.select_related().filter(jobs__user__username=request.user.username).distinct()
+        for product in products:
+            product_widgets.append(dict(productname=product.productname, jobs=product.jobs.filter(user__username=request.user.username)))
+
+        productless_widgets = models.UserCiJob.objects.filter(product__jobs__isnull=True,user__username=request.user.username)
+        return render(request, 'edit_readonly_display.html', dict(product_widgets=product_widgets, productless_widgets=productless_widgets))
        
     template = '%s.html' % template
     

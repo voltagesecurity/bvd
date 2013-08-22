@@ -2,9 +2,34 @@
     <div style="width:800px">
         <div id="erd_your_widgets">
             <h3>Your Widgets</h3>
-            {% for widget in widgets %}
+            {% for product in product_widgets %}
+                {% if product.jobs %}
+                <div class="erd_product">
+                    <span class="erd_product_label">{{ product.productname }}</span>
+                    {% for widget in product.jobs %}
+                        <ul>
+                            <li class="erd_widget">
+                                <span class="erdu_label" id="{{widget.pk }}_erdu_label">{{ widget.displayname }}</span>
+                                {% if not widget.appletv %}
+                                    <div class="btn btn-primary erdu_primary_btn erdu_show">
+                                        Show
+                                        <div style="display:none;">{{ widget.pk }}</div>
+                                    </div>
+                                {% else %}
+                                    <div class="btn btn-danger erdu_primary_btn erdu_hide">
+                                        Remove
+                                        <div style="display:none;">{{ widget.pk }}</div>
+                                    </div>
+                                {% endif %}
+                            </li>
+                        </ul>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endfor %}
+            {% for widget in productless_widgets %}
                 <div class="erd_widget">
-                    <span id="{{ widget.pk }}_erdu_label">{{ widget.displayname}}</span>
+                    <span class="erdu_label" id="{{ widget.pk }}_erdu_label">{{ widget.displayname}}</span>
                     {% if not widget.appletv %}
                         <div class="btn btn-primary erdu_primary_btn erdu_show">
                             Show
@@ -26,7 +51,6 @@
     <script>
     $(".erdu_primary_btn").on("click", function() {
         var widget_id = $(this).children().eq(0).html();
-        console.log(widget_id);
         if($(this).hasClass('erdu_show')) {
             $(this).removeClass('erdu_show');
             $(this).removeClass('btn-primary');
@@ -71,22 +95,31 @@
             float: left;
         }
         #erd_your_widgets h3, #erd_display_widgets h3 {
-            border-bottom: 1px dashed gray;
-            padding-bottom: 10px;
+            border-bottom: 2px dashed gray;
+            padding-bottom: 5px;
         }
         #erd_your_widgets {
             padding-right: 10px;
         }
         #erd_display_widgets {
-            border-left: 1px dashed gray;
+            border-left: 2px dashed gray;
             padding-left: 10px;
+            min-height: 430px;
+        }
+        #erd_display_widgets ul {
+            margin: 0 0 0 0;
+            padding: 10px 0 0 25px;
+            border-bottom: 2px dashed gray;
         }
         .erd_widget {
             width: 370px;
             min-height: 35px;
             border-radius: 5px;
-            margin-bottom: 5px;
-            float: left;
+            margin: 5px 0 5px 0;
+            list-style-type: none;
+        }
+        li.erd_widget {
+            width: 345px;
         }
         .erd_fade span {
             opacity: 0.4;
@@ -95,8 +128,24 @@
             padding-left: 36px;
             width: 334px;
         }
+        .erd_product {
+            margin: 5px 0 5px 0;
+            border-bottom: 2px dashed gray;
+        }
+        .erdd_productname {
+            list-style-type: none;
+            margin-left: -25px;
+            padding-left: 0;
+        }
+        .erdu_label {
+            display: inline;
+        }
         .erdu_primary_btn, .erdd_primary_btn {
+            display: inline;
             float: right;
+        }
+        .no_product {
+            border-bottom: 2px dashed gray;
         }
     </style>
 </div>
