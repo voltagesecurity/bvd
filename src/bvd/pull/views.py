@@ -207,6 +207,10 @@ def home(request,template='index.html'):
                               context_instance=RequestContext(request))
 
 @secure_required
+def view_product(request, productname):
+    return render_to_response('view_product.html', dict(productname=productname), context_instance=RequestContext(request))
+
+@secure_required
 def login(request):
     if 'view_tv' in request.POST:
         return HttpResponse(simplejson.dumps([dict(status = 200, readonly = True)]))
@@ -535,6 +539,42 @@ def pull_all_display_jobs(request, *args, **kwargs):
             
     return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]))
 
+def pull_jobs_for_product(request):
+    productname = request.GET.get('productname')
+
+    if request.user.is_authenticated():
+        jobs = [ widget_to_dictionary(job) for job in models.Product.objects.filter(productname=productname,jobs__user__username=request.user.username)[0].jobs.all() ]
+    else:
+        jobs = [ widget_to_dictionary(job) for job in models.Product.objects.filter(productname=productname,jobs__appletv_active=True)[0].jobs.all() ]
+
+    for job in jobs:
+        if not request.user.is_authenticated():
+            job['readonly'] = True
+        
+        jenkins = RetrieveJob(job['hostname'],job['jobname'])
+        result = jenkins.lookup_job()
+
+        lastSuccess = jenkins.lookup_last_successful_build()
+        job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
+
+        if result == urllib2.URLError:
+            #TODO: add an additional state other than down 
+            job['status'] = "DOWN"
+        elif result == ValueError:
+            #TODO: add an additional state other than down
+            job['status'] = "DOWN"
+        elif not result['status']:
+            job['status'] = 'SUCCESS'
+        elif job['status'] == 'ABORTED' or job['status'] == 'NOT_BUILT':
+            job['status'] = "DOWN"
+        else:
+            job['status'] = result['status']         
+
+    joblist = dict()
+    joblist["no_product"] = jobs
+
+    return HttpResponse(simplejson.dumps([dict(status=200, jobs=joblist)]))
+
 @secure_required
 def save_widget(request):
     """
@@ -612,6 +652,9 @@ def save_product(request):
         form.save()
     else:
         print form.errors
+
+    if not productinstance.jobs.all():
+        productinstance.delete()
 
     return HttpResponseRedirect('/')
 

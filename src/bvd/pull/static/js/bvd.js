@@ -42,21 +42,3 @@ var Poll = function() {
     	});
 	}
 }
-
-$(function(){
-
-	var poll = new Poll();
-   
-    var jenkins = function() {
-    	if ($("#add_job_modal").length == 0) {
-        	if(apple_tv != true) {
-                poll.ajax('/pull/pull_jobs/');
-            } else {
-                poll.ajax('/pull/pull_apple_tv_jobs/');
-            }
-        }
-    }
-	
-	setInterval(jenkins,'60000');
-    
-});

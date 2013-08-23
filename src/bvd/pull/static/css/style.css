@@ -228,15 +228,23 @@ body {
     border-right: 2px dashed lightgray;
 }
 
-.product-label span {
+.product-label a {
     display: inline;
     height: auto;
     margin: 5px 0 0 10px;
     padding: 0;
     float: left;
+    color: white;
+    text-decoration: none;
 }
 
-.product-label span.readonly {
+.product-label a:hover {
+    text-decoration: none;
+    border-bottom: 1px dashed white;
+    color: white;
+}
+
+.product-label a.readonly {
     margin: 0;
 }
 

@@ -126,7 +126,8 @@ Widget.render.add_product = function(product_name, readonly) {
         label.append(icon);
     }
 
-    var title = $('<span>' + product_name + '</span>');
+    var title = $('<a>' + product_name + '</a>');
+    title.attr('href','/pull/product/'+product_name+'/');
     label.append(title);
 
     if(readonly) {
