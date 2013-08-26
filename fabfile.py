@@ -68,7 +68,7 @@ def start_django_dev_server(*args,**kwargs):
     print 'CI Monitor is running under http://localhost:8000'
 
 def sync_db(*args,**kwargs):
-    cmd = 'cd ./src/bvd && python manage.py syncdb --noinput'
+    cmd = 'cd ./src/bvd && python manage.py syncdb --noinput && python manage.py createcachetable bvd_cache_table'
     subprocess.call(cmd,shell=True)
 
 def migrate_db(*args, **kwargs):

@@ -62,7 +62,7 @@ DATABASES = {
     }
 }
 
-CACHE_BACKEND = 'locmem:///'
+CACHE_BACKEND = 'db://bvd_cache_table'
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
