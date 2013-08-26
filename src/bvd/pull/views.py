@@ -37,7 +37,9 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth import authenticate, login as django_login, logout as django_logout
 from django.contrib.auth.models import User
 from django.core import serializers
+from django.core.cache import cache
 from collections import defaultdict
+from django.conf import settings
 
 from bvd.jenkins.jenkins import RetrieveJob
 from bvd.pull import models, forms
@@ -488,10 +490,20 @@ def pull_jobs(request, *args, **kwargs):
         joblist = get_jobs_for_user(request.user)
         for product, jobs in joblist.iteritems():
             for job in jobs:
-                jenkins = RetrieveJob(job['hostname'],job['jobname'])
-                result = jenkins.lookup_job()
+                if settings.CACHE_BACKEND:
+                    cache_key = job['hostname'] + '_' + job['jobname']
+                    last_success_key = cache_key + '_lastSuccess'
+                    
+                    result = cache.get(cache_key)
+                    lastSuccess = cache.get(last_success_key)
 
-                lastSuccess = jenkins.lookup_last_successful_build()
+                if not result:
+                    jenkins = RetrieveJob(job['hostname'],job['jobname'])
+                    result = jenkins.lookup_job()
+                    cache.set(cache_key, result, 60 * 10)
+                    lastSuccess = jenkins.lookup_last_successful_build()
+                    cache.set(last_success_key, lastSuccess, 60 * 10)
+
                 job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
 
                 if result == urllib2.URLError:
@@ -513,11 +525,19 @@ def pull_apple_tv_jobs(request, *args, **kwargs):
     joblist = get_jobs_for_readonly()
     for product, jobs in joblist.iteritems():
         for job in jobs:
-            jenkins = RetrieveJob(job['hostname'],job['jobname'])
-            result = jenkins.lookup_job()
+            if settings.CACHE_BACKEND:
+                cache_key = job['hostname'] + '_' + job['jobname']
+                last_success_key = cache_key + '_lastSuccess'
+                
+                result = cache.get(cache_key)
+                lastSuccess = cache.get(last_success_key)
 
-            lastSuccess = jenkins.lookup_last_successful_build()
-            job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
+            if not result:
+                jenkins = RetrieveJob(job['hostname'],job['jobname'])
+                result = jenkins.lookup_job()
+                cache.set(cache_key, result, 60 * 10)
+                lastSuccess = jenkins.lookup_last_successful_build()
+                cache.set(last_success_key, lastSuccess, 60 * 10)
                 
             if result == urllib2.URLError:
                #TODO: add an additional state other than down 
@@ -551,11 +571,19 @@ def pull_jobs_for_product(request):
         if not request.user.is_authenticated():
             job['readonly'] = True
         
-        jenkins = RetrieveJob(job['hostname'],job['jobname'])
-        result = jenkins.lookup_job()
+        if settings.CACHE_BACKEND:
+            cache_key = job['hostname'] + '_' + job['jobname']
+            last_success_key = cache_key + '_lastSuccess'
+            
+            result = cache.get(cache_key)
+            lastSuccess = cache.get(last_success_key)
 
-        lastSuccess = jenkins.lookup_last_successful_build()
-        job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
+        if not result:
+            jenkins = RetrieveJob(job['hostname'],job['jobname'])
+            result = jenkins.lookup_job()
+            cache.set(cache_key, result, 60 * 10)
+            lastSuccess = jenkins.lookup_last_successful_build()
+            cache.set(last_success_key, lastSuccess, 60 * 10)
 
         if result == urllib2.URLError:
             #TODO: add an additional state other than down 
