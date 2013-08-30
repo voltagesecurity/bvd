@@ -49,6 +49,9 @@ class ViewTests(unittest.TestCase):
     
     @classmethod
     def setUpClass(self):
+        settings.RALLY_WORKSPACEID = 12345
+        settings.RALLY_USER = "foo"
+        settings.RALLY_PASS = "bar"
         self.user = User.objects.create_user('testuser', 'testuser@testuser.com', 'testpassword')
         self.user.save()
 
