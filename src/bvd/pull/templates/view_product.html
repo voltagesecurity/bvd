@@ -44,39 +44,7 @@
     </div>
 </div>
 <div id="widgets">
-    <script>
-        var update = function() {
-            BVD.utils.do_ajax('GET', '/pull/pull_jobs_for_product', { productname: "{{ productname }}" }, function(data) {
-                data = eval(data);
-                BVD.utils.remove_old_widgets();
-                BVD.utils.draw_widgets(data);
-                Widget.render.refresh_grid();
-            });
-        }
-        $(function() {
-            update();
-        });
-        $("#return_to_home").button().click(function() {
-            document.location.href = '/';
-        });
-        $("#edit_product").button().click(function() {
-        var id = 'edit_product_modal';
-        var $modal;
-        var opts = {
-            width: 300,
-            autoOpen: true,
-            title: "Edit Product",
-            resizable: false,
-            modal: true,
-            beforeClose: function() {
-                $("#edit_product_modal").remove();
-            }
-        }
-        $modal = BVD.modal_factory(BVD.data.get_url('modal', "?template=edit_product&productname={{ productname }}"), id, opts);
-    });
-    </script>
 </div>
-
 <div id="legend">
     <div class="legend_success">
         <div class="legend_square"></div>
@@ -96,6 +64,40 @@
     </div>
 </div>
 
+<div id="burndown"></div>
+
+<script>
+    var update = function() {
+        BVD.utils.do_ajax('GET', '/pull/pull_jobs_for_product', { productname: "{{ productname }}" }, function(data) {
+            data = eval(data);
+            BVD.utils.remove_old_widgets();
+            BVD.utils.draw_widgets(data);
+            Widget.render.refresh_grid();
+        });
+    }
+    $(function() {
+        update();
+    });
+    $("#return_to_home").button().click(function() {
+        document.location.href = '/';
+    });
+    $("#edit_product").button().click(function() {
+    var id = 'edit_product_modal';
+    var $modal;
+    var opts = {
+        width: 300,
+        autoOpen: true,
+        title: "Edit Product",
+        resizable: false,
+        modal: true,
+        beforeClose: function() {
+            $("#edit_product_modal").remove();
+        }
+    }
+    $modal = BVD.modal_factory(BVD.data.get_url('modal', "?template=edit_product&productname={{ productname }}"), id, opts);
+});
+</script>
+
 <style>
     #productname {
         height: 30px;
@@ -104,6 +106,10 @@
         color: white;
         font-family: Georgia, Arial, Helvetica, Serif;
         margin-left: 20px;
+    }
+    .widget {
+        margin: 0;
+        padding: 0;
     }
 </style>
 

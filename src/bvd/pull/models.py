@@ -54,6 +54,8 @@ class UserCiJob(models.Model):
 class Product(models.Model):
     productname = models.CharField(max_length=100)
     jobs = models.ManyToManyField(UserCiJob, blank=True)
+    show_rally = models.BooleanField(default=False)
+    rally_release_name = models.CharField(max_length=100, null=True, blank=True)
 
     def __unicode__(self):
         return self.productname

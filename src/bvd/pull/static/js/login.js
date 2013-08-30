@@ -145,8 +145,10 @@ BVD.login.logout_success = function() {
 	}
 	
 	BVD.utils.remove_old_widgets();
+
+	$("#charts").remove();
 	
-	$modal = BVD.modal_factory(BVD.data.get_url('modal','?template=logout_success'),id, opts);	
+	$modal = BVD.modal_factory(BVD.data.get_url('modal','?template=logout_success'),id, opts);
 }
 
 BVD.login.do_logout = function() {

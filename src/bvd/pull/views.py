@@ -26,7 +26,7 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
 THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
-import urllib2, types, os
+import urllib2, urllib, simplejson, types, os
 
 from django.shortcuts import render_to_response, render
 from django.template import RequestContext
@@ -44,8 +44,6 @@ from django.conf import settings
 from bvd.jenkins.jenkins import RetrieveJob
 from bvd.pull import models, forms
 from bvd.decorators.decorators import secure_required
-
-import pdb
 
 def append_http(hostname):
     if not hostname: return 'http://'
@@ -157,6 +155,43 @@ def get_jobs_for_user(user, *args):
 
     return joblist
 
+def get_rally_release_oid(release_name, workspace, username, password):
+    """
+        This function:
+            Pulls the ObjectID for the currently-active Rally release whose name contains 'release_name'
+            from workspace ID 'workspace' with the given Rally user credentials.
+    """
+    # Create auth header for request
+    import base64
+    base64string = base64.encodestring('%s:%s' % (username, password))[:-1]
+    authheader =  "Basic %s" % base64string
+
+    # Create request with Rally SDK Query
+    req = urllib2.Request("https://rally1.rallydev.com/slm/webservice/v2.0/release?" +
+        urllib.urlencode({
+            'workspace': 'https://rally1.rallydev.com/slm/webservice/v2.0/workspace/%d' % workspace,
+            'query': '((Name contains "%s") AND (State = Active))' % release_name, # release name contains 'release_name' and state is "Active"
+            'fetch': 'true', # return the full object from the query
+            'order': 'ReleaseDate desc', # oldest first
+            'start': 1, # start at the beginning of the result list
+            'pagesize': 1, # only get the first (latest) release
+        }))
+
+    # Add auth header
+    req.add_header("Authorization", authheader)
+    conn = urllib2.urlopen(req,timeout=5)
+
+    # Load data returned from query
+    data = simplejson.load(conn)
+    conn.close()
+
+    # Extract the ObjectID
+    try:
+        oid = data['QueryResult']['Results'][0]['ObjectID']
+    except (ValueError, KeyError, IndexError):
+        oid = None
+    return oid
+
 def save_ci_server(**widget):
     try:
         ci_server = models.CiServer.objects.get(hostname=append_http(widget['hostname']))
@@ -190,27 +225,84 @@ def redirect_to_home(request):
 
 @secure_required
 def home(request,template='index.html'):
-    appletv = request.GET.get('appletv')
-    if appletv == '1':
-        return render_to_response(template,
-                                  dict(title="Welcome to BVD", readonly=True, appletv=True),
-                                  context_instance=RequestContext(request))
+    if settings.RALLY_ENABLE:
+        appletv = request.GET.get('appletv')
+        if appletv == '1':
+            products = models.Product.objects.filter(show_rally=True)
+            if products:
+                return render_to_response(template,
+                          dict(title="Welcome to BVD", readonly=True, appletv=True, loginkey=settings.RALLY_LOGINKEY, rally_enable=True),
+                          context_instance=RequestContext(request))
+            else:
+                return render_to_response(template,
+                          dict(title="Welcome to BVD", readonly=True, appletv=True),
+                          context_instance=RequestContext(request))
 
-    if settings.USE_SSL:
-        import socket
-        if socket.gethostbyname(request.META['SERVER_NAME']) == request.META['REMOTE_ADDR']:
-            readonly = False
+        if settings.USE_SSL:
+            import socket
+            if socket.gethostbyname(request.META['SERVER_NAME']) == request.META['REMOTE_ADDR']:
+                readonly = False
+            else:
+                readonly = True
         else:
-            readonly = True
+            readonly = False
+
+        return render_to_response(template,
+                                  dict(title='Welcome to BVD', readonly = readonly, rally_enable=True),
+                                  context_instance=RequestContext(request))
     else:
-        readonly = False
-    return render_to_response(template,
-                              dict(title='Welcome to BVD', readonly = readonly),
-                              context_instance=RequestContext(request))
+        appletv = request.GET.get('appletv')
+        if appletv == '1':
+            return render_to_response(template,
+                                      dict(title="Welcome to BVD", readonly=True, appletv=True),
+                                      context_instance=RequestContext(request))
+
+        if settings.USE_SSL:
+            import socket
+            if socket.gethostbyname(request.META['SERVER_NAME']) == request.META['REMOTE_ADDR']:
+                readonly = False
+            else:
+                readonly = True
+        else:
+            readonly = False
+        return render_to_response(template,
+                                  dict(title='Welcome to BVD', readonly = readonly),
+                                  context_instance=RequestContext(request))
 
 @secure_required
 def view_product(request, productname):
-    return render_to_response('view_product.html', dict(productname=productname), context_instance=RequestContext(request))
+        return render_to_response('view_product.html', dict(productname=productname), context_instance=RequestContext(request))
+
+@secure_required
+def view_rally(request):
+    if request.user.is_authenticated():
+        return render_to_response('view_rally.html', dict(loginkey=settings.RALLY_LOGINKEY), context_instance=RequestContext(request))
+    else:
+        return render_to_response('view_rally.html', dict(appletv=True, loginkey=settings.RALLY_LOGINKEY), context_instance=RequestContext(request))
+
+
+@secure_required
+def pull_rally_for_appletv(request):
+    products = models.Product.objects.filter(show_rally=True, jobs__appletv=True, jobs__appletv_active=True).distinct()
+    releaseids = []
+    for product in products:
+        release = get_rally_release_oid(product.rally_release_name, settings.RALLY_WORKSPACEID, settings.RALLY_USER, settings.RALLY_PASS)
+        if release:
+            releaseids.append(dict(productname=product.productname, release=release))
+    return HttpResponse(simplejson.dumps(releaseids))
+
+@secure_required
+def pull_rally(request):
+    if request.user.is_authenticated():
+        products = models.Product.objects.filter(show_rally=True, jobs__user__username=request.user.username).distinct()
+        releaseids = []
+        for product in products:
+            release = get_rally_release_oid(product.rally_release_name, settings.RALLY_WORKSPACEID, settings.RALLY_USER, settings.RALLY_PASS)
+            if release:
+                releaseids.append(dict(productname=product.productname, release=release))
+        return HttpResponse(simplejson.dumps(releaseids))
+    else:
+        return HttpResponse(dict(status=401))
 
 @secure_required
 def login(request):
@@ -363,7 +455,7 @@ def get_modal(request):
                   dict(),
                   context_instance=RequestContext(request))
         form = forms.ProductForm(username=request.user.username)
-        return render(request, 'add_product.html', dict(form=form))
+        return render(request, 'add_product.html', dict(form=form, rally_enable=settings.RALLY_ENABLE))
 
     if template == 'edit_product':
         if not request.user.is_authenticated():
@@ -373,7 +465,7 @@ def get_modal(request):
                   context_instance=RequestContext(request))
         product = models.Product.objects.get(productname=request.GET.get('productname'))
         form = forms.ProductForm(instance=product, username=request.user.username)
-        return render(request, 'edit_product.html', dict(form=form, product_id=product.pk))
+        return render(request, 'edit_product.html', dict(form=form, product_id=product.pk, rally_enable=settings.RALLY_ENABLE))
 
     if template == "inactive_widgets":
         if not request.user.is_authenticated():
@@ -501,6 +593,7 @@ def pull_jobs(request, *args, **kwargs):
                     jenkins = RetrieveJob(job['hostname'],job['jobname'])
                     result = jenkins.lookup_job()
                     cache.set(cache_key, result, 60 * 10)
+                if not lastSuccess:
                     lastSuccess = jenkins.lookup_last_successful_build()
                     cache.set(last_success_key, lastSuccess, 60 * 10)
 

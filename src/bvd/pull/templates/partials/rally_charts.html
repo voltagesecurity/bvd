@@ -1,0 +1,160 @@
+<!--
+
+* BVD v1.0
+
+* Copyright (c) 2012 Voltage Security
+* All rights reserved.
+
+* Redistribution and use in source and binary forms, with or without
+* modification, are permitted provided that the following conditions
+* are met:
+* 1. Redistributions of source code must retain the above copyright
+*    notice, this list of conditions and the following disclaimer.
+* 2. Redistributions in binary form must reproduce the above copyright
+*    notice, this list of conditions and the following disclaimer in the
+*    documentation and/or other materials provided with the distribution.
+* 3. The name of the author may not be used to endorse or promote products
+*    derived from this software without specific prior written permission.
+* 
+* THIS SOFTWARE IS PROVIDED BY THE AUTHOR ``AS IS'' AND ANY EXPRESS OR
+* IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+* OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED.
+* IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY DIRECT, INDIRECT,
+* INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+* NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+* THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+* (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF
+* THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-->
+<div id="charts">
+</div>
+{% if close_slider %}
+</div>
+{% endif %}
+<script type="text/javascript" src="https://rally1.rallydev.com/apps/1.25/sdk.js?loginKey={{ loginkey }}"></script>
+<link rel="stylesheet" href="{{ STATIC_URL }}css/style.css">
+<script src="{{ STATIC_URL }}js/jquery.slides.min.js"></script>
+<script>
+var size_charts = function(count) {
+    var window_width = window.innerWidth;
+    var window_height = window.innerHeight;
+
+    var sizes = {};
+    var n = 0;
+    for(var s = 1000; s >= 100; s = s-10) {
+        n = Math.floor(window_height/s) * Math.floor(window_width/s);
+        sizes[n] = s;
+    }
+
+    var size = 200;
+    for(n = count; n >= 0; n--) {
+        if(sizes[n] != undefined) {
+            size = sizes[n] - (-0.5*n + 50);
+            break;
+        }
+    }
+
+    return size-50;
+}
+
+var update_charts = function() {
+    rally.sdk.ui.AppHeader.destroy();
+    {% if appletv %}
+    BVD.utils.do_ajax('GET', '/pull/pull_rally_for_appletv', {}, function(data) {
+    {% else %}
+    BVD.utils.do_ajax('GET', '/pull/pull_rally', {}, function(data) {
+    {% endif %}
+        var size = size_charts(eval(data).length);
+        if(size > 599) {
+            size = 599;
+        }
+        $.each($("#charts").children(),function() {
+            $(this).remove();
+        });
+        for(var i = 1; i <= eval(data).length; i++) {
+            $("#charts").append($("<div></div>").attr('id','chart_'+i).addClass('chart'));            
+        }
+        $.each(eval(data), function(index, product) {
+            new rally.sdk.ui.StandardReport({
+                report: rally.sdk.ui.StandardReport.ReleaseCumulativeFlowDiagram,
+                width: size,
+                height: size,
+                releases: [product.release]
+            }).display("chart_" + (index+1));
+        });
+        for(var i = 1; i <= eval(data).length; i++) {
+            $("#chart_"+i).prepend($("<p>" + eval(data)[i-1].productname + "</p>").addClass('chart_title'));
+        }
+        $(".chart").css('float', 'left');
+        $(".chart").css('width', size+50);
+        $(".chart").css('height', size+70);
+    });
+}
+rally.addOnLoad(update_charts);
+setInterval(update_charts, 100000);
+
+{% if rally_animate %}
+$(function() {
+    $("#slider").slidesjs({
+        width: window.innerWidth,
+        height: window.innerHeight-100,
+        pagination: {
+                        active: false,
+                        effect: "slide"
+                    },
+        play: {
+                  active: false,
+                    // [boolean] Generate the play and stop buttons.
+                    // You cannot use your own buttons. Sorry.
+                  effect: "slide",
+                    // [string] Can be either "slide" or "fade".
+                  interval: 10000,
+                    // [number] Time spent on each slide in milliseconds.
+                  auto: true,
+                    // [boolean] Start playing the slideshow on load.
+                  swap: false,
+                    // [boolean] show/hide stop and play buttons
+                  pauseOnHover: false,
+                    // [boolean] pause a playing slideshow on hover
+                  restartDelay: 0
+                    // [number] restart delay on inactive slideshow
+              }
+    });
+});
+{% endif %}
+</script>
+<style>
+.widget, #legend, p, a {
+    font-size: 15px;
+    font-family: Georgia, Arial, Helvetica, Serif !important;
+}
+#slider {
+    display: none;
+}
+.widget .marquee {
+    font-size: 25pt;
+}
+#buttons {
+    font-size: 18px !important;
+}
+.chart_title {
+    font-size: 30px;
+    font-family: Georgia, Arial, Helvetica, Serif !important;
+    color: white;
+    position: relative;
+    left: 20px;
+}
+.chart {
+    padding: 5px;
+    margin: 5px;
+    border: 2px dashed gray;
+}
+.slidesjs-navigation {
+    display: none;
+}
+.appHeader {
+    display: none !important;
+}
+</style>

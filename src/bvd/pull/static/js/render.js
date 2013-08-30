@@ -150,9 +150,7 @@ Widget.render.refresh_grid = function(animate) {
 	}
     var size = $('.widget').eq(0).height();
     while(document.height > window.innerHeight) {
-        console.log("make widgets smaller")
         size--;
-        console.log(size);
         $.each($('.widget'), function() {
             Widget.render.resize($(this), size, size);
         });

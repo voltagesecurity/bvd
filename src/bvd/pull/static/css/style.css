@@ -30,7 +30,7 @@
 **/
 
 body {
-	background: url(../images/black_linen_v2.png);
+	background: url(../images/black_linen_v2.png) !important;
 }
 
 .menu-on {

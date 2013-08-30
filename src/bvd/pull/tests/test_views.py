@@ -28,7 +28,7 @@ THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 """
 from mock import Mock, patch
 from StringIO import StringIO
-import urllib2
+import urllib2, simplejson
 
 from django.utils import unittest
 from django.test.client import RequestFactory, Client
@@ -41,6 +41,7 @@ from django.contrib.auth.models import User
 
 from bvd.pull import views
 from bvd.pull import models
+from bvd.pull import forms
 from bvd.tests.test_support import generate_xml_doc
 
 
@@ -53,24 +54,37 @@ class ViewTests(unittest.TestCase):
 
         self.testclient = Client()
 
-    @classmethod
-    def tearDownClass(self):
-        User.objects.all().delete()
-
-    def setUp(self):
         self.factory = RequestFactory()
 
         d1 = dict(hostname= 'http://pydevs.org:9080')
         d3 = dict(jobname = 'Test1')
         d2 = dict(displayname = 'Test1', jobname='Test1', user = self.user)
-        
+        d4 = dict(displayname = 'Test2', jobname='Test2', user = self.user, appletv=True, appletv_active=True)
+
         self.server1 = models.CiServer(**d1)
         self.job1 = models.UserCiJob(**d2)
+        self.job2 = models.UserCiJob(**d4)
         
         self.server1.save()
         
         self.job1.ci_server = self.server1
         self.job1.save()
+
+        self.job2.ci_server = self.server1
+        self.job2.save()
+
+        productdata1 = dict(productname="foo", jobs=[self.job1.pk], show_rally=True, rally_release_name="bar")
+        productdata2 = dict(productname="baz", jobs=[self.job2.pk], show_rally=True, rally_release_name="biff")
+
+        self.product1 = forms.ProductForm(productdata1)
+        self.product1.save()
+
+        self.product2 = forms.ProductForm(productdata2)
+        self.product2.save()
+
+    @classmethod
+    def tearDownClass(self):
+        User.objects.all().delete()
         
 
     @patch('bvd.jenkins.jenkins.RetrieveJob.lookup_hostname', Mock(return_value=ValueError))
@@ -379,4 +393,36 @@ class ViewTests(unittest.TestCase):
         )
         self.assertEqual(views.widget_to_dictionary(self.job1), proper_data)
 
+    @patch('urllib2.urlopen', Mock(return_value=StringIO('{"QueryResult": {"Results": [{"ObjectID": 42}]}}')))
+    def test_get_rally_release_oid_pulls_data_from_rally(self):
+        oid = views.get_rally_release_oid("releaseName", 12345, "username", "password")
+        self.assertEqual(oid, 42)
+    
+    @patch('urllib2.urlopen', Mock(return_value=StringIO('{"QuarryResult": 2}')))
+    def test_get_rally_release_oid_returns_none_when_bad_data(self):
+        oid = views.get_rally_release_oid("releaseName", 12345, "username", "password")
+        self.assertEqual(oid, None)
+
+    @patch('urllib2.urlopen', Mock(return_value=StringIO('{"QueryResult": {"Results": []}}')))
+    def test_get_rally_release_oid_returns_none_when_no_results(self):
+        oid = views.get_rally_release_oid("releaseName", 12345, "username", "password")
+        self.assertEqual(oid, None)
+
+    @patch('bvd.pull.views.get_rally_release_oid', Mock(return_value="12345"))
+    def test_pull_rally_for_appletv_returns_only_appletv_jobs(self):
+        request = self.factory.post('/pull/pull_rally_for_appletv', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+        
+        data = simplejson.loads(str(views.pull_rally_for_appletv(request))[39:])
+        self.assertEqual(len(data), 1)
+
+    @patch('bvd.pull.views.get_rally_release_oid', Mock(return_value="12345"))
+    def test_pull_rally_returns_all_user_jobs(self):
+        request = self.factory.post('/pull/pull_rally', HTTP_X_REQUESTED_WITH='XMLHttpRequest')
+        request.user = self.user
+        request.user.is_authenticated = Mock(return_value=True)
+        
+        data = simplejson.loads(str(views.pull_rally(request))[39:])
+        self.assertEqual(len(data), 2)
 

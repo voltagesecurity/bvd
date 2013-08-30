@@ -36,6 +36,12 @@ ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
 
+# RALLY_ENABLE = True
+# RALLY_LOGINKEY = ""
+# RALLY_USER = ""
+# RALLY_PASS = ""
+# RALLY_WORKSPACEID = 0
+
 LOGIN_URL = '/openid/login/'
 
 MANAGERS = ADMINS

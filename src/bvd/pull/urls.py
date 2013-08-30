@@ -54,4 +54,7 @@ urlpatterns = patterns('bvd.pull.views',
   url(r'^remove_product/$', 'remove_product', name='remove_product'),
   url(r'^edit_widget_image/$','edit_widget_image',name='edit_widget_image'),
   url(r'^product/(?P<productname>\w*)/$', 'view_product', name='view_product'),
+  url(r'^pull_rally_for_appletv/$', 'pull_rally_for_appletv', name='pull_rally_for_appletv'),
+  url(r'^pull_rally/$', 'pull_rally', name='pull_rally'),
+  url(r'^rally/$', 'view_rally', name='view_rally'),
 )

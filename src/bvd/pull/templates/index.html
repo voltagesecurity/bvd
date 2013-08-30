@@ -48,12 +48,22 @@ div.button {
 			<button id="view_inactive_widgets">Inactive Widgets</button>
 			<button id="edit_readonly_display">Edit Public TV</button>
 		</div>
+		{% if rally_enable %}
+		<button id="view_rally" style="display:inline">View Rally</button>
+		{% endif %}
 		<button id="view_tv" style="display:inline;">View TV</button>
-		<button id="refresh" style="display:none;">Refresh</button>&nbsp;&nbsp;&nbsp;
+		<button id="refresh" style="display:none;">Refresh</button>
 		<button id="login" style="display:{%if user.is_authenticated %}none;{%else%}inline;{%endif%}">Login</button>
 		<button id="logout" style="display:{%if user.is_authenticated %}inline;{%else%}none;{%endif%}">Logout</button>
 	</div>
 </div>
+
+{% if rally_enable %}
+{% if appletv %}
+<div id="slider">
+{% endif %}
+{% endif %}
+
 <div id="widgets">
 		<script>
 			{%if readonly%}
@@ -103,6 +113,13 @@ div.button {
 			});
 		</script>
 </div>
+
+{% if rally_enable %}
+	{% if appletv %}
+	{% include 'partials/rally_charts.html' with loginkey=loginkey rally_animate=1 close_slider=1 appletv=1 %}
+	{% endif %}
+{% endif %}
+
 <div id="legend">
 	<div class="legend_success">
 		<div class="legend_square"></div>

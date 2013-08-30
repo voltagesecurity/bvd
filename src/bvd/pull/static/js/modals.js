@@ -63,6 +63,10 @@ $(function(){
         BVD.login.login_apple_tv(); 
     });
 
+    $("#view_rally").button().click(function() {
+        window.location.href = '/pull/rally';
+    });
+
     $("#refresh").on('click',function(){
         poll = new Poll();
         if(apple_tv != true) {
