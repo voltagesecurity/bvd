@@ -597,7 +597,8 @@ def pull_jobs(request, *args, **kwargs):
                     lastSuccess = jenkins.lookup_last_successful_build()
                     cache.set(last_success_key, lastSuccess, 60 * 10)
 
-                job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
+                if not lastSuccess == urllib2.URLError:
+                    job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
 
                 if result == urllib2.URLError:
                     #TODO: add an additional state other than down 
