@@ -46,6 +46,12 @@ from bvd.pull import models, forms
 from bvd.decorators.decorators import secure_required
 
 def append_http(hostname):
+    """
+        This function:
+            Prepends 'http://' to the hostname if it's not already there.
+
+            Should really be named "prepend_http" or "append_to_http".
+    """
     if not hostname: return 'http://'
     
     if hostname.find('http') > -1 or hostname.find('https') > -1:
@@ -54,6 +60,12 @@ def append_http(hostname):
         return 'http://%s' % hostname
 
 def widget_to_dictionary(widget):
+    """
+        This function:
+            Returns a Python dict() of a job/widget instance.
+
+            Should really be used anywhere jobs are loaded to be sent to the client, but in practice is only used in pull_jobs_for_product() and save_widget().
+    """
     if isinstance(widget, models.UserCiJob):
         return dict(
             pk = widget.pk,
@@ -73,6 +85,11 @@ def widget_to_dictionary(widget):
         raise TypeError
    
 def get_jobs_for_readonly(only_active=True):
+    """
+        This function:
+            Returns a data structure of products and jobs viewable by readonly users/Apple TV/the public BVD displays.
+            Also used to load the widget list for the 'Edit Public TV Display' window, hence the argument which allows non-active widgets to be loaded as well.
+    """
     products = models.Product.objects.all()
     joblist = defaultdict(list)
     
@@ -118,6 +135,10 @@ def get_jobs_for_readonly(only_active=True):
 
 
 def get_jobs_for_user(user, *args):
+    """
+        This function:
+            Returns a data structure of products and jobs belonging to the user.
+    """
     products = models.Product.objects.all()
     joblist = defaultdict(list)
     
@@ -197,6 +218,12 @@ def redirect_to_home(request):
 
 @secure_required
 def home(request,template='index.html'):
+    """
+        This function:
+            Handles all requests for '/'. If '/appletv=1' is requested, returns a readonly view.
+
+            Also handles Rally for readonly if it's enabled.
+    """
     if settings.RALLY_ENABLE:
         appletv = request.GET.get('appletv')
         if appletv == '1':
@@ -243,10 +270,18 @@ def home(request,template='index.html'):
 
 @secure_required
 def view_product(request, productname):
-        return render_to_response('view_product.html', dict(productname=productname), context_instance=RequestContext(request))
+    """
+        This function:
+            Renders the template for the requested Product
+    """
+    return render_to_response('view_product.html', dict(productname=productname), context_instance=RequestContext(request))
 
 @secure_required
 def view_rally(request):
+    """
+        This function:
+            Renders the template for Rally charts.
+    """
     if request.user.is_authenticated():
         return render_to_response('view_rally.html', dict(loginkey=settings.RALLY_LOGINKEY), context_instance=RequestContext(request))
     else:
@@ -255,6 +290,16 @@ def view_rally(request):
 
 @secure_required
 def pull_rally_for_appletv(request):
+    """
+        This function:
+            Pulls the list of Rally Release ObjectIDs for publicly-accessible products.
+
+        Requested by:
+            /appletv=1, view_rally.html
+
+        Request Method:
+            GET
+    """
     products = models.Product.objects.filter(show_rally=True, jobs__appletv=True, jobs__appletv_active=True).distinct()
     releaseids = []
     for product in products:
@@ -265,6 +310,16 @@ def pull_rally_for_appletv(request):
 
 @secure_required
 def pull_rally(request):
+    """
+        This function:
+            Pulls the list of Rally Release ObjectIDs for the user.
+
+        Requested by:
+            view_rally.html
+            
+        Request Method:
+            GET
+    """
     if request.user.is_authenticated():
         products = models.Product.objects.filter(show_rally=True, jobs__user__username=request.user.username).distinct()
         releaseids = []
@@ -278,6 +333,16 @@ def pull_rally(request):
 
 @secure_required
 def login(request):
+    """
+        This function:
+            Logs in to BVD
+
+        Requested by:
+            login.html
+
+        Request method:
+            POST
+    """
     if 'view_tv' in request.POST:
         return HttpResponse(simplejson.dumps([dict(status = 200, readonly = True)]))
     else:    
@@ -294,11 +359,31 @@ def login(request):
 
 @secure_required
 def logout(request):
+    """
+        This function:
+            Logs out of BVD
+
+        Requested by:
+            the Logout buttons
+
+        Request method:
+            POST
+    """
     django_logout(request)
     return HttpResponse(simplejson.dumps([dict(status = 200)]))
             
 @secure_required
 def validate_username(request):
+    """
+        This function:
+            Validates that a BVD username is valid.
+
+        Requested by:
+            login.html
+
+        Request method:
+            POST
+    """
     username = request.POST.get('username')
     
     try:
@@ -310,6 +395,16 @@ def validate_username(request):
  
 @secure_required
 def validate_hostname(request):
+    """
+        This function:
+            Validates that a Jenkins hostname is valid
+
+        Requested by:
+            add_job.html, edit_job.html
+
+        Request method:
+            POST
+    """
     print request.POST.get('hostname')
     job = RetrieveJob(append_http(request.POST.get('hostname',None)),None)
     print request.POST.get('username') == 'Username'
@@ -330,6 +425,16 @@ def validate_hostname(request):
     
 @secure_required
 def validate_job(request):
+    """
+        This function:
+            Validates that a Jenkins job and hostname is valid.
+
+        Requested by:
+            add_job.html, edit_job.html
+
+        Request method:
+            POST
+    """
     hostname = append_http(request.POST.get('hostname',''))
     jobname = request.POST.get('jobname',None)
 
@@ -363,6 +468,16 @@ def validate_job(request):
 
 @secure_required    
 def autocomplete_hostname(request):
+    """
+        This function:
+            Deprecated - no longer used by Add Product window
+
+        Requested by:
+            None
+
+        Request method:
+            POST
+    """
     txt = request.POST.get('txt')
     servers = models.CiServer.objects.filter(hostname__icontains=txt)
     result = [server.hostname for server in servers]
@@ -372,6 +487,16 @@ def autocomplete_hostname(request):
 
 @secure_required    
 def get_modal(request):
+    """
+        This function:
+            Renders the template for the requested window/"modal"
+
+        Requested by:
+            BVD.modal_factory()
+
+        Request method:
+            GET
+    """
     template = request.GET.get('template')
 
     if template == 'login':
@@ -523,13 +648,32 @@ def add_job(request):
 
 @secure_required    
 def remove_job(request):
+    """
+        This function:
+            Deletes a job.
+
+        Requested by:
+            'Remove Widget' menu option
+
+        Request method:
+            POST
+    """
     user_ci_job = models.UserCiJob.objects.get(pk=int(request.POST.get('pk')))
     user_ci_job.delete()
     return HttpResponse(simplejson.dumps([dict(status = 200)]))
 
 @secure_required
 def pull_jobs(request, *args, **kwargs):
-    
+    """
+        This function:
+            Pulls the list of jobs for the user.
+
+        Requested by:
+            Poll.ajax('/pull/pull_jobs')
+
+        Request method:
+            GET
+    """
     if request.user.is_authenticated():
         joblist = get_jobs_for_user(request.user)
         for product, jobs in joblist.iteritems():
@@ -573,6 +717,16 @@ def pull_jobs(request, *args, **kwargs):
         return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]))
 
 def pull_apple_tv_jobs(request, *args, **kwargs):
+    """
+       This function:
+            Pulls the list of jobs for a readonly user.
+
+        Requested by:
+            Poll.ajax('/pull/pull_apple_tv_jobs')
+
+        Request method:
+            GET
+    """
     joblist = get_jobs_for_readonly()
     for product, jobs in joblist.iteritems():
         for job in jobs:
@@ -606,11 +760,31 @@ def pull_apple_tv_jobs(request, *args, **kwargs):
     return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]))
 
 def pull_all_display_jobs(request, *args, **kwargs):
+    """
+        This function:
+            Loads the list of public display jobs for the Edit Public TV window.
+
+        Requested by:
+            update_erdd()
+
+        Request method:
+            GET
+    """
     joblist = get_jobs_for_readonly(False)
             
     return HttpResponse(simplejson.dumps([dict(status = 200, jobs = joblist)]))
 
 def pull_jobs_for_product(request):
+    """
+        This function:
+            Loads the list of jobs for a specific product.
+
+        Requested by:
+            view_product.html - update()
+
+        Request method:
+            GET
+    """
     productname = request.GET.get('productname')
 
     if request.user.is_authenticated():
@@ -709,6 +883,16 @@ def save_widget(request):
 
 @secure_required
 def add_product(request):
+    """
+        This function:
+            Adds a new product.
+
+        Requested by:
+            add_product.html
+
+        Request method:
+            POST
+    """
     if not request.user.is_authenticated():
         return HttpResponse(status=401)
 
@@ -722,6 +906,16 @@ def add_product(request):
 
 @secure_required
 def save_product(request):
+    """
+        This function:
+            Changes a product.
+
+        Requested by:
+            edit_product.html
+
+        Request method:
+            POST
+    """
     if not request.user.is_authenticated():
         return HttpResponse(status=401)
 
@@ -739,6 +933,16 @@ def save_product(request):
 
 @secure_required
 def remove_product(request):
+    """
+        This function:
+            Deletes a product.
+
+        Requested by:
+            "Remove Product" button
+
+        Request method:
+            POST
+    """
     if not request.user.is_authenticated():
         return HttpResponse(status=401)
 
@@ -750,6 +954,16 @@ def remove_product(request):
     return HttpResponseRedirect('/')
 
 def edit_widget_image(request):
+    """
+        This function:
+            Uploads an image for the job.
+
+        Requested by:
+            edit_image.html
+
+        Request method:
+            POST
+    """
     if request.method == 'POST':
         try:
             user_ci_job = models.UserCiJob.objects.get(id=request.POST.get('widget_id'))

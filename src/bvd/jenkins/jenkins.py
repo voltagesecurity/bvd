@@ -42,6 +42,9 @@ class RetrieveJob(object):
         self.jobname = jobname
 
     def _parse_jenkins_timestamp(self, timestamp):
+        """
+            Parses the timestamp returned from Jenkins' JSON api and returns a python datetime object
+        """
         expression = re.compile(r'\d{4}-\d{2}-\d{2}_\d{2}-\d{2}-\d{2}')
         if not timestamp or not expression.match(timestamp):
             return None
@@ -49,6 +52,9 @@ class RetrieveJob(object):
         return date
 
     def _get_time_diff(self, time):
+        """
+            Returns a human-readable difference in time between the given timestamp and the present time
+        """
         if isinstance(time, datetime.datetime):
             diff = relativedelta.relativedelta(datetime.datetime.now(),time)
             if diff.years >=1:
@@ -83,6 +89,9 @@ class RetrieveJob(object):
             return None
 
     def lookup_hostname(self, use_auth=False, username=None, password=None):
+        """
+            Determines if the given hostname is accessible by BVD
+        """
         try:
             if use_auth:
                 req = urllib2.Request(self.hostname)
@@ -110,6 +119,9 @@ class RetrieveJob(object):
         
             
     def lookup_job(self, use_auth=False, username=None, password=None):
+        """
+            Determines if the given job can be found and returns the status of the job
+        """
         try:
             if use_auth:
                 # Create auth header for request
@@ -152,6 +164,9 @@ class RetrieveJob(object):
         )
 
     def lookup_last_successful_build(self, use_auth=False, username=None, password=None):
+        """
+            Looks up the last successful build of the given job and returns data on the timestamp
+        """
         # Lookup lastSuccessfulBuild number
         try:
             if use_auth:
