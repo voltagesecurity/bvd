@@ -164,12 +164,6 @@ test("all widgets removed when remove_old_widgets() is called", function() {
 	equal($(".widget").length, 0, "destroyed all widgets");
 });
 
-test("BVD.utils saves widget when created", function() {
-	var previous_number_of_widgets = $('.widget').length;
-	BVD.utils.create_new_widget(widget_data);
-	equal(previous_number_of_widgets+1, $('.widget').length, "new widgets created");
-});
-
 test("invalid when email address does not contain '@'", function() {
 	var invalid_email_result = BVD.utils.validate_email("notanemailaddress.com");
 	ok(!invalid_email_result, "email without '@' not validated");

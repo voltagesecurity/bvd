@@ -56,12 +56,6 @@ BVD.utils.remove_old_widgets = function() {
     });
 }
 
-BVD.utils.create_new_widget = function(json) {
-    var count = $(".widget").length;
-    var $widget = new Widget(json.hostname, json.jobname, json.displayname, json.status, json.pk, count, false, json.icon, json.timeSinceLastSuccess);    
-    BVD.utils.set_size_of_widgets(count);
-}
-
 
 BVD.utils.set_size_of_widgets = function(count) {
     /*

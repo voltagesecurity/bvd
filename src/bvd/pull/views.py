@@ -191,34 +191,6 @@ def get_rally_release_oid(release_name, workspace, username, password):
     except (ValueError, KeyError, IndexError):
         oid = None
     return oid
-
-def save_ci_server(**widget):
-    try:
-        ci_server = models.CiServer.objects.get(hostname=append_http(widget['hostname']))
-    except models.CiServer.DoesNotExist:
-        ci_server = forms.CiServerForm(data=widget).save()
-    
-    return ci_server
-
-    
-def save_user_ci_job(**widget):
-    ci_server = save_ci_server(**widget)
-    widget['ci_server'] = ci_server.pk
-
-    try:
-        user_ci_job = models.UserCiJob.objects.get(user__pk=widget['user'], jobname=widget['jobname'])
-        widget['appletv'] = user_ci_job.appletv
-        widget['appletv_active'] = user_ci_job.appletv_active
-        form = forms.UserCiJobForm(data=widget, instance=user_ci_job)
-        if form.is_valid():
-            user_ci_job = form.save()
-    except models.UserCiJob.DoesNotExist:
-        form = forms.UserCiJobForm(widget)
-        if form.is_valid():
-            user_ci_job = form.save()
-        else:
-            print form.errors
-    return user_ci_job 
     
 def redirect_to_home(request):
     return HttpResponseRedirect('/')
@@ -388,26 +360,6 @@ def validate_job(request):
     
     request.session[key] = result
     return HttpResponse(simplejson.dumps([dict(status = 200)]))
-
-@secure_required
-def save_jobs(request):
-    if not request.user.is_authenticated():
-        result = [dict(status = 401)]
-        return HttpResponse(simplejson.dumps(result))
-    
-    user = request.user
-    widgets = simplejson.loads(request.POST['widgets'])
-    
-    if not widgets:
-        result = [dict(status = 500)]
-        return HttpResponse(simplejson.dumps(result))
-    
-    for widget in widgets:
-        widget['user'] = user.pk
-        widget['entity_active'] = True
-        save_user_ci_job(**widget)
-    result = [dict(status = 200)]
-    return HttpResponse(simplejson.dumps(result))
 
 @secure_required    
 def autocomplete_hostname(request):
@@ -592,12 +544,17 @@ def pull_jobs(request, *args, **kwargs):
                 if not result:
                     jenkins = RetrieveJob(job['hostname'],job['jobname'])
                     result = jenkins.lookup_job()
-                    cache.set(cache_key, result, 60 * 10)
+                    if settings.CACHE_BACKEND:
+                        cache.set(cache_key, result, 60 * 10)
                 if not lastSuccess:
-                    lastSuccess = jenkins.lookup_last_successful_build()
-                    cache.set(last_success_key, lastSuccess, 60 * 10)
+                    try:
+                        lastSuccess = jenkins.lookup_last_successful_build()
+                        if settings.CACHE_BACKEND:
+                            cache.set(last_success_key, lastSuccess, 60 * 10)
+                    except:
+                        lastSuccess = None
 
-                if not lastSuccess == urllib2.URLError:
+                if lastSuccess and not lastSuccess == urllib2.URLError:
                     job['timeSinceLastSuccess'] = lastSuccess.get('timeSinceLastSuccess')
 
                 if result == urllib2.URLError:

@@ -168,20 +168,5 @@ Widget.render.resize = function(widget, width, height) {
     widget.css('height',height+'px');
     widget.css('width',width+'px');
 }
-	
-Widget.render.draw = function (widget, width, height) {
-    widget.css({ 'width' : width, 'height' : height });
-}
-
-Widget.render.refresh = function(widget) {
-    var dimensions = this.getWidgetDimensions();
-    widget.css(dimensions);
-}
-
-Widget.render.getWidgetDimensions = function(widget) {
-	var ele = document.getElementById(widget.id);
-
-    return { top: ele.style.top, left: ele.style.left, height: ele.style.height, width: ele.style.width };
-}
 
 
