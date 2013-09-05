@@ -28,6 +28,19 @@
 * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 -->
+{% comment %}
+    This window loads the list of inactive widgets in the template and does not need to update from
+    the server, hence it's loaded in the template to simplify html generation and cut the unnecessary
+    network traffic that a dynamically-loaded list of widgets would create.
+
+    There are essentially two sections: widgets which belong to a product and widgets that don't.
+
+    There's potentially a rendering bug in the code as a result of the many-to-many relationship
+    between products and jobs. A job can belong to multiple products, but the logic for manipulating
+    widgets with this window wasn't *designed* with this in consideration. I've run out of time to
+    investigate and test this, but it's something to look out for. Try activating an inactive job
+    which belongs to multiple products and check that the resulting behavior makes sense.
+{% comment %}
 <div id="inactive_widgets_dialog">
     <form>
         {% for product in products %}
@@ -70,6 +83,11 @@
     </form>
     <script>
         $(".activate_inactive_widget_button").on("click", function() {
+            /*
+                This function handles the reactivation of inactive widgets. It fades out the widget and
+                then POSTs the data to the save_widget view to reactivate it. Then it removes the widget
+                from the list and, if there are no more widgets, closes the window.
+            */
             var widgetbox = $(this).parents().eq(1);
             widgetbox.animate({'color':'white','background-color':'#0066dd','opacity':.25},200).fadeOut(100,
                 function() {
@@ -99,6 +117,11 @@
             );
         });
         $(".delete_inactive_widget_button").on("click", function() {
+            /*
+                This function handles the deletion of inactive widgets. It fades out the widget and
+                then POSTs the widget ID to the server to delete it. Then it removes the widget
+                from the list and, if there are no more widgets, closes the window.
+            */
             var widgetbox = $(this).parents().eq(1);
             var widget_id = widgetbox.children().eq(0).attr('id').slice(0,-6);
             widgetbox.animate({'color':'white','background-color':'red','opacity':.25},200).fadeOut(100,
@@ -109,7 +132,6 @@
                             $("#inactive_widgets_dialog").parent().dialog("close");
                         }
                     });
-                    console.log(widget_id);
                 }
             );
         });

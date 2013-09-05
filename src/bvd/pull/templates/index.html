@@ -58,6 +58,11 @@ div.button {
 	</div>
 </div>
 
+
+{% comment %}
+	If Rally is enabled and '/appletv=1', we want to create a slider to swap back and forth
+	between build status and Rally ReleaseCumulativeFlowDiagrams
+{% endcomment %}
 {% if rally_enable %}
 {% if appletv %}
 <div id="slider">
@@ -66,7 +71,7 @@ div.button {
 
 <div id="widgets">
 		<script>
-			{%if readonly%}
+			{%if readonly%} {# Do not display buttons for adding jobs and products if in readonly mode. #}
 				readonly = true;
 				$("#add_job").css('display','none');
 				$("#add_product").css('display', 'none');
@@ -75,13 +80,13 @@ div.button {
 				$("#add_job").css('display','inline');
 				$("#add_product").css('display','inline');
 			{% endif %}
-			{% if appletv %}
+			{% if appletv %} {# Automatically log in to readonly for '/appletv=1' #}
 				$(function() {
 					BVD.login.login_apple_tv();
 					$("#bottom_right_buttons").css('display', 'none');
 				});
 			{% endif %}
-			{% if user.is_authenticated %}
+			{% if user.is_authenticated %} {# If logged in, automatically load widgets #}
 				new Poll().ajax('/pull/pull_jobs/');
 				$("#view_tv").css('display','none');
 				$("#refresh").css('display','inline');
@@ -97,6 +102,7 @@ div.button {
 			});
 
 			$(function(){
+				// When the page is ready, set up the automatic page refresh.
 				var poll = new Poll();
 			   
 			    var jenkins = function() {
@@ -114,6 +120,9 @@ div.button {
 		</script>
 </div>
 
+{% comment %}
+	If Rally is enabled and '/appletv=1', load the rally charts to slide between.
+{% endcomment %}
 {% if rally_enable %}
 	{% if appletv %}
 	{% include 'partials/rally_charts.html' with loginkey=loginkey rally_animate=1 close_slider=1 appletv=1 %}

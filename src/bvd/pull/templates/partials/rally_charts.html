@@ -30,14 +30,18 @@
 -->
 <div id="charts">
 </div>
-{% if close_slider %}
+{% if close_slider %} {% comment %} Used for '/appletv=1' to close the slider div {% endcomment %}
 </div>
 {% endif %}
+<!-- Here's the infamous Rally App SDK include. -->
 <script type="text/javascript" src="https://rally1.rallydev.com/apps/1.25/sdk.js?loginKey={{ loginkey }}"></script>
 <link rel="stylesheet" href="{{ STATIC_URL }}css/style.css">
 <script src="{{ STATIC_URL }}js/jquery.slides.min.js"></script>
 <script>
 var size_charts = function(count) {
+    /*
+        Blatant code duplication from BVD.utils.set_size_of_widgets() in utils.js.
+    */
     var window_width = window.innerWidth;
     var window_height = window.innerHeight;
 
@@ -60,22 +64,41 @@ var size_charts = function(count) {
 }
 
 var update_charts = function() {
+    /*
+        This function serves the same function as Poll.ajax(), except it updates the Rally charts
+        instead of the widgets.
+
+        Functionality:
+            - Removes the Rally "app header" label from the top of the page
+            - GETs the list of Rally charts from Django
+            - Determines how large to make the new charts
+            - Clears the old charts
+            - Creates new <div>s for the new charts
+            - Calls the Rally SDK to create the new charts
+            - Adds the product name to each chart <div>
+    */
+    // Remove the App header
     rally.sdk.ui.AppHeader.destroy();
+    // Pull the list of charts from Django
     {% if appletv %}
     BVD.utils.do_ajax('GET', '/pull/pull_rally_for_appletv', {}, function(data) {
     {% else %}
     BVD.utils.do_ajax('GET', '/pull/pull_rally', {}, function(data) {
     {% endif %}
+        // Determine the size of the new charts
         var size = size_charts(eval(data).length);
         if(size > 599) {
             size = 599;
         }
+        // Remove all the old charts
         $.each($("#charts").children(),function() {
             $(this).remove();
         });
+        // Create a div for each new chart
         for(var i = 1; i <= eval(data).length; i++) {
             $("#charts").append($("<div></div>").attr('id','chart_'+i).addClass('chart'));            
         }
+        // Load all the new charts with the Rally SDK
         $.each(eval(data), function(index, product) {
             new rally.sdk.ui.StandardReport({
                 report: rally.sdk.ui.StandardReport.ReleaseCumulativeFlowDiagram,
@@ -84,6 +107,7 @@ var update_charts = function() {
                 releases: [product.release]
             }).display("chart_" + (index+1));
         });
+        // Add the name of the Product to the chart <div>
         for(var i = 1; i <= eval(data).length; i++) {
             $("#chart_"+i).prepend($("<p>" + eval(data)[i-1].productname + "</p>").addClass('chart_title'));
         }
@@ -92,10 +116,13 @@ var update_charts = function() {
         $(".chart").css('height', size+70);
     });
 }
+// Call update_charts as soon as Rally is ready
 rally.addOnLoad(update_charts);
+// Call update_charts regularly to refresh
 setInterval(update_charts, 100000);
 
-{% if rally_animate %}
+{% if rally_animate %} {# used for '/appletv=1' #}
+// Creates the slider and automatically starts the sliding animation.
 $(function() {
     $("#slider").slidesjs({
         width: window.innerWidth,
@@ -106,20 +133,12 @@ $(function() {
                     },
         play: {
                   active: false,
-                    // [boolean] Generate the play and stop buttons.
-                    // You cannot use your own buttons. Sorry.
                   effect: "slide",
-                    // [string] Can be either "slide" or "fade".
-                  interval: 10000,
-                    // [number] Time spent on each slide in milliseconds.
-                  auto: true,
-                    // [boolean] Start playing the slideshow on load.
+                  interval: 15000,
+                  auto: true, // automatically start the slide show
                   swap: false,
-                    // [boolean] show/hide stop and play buttons
                   pauseOnHover: false,
-                    // [boolean] pause a playing slideshow on hover
                   restartDelay: 0
-                    // [number] restart delay on inactive slideshow
               }
     });
 });

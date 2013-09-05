@@ -31,6 +31,20 @@
 <div id="edit_readonly_display_dialog">
     <div style="width:800px">
         <div id="erd_your_widgets">
+            {% comment %}
+                This <div> holds the user's widgets and does not need to update while the window is open,
+                hence it's loaded in the template to simplify html generation and cut the unnecessary
+                network traffic that a dynamically-loaded list of widgets would create.
+
+                There are essentially two sections: widgets which belong to a product and widgets that don't.
+
+                There's potentially a rendering bug in the code as a result of the many-to-many relationship
+                between products and jobs. A job can belong to multiple products, but the logic for manipulating
+                widgets with this window wasn't *designed* with this in consideration. I've run out of time to
+                investigate and test this, but it's something to look out for. Try adding and removing a job
+                which belongs to multiple products to the public display and check that the resulting behavior
+                makes sense.
+            {% endcomment %}
             <h3>Your Widgets</h3>
             {% for product in product_widgets %}
                 {% if product.jobs %}
@@ -80,6 +94,15 @@
     </div>
     <script>
     $(".erdu_primary_btn").on("click", function() {
+        /*
+            This function handles the client-server communication to update the public display status of the widget
+            If the widget is not on the public display it includes the appletv and appletv_active values in the POST
+            request, otherwise it omits them. The save_widget function only cares if those values exist in the
+            request data because of the way <form>s work.
+
+            After it updates the widget on the server in refreshes the list of display widgets in this window
+            and the BVD display behind the window.
+        */
         var widget_id = $(this).children().eq(0).html();
         if($(this).hasClass('erdu_show')) {
             $(this).removeClass('erdu_show');
@@ -94,6 +117,7 @@
                     'appletv': 'True',
                     'appletv_active': 'True'
                 }, function() {
+                    // Once the request is done, update the display widgets and the BVD display.
                     update_erdd();
                     new Poll().ajax('/pull/pull_jobs/');
                 });
@@ -108,12 +132,14 @@
                     'widget_id': widget_id,
                     'entity_active': 'True',
                 }, function() {
+                    // Once the request is done, update the display widgets and the BVD display.
                     update_erdd();
                     new Poll().ajax('/pull/pull_jobs/');
                 });
         }
     });
     $(function() {
+        // Load the list of display widgets when the window's document is ready.
         update_erdd();
     });
     </script>

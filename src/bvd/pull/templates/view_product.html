@@ -68,6 +68,7 @@
 
 <script>
     var update = function() {
+        // Another clone of Poll.ajax(), this time for the individual product jobs pull.
         BVD.utils.do_ajax('GET', '/pull/pull_jobs_for_product', { productname: "{{ productname }}" }, function(data) {
             data = eval(data);
             BVD.utils.remove_old_widgets();
@@ -82,6 +83,7 @@
         document.location.href = '/';
     });
     $("#edit_product").button().click(function() {
+        // We need a new modal creator for the different edit product button.
     var id = 'edit_product_modal';
     var $modal;
     var opts = {
