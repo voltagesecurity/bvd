@@ -33,7 +33,7 @@ Insallation Requirements
 3) SqlLite-3 (Required)
 
 
-Automated Installation
+Automated Dev Installation
 ======================
 
 1) Install fabric, via easy_install: ex: 
@@ -74,17 +74,25 @@ Configuring Apache and Setting Up Production
     
     where {{ path_to_bvd }} is the location of the installation of BVD
 
-4) Restart Apache
+4) SSL
+    
+    If you're using SSL, copy your .crt and .key to src/certs/ and edit src/config/bvd.conf to match
+    
+    If you're not using SSL, remove the lines regarding SSL from src/config/bvd.conf
+
+5) Restart Apache
 
     $ sudo apachectl -k restart
 
-5) To Automatically load BVD at login on OS X run
+6) To Automatically load BVD at login on OS X run
 
     $ fab configure_automatic_start_on_login_osx
 
-6) [optional] Test that the login script works with
+7) [optional] Test that the login script works with
 
     $ launchctl start com.user.loginscript
+
+8) If you have a database error, make sure that bvd.db is writable by apache.
 
 Automated Installation Explanation
 ==================================
@@ -93,7 +101,7 @@ The automated install script will download and install all required libraries vi
 
     $ pip install --user -r requirements.txt
 
-which will store all required libraries at the user level, and not the system leve, thereby not needing sudo access
+which will store all required libraries at the user level, and not the system level, thereby not needing sudo access
 
 the script then runs the following command
 
